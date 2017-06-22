@@ -1,38 +1,46 @@
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
 
-/*Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Temp";*/
-
+Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Temp";
 
 %Macro Import(Filename,Dsn);
 /**********************************************************************
 *   PRODUCT:   SAS
 *   VERSION:   9.4
 *   CREATOR:   External File Interface
-*   DATE:      21JUN17
+*   DATE:      22JUN17
 *   DESC:      Generated SAS Datastep Code
 *   TEMPLATE SOURCE:  (None Specified.)
 ***********************************************************************/
-   data WORK.&Dsn    ;
+Data WORK.&Dsn    ;
    %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-   infile "&Filename" Delimiter = ',' MISSOVER DSD Lrecl=32767 Firstobs=2 Termstr=CRLF;
-      informat Name $262. ;
-      informat Occurrence $4. ;
-      informat XPath $58. ;
+   infile "&Filename" delimiter = ',' Termstr=CRLF
+MISSOVER DSD lrecl=32767 firstobs=2 ;
+      informat XPath $100. ;
+      informat Name $14. ;
+      informat ConstraintID $2. ;
+      informat MinOccurs best32. ;
+      informat MaxOccurs $9. ;
+      informat Data_type $26. ;
+      informat Length $1. ;
+      informat MinLength $ 250. ;
+      informat MaxLength $ 250. ;
+      informat Pattern $20. ;
+      informat Code_Name $25. ;
       informat EnhancedDefinition $1024. ;
-      informat Class $49. ;
-      informat Codes $6. ;
-      informat Pattern $12. ;
-      informat TotalDigits $1. ;
-      informat FractionDigits $1. ;
-      format Name $262. ;
-      format Occurrence $4. ;
-      format XPath $58. ;
+      informat XMLTag $4. ;
+      format XPath $100. ;
+      format Name $14. ;
+      format ConstraintID $2. ;
+      format MinOccurs best12. ;
+      format MaxOccurs $9. ;
+      format Data_type $26. ;
+      format Length $1. ;
+      format MinLength $ 250. ;
+      format MaxLength $ 250. ;
+      format Pattern $20. ;
+      format Code_Name $25. ;
       format EnhancedDefinition $1024. ;
-      format Class $49. ;
-      format Codes $6. ;
-      format Pattern $12. ;
-      format TotalDigits $1. ;
-      format FractionDigits $1. ;
+      format XMLTag $4. ;
 
 	  input @;
 
@@ -42,41 +50,32 @@ Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
 	  End;
 
    input
-               Name $
-               Occurrence $
                XPath $
-               EnhancedDefinition $
-               Class $
-               Codes $
+               Name $
+               ConstraintID $
+               MinOccurs
+               MaxOccurs $
+               Data_type $
+               Length $
+               MinLength
+               MaxLength
                Pattern $
-               TotalDigits $
-               FractionDigits $
+               Code_Name $
+               EnhancedDefinition $
+               XMLTag $
    ;
    if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
    run;
 
-
-Data OBData.&Dsn(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy));
-	Length Table $ 16 Pattern Hierarchy Hierarchy1 &Dsn._Lev1 Position Want $ 250;
+Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/;
+	Length Table $ 16 Pattern Hierarchy ATM_Lev1 $ 250;
 	Set Work.&Dsn;
 	If XPath NE '';
 	Table = "&Dsn";
-	NewPath = Compress('D'||Scan(XPath,2,'/D'));
-	Hierarchy = Trim(Left(Tranwrd(Trim(Left(Substr(XPath, index(XPath, '/D') + 1))),'/','-'))); 
 
-	Position = Scan(Hierarchy,2,'-');
-	want = substr(Hierarchy,1,length(Hierarchy)-indexc(reverse(trim(Hierarchy)),'-'));
+	Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),16),'/','-');
 
-	If Trim(Left(Name)) EQ 'Data' Then
-	Do;
-		Hierarchy1 = Trim(Left(Name));
-	End;
-	If Trim(Left(Name)) NE 'Data' Then
-	Do;
-		Hierarchy1 = Trim(Left(Want))||'-'||Trim(Left(Name));
-	End;
-
-	&Dsn._Lev1 = Hierarchy1;
+	ATM_Lev1 = Hierarchy;
 Run;
 
 Proc Sort Data = OBData.&Dsn;
@@ -84,10 +83,7 @@ Proc Sort Data = OBData.&Dsn;
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\OBPaySet.csv,OBPaySet);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\OBPaySetResponse.csv,OBPaySetResponse);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\OBPaySub.csv,OBPaySub);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\OBPaySubResponse.csv,OBPaySubResponse);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\UML\atml_001_001_01DD.csv,ATM);
 
 
 /*
@@ -441,7 +437,7 @@ Run;
 		enum1 - enum33
 		Hierarchy1
 		Table)*/   OBData.X;
-		Length Table $ 16 Hierarchy1 $ 250;
+		Length Table $ 16 Hierarchy1 Swagger_Lev1 $ 250;
 		Set Work.Schema_Columns
 			Work.Unique_Columns&i;
 
@@ -449,7 +445,7 @@ Run;
 
 /*		If Hierarchy EQ '' then Delete;*/
 
-		Hierarchy1 = Trim(Left(Substr(Hierarchy, index(Hierarchy, '-D') + 1)));
+/*		Hierarchy1 = Trim(Left(Substr(Hierarchy, index(Hierarchy, '-D') + 1)));*/
 		Table  = 'Swagger_Sch';
 	Run;
 
@@ -458,7 +454,7 @@ Run;
 
 
 	Proc Sort Data = Work.Schema_Columns
-		Out = OBData.&API_SCH(Drop = Hierarchy Rename=(Hierarchy1 = Hierarchy));
+		Out = OBData.&API_SCH/*(Drop = Hierarchy Rename=(Hierarchy1 = Hierarchy))*/;
 		By Hierarchy1;
 	Run;
 
@@ -471,48 +467,34 @@ Run;
 
 
 %Mend Schema;
-%Schema(http://localhost/sasweb/data/temp/payment_initiation_swagger.json,Test,Swagger_SCH);
+%Schema(http://localhost/sasweb/data/temp/json/atm.json,ATM,Swagger_SCH);
 
-Data OBData.Compare(Keep = Hierarchy Table MinLength MaxLength type Class
-	OBPaySet_Lev1
-	OBPaySetResponse_Lev1
-	OBPaySub_Lev1
-	OBPaySubResponse_Lev1 
+Data OBData.Compare/*(Keep = Hierarchy Table MinLength MaxLength type Class
+	ATM_Lev1
 	ClassLength EnhancedDefinition Description Desc_Flag UML_MaxLength UML_MinLength
-	Min_Length_Flag Max_Length_Flag);
+	Min_Length_Flag Max_Length_Flag)*/;
 
 	Length Table $ 16
-	Hierarchy 
-	OBPaySet_Lev1
-	OBPaySetResponse_Lev1
-	OBPaySub_Lev1
-	OBPaySubResponse_Lev1 
+	Infile $ 4
+	Hierarchy $ 250
+	Swagger_Lev1 $ 250
+	ATM_Lev1 $ 250
 	Description $ 1024
 	EnhancedDefinition $ 1024
 	Desc_Flag $ 8
 	XPath $ 100 
-	Codes $ 30 
-	NewPath $ 70;
+	Codes $ 30;
 
 	Merge OBData.Swagger_Sch(In=a)
-	OBData.OBPaySet(In=b)
-	OBData.OBPaySub(In=d)
-	OBData.OBPaySetResponse(In=c)
-	OBData.OBPaySubResponse(In=e);
+	OBdata.ATM(In=b);
+
+	If a and b then Infile = 'Both';
+	If a and not b then Infile = 'Swag';
+	If b and not a then Infile = 'ATM';
 
 	By Hierarchy;
 
-	If maxLength ~= '' Then
-	Do;
-		ClassLength = Length(Class);
-	End;
-
-/*
-	If a and b then Infile = 'a and b';
-	If a and c then Infile = 'a and c';
-	If a and d then Infile = 'a and d';
-	If a and e then Infile = 'a and e';
-*/
+	Swagger_Lev1 = Hierarchy;
 
 *--- Find mismatches between EhancedDefinition and Description variables ---;
 If Trim(Left(EnhancedDefinition)) NE Trim(Left(Description)) then 
@@ -522,7 +504,7 @@ If Trim(Left(EnhancedDefinition)) NE Trim(Left(Description)) then
 	Else Do;
 		Desc_Flag = 'Match';
 	End;
-
+/*
 *--- Compare the length values of the Class and MinLength/MacLength variablesv ---;
 If Substr(Class,1,3) in ('Min','Max') Then
 Do;
@@ -554,12 +536,12 @@ Do;
 		Min_Length_Flag = 'Match';
 	End;
 End;
-
+*/
 Run;
 
 
 
-Proc Sort Data = OBData.Compare NoDupKey;
+Proc Sort Data = OBData.Compare;
 	By Hierarchy;
 Run;
 
@@ -643,17 +625,17 @@ Run;
 %Mend Fdate;
 %Fdate(worddate12., datetime.);
 
-
+/*
 ODS _All_ Close;
 ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
-
+*/
 	Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 	Title2 "Comparison of UML and JSON File Structures - %Sysfunc(UPCASE(&Fdate))";
 
 Proc Print Data = OBData.Compare;
 Run;
 
-%ReturnButton;
+/*%ReturnButton;*/
 
 ODS HTML Close;
 ODS Listing;

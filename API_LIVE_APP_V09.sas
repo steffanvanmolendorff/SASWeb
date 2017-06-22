@@ -3,7 +3,6 @@ Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 
 Data OBData._Null_;
-
 _BankName = "&_BankName";
 _APIName = "&_APIName";
 _VersionNo = "&_VersionNo";
@@ -11,7 +10,6 @@ _VersionNo = "&_VersionNo";
 Call Symput('_BankName',_BankName);
 Call Symput('_APIName',_APIName);
 Call Symput('_VersionNo',_VersionNo);
-
 Run;
 
 %Global SCH_Name;
@@ -22,6 +20,7 @@ Run;
 %Global BankName_C;
 %Global Version_C;
 %Global Sch_Version;
+%Global SysError;
 /*
 %Let _BankName = Barclays;
 %Let _APIName = BCA;
@@ -52,7 +51,10 @@ Run;
 
 
 
+
+
 %Macro Main(GitHub_Path,Github_API,API_Path,Main_API,API_SCH,Version,Bank_Name);
+
 *--- Set X path variable to the default directory ---;
 *X "cd H:\StV\Open Banking\SAS\Data\Temp";
 /*
@@ -90,16 +92,180 @@ Libname OBData "&Path\Perm";
 	%Put Sch_Version = "Sch_Version";
 
 
-*--- Set the SYSTEM Error macro variable to zero ---;
-%Let SYSTEM_ERROR = 0;
-
 *--- Set system options to track comments in the log file ---;
 *Options DMSSYNCHK;
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
 
+*--- Set Title Date in Proc Print ---;
+%Macro Fdate(Fmt,Fmt2);
+   %Global Fdate FdateTime;
+   Data _Null_;
+      Call Symput("Fdate",Left(Put("&Sysdate"d,&Fmt)));
+      Call Symput("FdateTime",Left(Put("&Sysdate"d,&Fmt2)));
+  Run;
+%Mend Fdate;
+
+%Macro ReturnButton();
+Data _Null_;
+		File _Webout;
+
+		Put '<HTML>';
+		Put '<HEAD>';
+		Put '<html xmlns="http://www.w3.org/1999/xhtml">';
+		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+		Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
+		Put '<title>OB TESTING</title>';
+
+		Put '<meta charset="utf-8" />';
+		Put '<title>Open Data Test Harness</title>';
+		Put '<meta name="description" content="">';
+		Put '<meta name="author" content="">';
+
+		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
+
+		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+		Put '<title>LRM</title>';
+
+		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '</script>';
+
+		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+
+		Put '</HEAD>';
+		Put '<BODY>';
+
+
+		Put '<p></p>';
+		Put '<HR>';
+		Put '<p></p>';
+
+		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_WebUser VALUE="vamola@mac.com">';
+	    Put '<INPUT TYPE=hidden NAME=_WebPass VALUE="Test">';
+		Put '</Form>';
+		Put '</td>';
+		Put '</tr>';
+		Put '</Table>';
+
+		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
+		Put '<td valign="top" style="background-color: White; color: black">';
+		Put '<H3>All Rights Reserved</H3>';
+		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
+		Put '</td>';
+		Put '</Table>';
+
+		Put '</BODY>';
+		Put '<HTML>';
+		
+Run;
+%Mend ReturnButton;
+
+%Macro Sys_Errors(Bank, API);
+
+*--- Set Output Delivery Parameters  ---;
+			ODS _All_ Close;
+/*
+			ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
+				Contents="&Bank._&API._Contents.html" 
+				Frame="&Bank._&API._Frame.html" 
+				Style=HTMLBlue;
+*/
+	  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
+
+			Data Work.System_Error;
+
+			Length ERROR_DESC $ 100;
+
+				ERROR_DESC = '';
+				Output;
+				ERROR_DESC = "There are crytical system Errors in the execution of the program.";
+				Output;
+				ERROR_DESC = '';
+				Output;
+				ERROR_DESC = "*** Error Code: &SYSERR ***";
+				Output;
+				ERROR_DESC = '';
+				Output;
+				ERROR_DESC = "*** Error Description: &syserrortext ***";
+				Output;
+				ERROR_DESC = '';
+				Output;
+				ERROR_DESC = 'Please contact the System Administrator - Steffan van Molendorff.';
+				Output;
+				ERROR_DESC = '';
+				Output;
+				ERROR_DESC = 'Steffan van Molendorff - Open Banking Limited';
+				Output;
+				ERROR_DESC = '';
+				Output;
+				ERROR_DESC = 'Email: steffan.vanmolendorff@openbanking.org.uk';
+				Output;
+				ERROR_DESC = '';
+				Output;
+				ERROR_DESC = 'UK Mobile: +44 749 7002 765';
+				Output;
+				ERROR_DESC = '';
+				Output;
+			Run;
+
+			Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
+			Title2 "%Sysfunc(UPCASE(&Bank)) %Sysfunc(UPCASE(&API)) API HAS DATA VALIDATION ERRORS - %Sysfunc(UPCASE(&Fdate))";
+
+			Proc Report Data =  Work.System_Error nowd
+				style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+				style(header)=[background=lightskyblue foreground=black] 
+				style(column)=[background=lightcyan foreground=black];
+
+				Columns ERROR_DESC;
+
+				Define ERROR_DESC / display 'System Execution Error' left;
+
+				Compute ERROR_DESC;
+				If ERROR_DESC NE '' then 
+					Do;
+						call define(_col_,'style',"style=[foreground=Red background=pink font_weight=bold]");
+					End;
+				Endcomp;
+
+			Run;
+*--- Add bottom of report Menu ReturnButton code here ---;
+			%ReturnButton();
+
+*--- Close Output Delivery Parameters  ---;
+		ODS HTML Close;
+		ODS Listing;	
+%Mend Sys_Errors;
+
 
 *--- The Main macro will execute the code to extract data from the API end points ---;
 %Macro Schema(Url,JSON,API_SCH);
+
+/* create a macro to use at end of data and proc steps. */
+%Macro Runquit; 
+; Run; Quit;
+%If %Eval(&SysErr. > 4) %Then
+%Do;
+	%Sys_Errors(&_BankName, &_APIName);
+%End;
+%Mend Runquit;
 
 *--- Set a temporary file name to extract the content of the Schema JSON file into ---;
 Filename API Temp;
@@ -109,31 +275,25 @@ Proc HTTP
 	Url = "&Url."
  	Method = "GET" Verbose
  	Out = API;
-Run;
- 
+%Runquit;
+
 *--- The JSON engine will extract the data from the JSON script ---; 
 Libname LibAPIs JSON Fileref=API;
 
 *--- Proc datasets will create the datasets to examine resulting tables and structures ---;
 Proc Datasets Lib = LibAPIs; 
-Quit;
-
-*--- Capture any error codes at this point, specifically if the Schema file did no load ---;
-%If &SYSERR > 0 %Then
-%Do;
-	%Let SYSTEM_ERROR = &SYSERR;
-%End;
+%Runquit;
 
 *--- Create the Bank Schema dataset ---;
 Data Work.&JSON;
 	Set LibAPIs.Alldata(Where=(V NE 0));
-Run;
+%Runquit;
 
 *--- Sort the Bank Schema file ---;
 Proc Sort Data = Work.&JSON
 	Out = Work.H_Num;
 	By Descending P;
-Run;
+%Runquit;
 
 Data Work._Null_;
 *--- The variable V contains the first level of the Hierarchy which has no Bank information ---;
@@ -439,6 +599,16 @@ Run;
 *--- The Main macro will execute the code to extract data from the API end points ---;
 %Macro API(Url,Bank,API);
 
+/* create a macro to use at end of data and proc steps. */
+%Macro Runquit; 
+; Run; Quit;
+%If %Eval(&SysErr. > 4) %Then
+%Do;
+	%Sys_Errors(&Bank, &API);
+%End;
+%Mend Runquit;
+
+
 Filename API Temp;
  
 *--- Proc HTTP assigns the GET method in the URL to access the data ---;
@@ -446,23 +616,18 @@ Proc HTTP
 	Url = "&Url."
  	Method = "GET"
  	Out = API;
-Run;
- 
+%Runquit;
+
 *--- The JSON engine will extract the data from the JSON script ---; 
 Libname LibAPIs JSON Fileref=API;
 
 *--- Proc datasets will create the datasets to examine resulting tables and structures ---;
 Proc Datasets Lib = LibAPIs; 
-Quit;
-
-%If &SYSERR > 0 %Then
-%Do;
-	%Let SYSTEM_ERROR = &SYSERR;
-%End;
+%Runquit;
 
 Data Work.&Bank._API;
 	Set LibAPIs.Alldata;
-Run;
+%Runquit;
 
 *--- Sort the Bank Schema file ---;
 Proc Sort Data = Work.&Bank._API
@@ -1329,14 +1494,6 @@ Proc Sort Data = OBData.Stats;
 	By Descending Date_Time;
 Run;
 
-*--- Set Title Date in Proc Print ---;
-%Macro Fdate(Fmt,Fmt2);
-   %Global Fdate FdateTime;
-   Data _Null_;
-      Call Symput("Fdate",Left(Put("&Sysdate"d,&Fmt)));
-      Call Symput("FdateTime",Left(Put("&Sysdate"d,&Fmt2)));
-  Run;
-%Mend Fdate;
 %Fdate(worddate12., datetime.);
 
 
@@ -1345,171 +1502,9 @@ Run;
 
 
 
-%Macro ReturnButton();
-Data _Null_;
-		File _Webout;
-
-		Put '<HTML>';
-		Put '<HEAD>';
-		Put '<html xmlns="http://www.w3.org/1999/xhtml">';
-		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
-		Put '<title>OB TESTING</title>';
-
-		Put '<meta charset="utf-8" />';
-		Put '<title>Open Data Test Harness</title>';
-		Put '<meta name="description" content="">';
-		Put '<meta name="author" content="">';
-
-		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
-
-		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		Put '<title>LRM</title>';
-
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
-		Put '</script>';
-
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
-
-		Put '</HEAD>';
-		Put '<BODY>';
 
 
-		Put '<p></p>';
-		Put '<HR>';
-		Put '<p></p>';
-
-		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login.sas">';
-		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
-			"&_service"
-			'>';
-	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
-			"&_debug"
-			'>';
-		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
-			"&_WebUser"
-			'>';
-		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
-			"&_WebPass"
-			'>';
-	    Put '<INPUT TYPE=hidden NAME=_WebUser VALUE="vamola@mac.com">';
-	    Put '<INPUT TYPE=hidden NAME=_WebPass VALUE="Test">';
-		Put '</Form>';
-		Put '</td>';
-		Put '</tr>';
-		Put '</Table>';
-
-		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
-		Put '<td valign="top" style="background-color: White; color: black">';
-		Put '<H3>All Rights Reserved</H3>';
-		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
-		Put '</td>';
-		Put '</Table>';
-
-		Put '</BODY>';
-		Put '<HTML>';
-		
-Run;
-%Mend ReturnButton;
-
-
-
-
-%Put SYSTEM_ERROR = &SYSTEM_ERROR;
-
-%If &SYSTEM_ERROR > 0 %Then
-%Do;
-*=================================================================================================
-						CRYTICALL SYSTEM EXECUTION ERROR REPORT
-==================================================================================================;
-	%Macro Sys_Errors(Bank, API);
-
-*--- Set Output Delivery Parameters  ---;
-			ODS _All_ Close;
-/*
-			ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
-				Contents="&Bank._&API._Contents.html" 
-				Frame="&Bank._&API._Frame.html" 
-				Style=HTMLBlue;
-*/
-	  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
-
-			ODS Graphics On;
-
-			%Put SYSTEM_ERROR = &SYSTEM_ERROR;
-
-			Data Work.System_Error;
-
-			Length ERROR_DESC $ 100;
-
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = "There are crytical system Errors in the execution of the program.";
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = "*** Error Code: &SYSTEM_ERROR ***";
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = "*** Error Description: &syserrortext ***";
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = 'Please contact the System Administrator - Steffan van Molendorff.';
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = 'Steffan van Molendorff - Open Banking Limited';
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = 'Email: steffan.vanmolendorff@openbanking.org.uk';
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = 'UK Mobile: +44 749 7002 765';
-				Output;
-				ERROR_DESC = '';
-				Output;
-			Run;
-
-			Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
-			Title2 "%Sysfunc(UPCASE(&Bank)) %Sysfunc(UPCASE(&API)) API HAS DATA VALIDATION ERRORS - %Sysfunc(UPCASE(&Fdate))";
-
-			Proc Report Data =  Work.System_Error nowd
-				style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-				style(header)=[background=lightskyblue foreground=black] 
-				style(column)=[background=lightcyan foreground=black];
-
-				Columns ERROR_DESC;
-
-				Define ERROR_DESC / display 'System Execution Error' left;
-
-				Compute ERROR_DESC;
-				If ERROR_DESC NE '' then 
-					Do;
-						call define(_col_,'style',"style=[foreground=Red background=pink font_weight=bold]");
-					End;
-				Endcomp;
-
-			Run;
-*--- Add bottom of report Menu ReturnButton code here ---;
-			%ReturnButton();
-
-*--- Close Output Delivery Parameters  ---;
-		ODS HTML Close;
-		ODS Listing;	
-	%Mend Sys_Errors;
-	%Sys_Errors(&Bank, &API);
-%End;
-%Else %If &SYSTEM_ERROR = 0 and &NOBS = 0 %Then 
+%If %Eval(&SysErr. > 4) and &NOBS = 0 %Then 
 %Do;
 	%Macro No_Errors(Bank, API);
 *=================================================================================================
@@ -1579,7 +1574,7 @@ Run;
 	%No_Errors(&Bank, &API);
 
 %End;
-%Else %If &SYSTEM_ERROR = 0 and &NOBS > 0 %Then 
+%Else %If %Eval(&SysErr. > 4) and &NOBS > 0 %Then 
 %Do;
 *=================================================================================================
 						LIST OF ERRORS REPORT
@@ -1726,8 +1721,7 @@ Run;
 	%Mend API_Errors;
 	%API_Errors(&Bank, &API);
 %End;
-
-%If &SYSTEM_ERROR = 0 and &NOBS_API = 0 %Then 
+%Else %If %Eval(&SysErr. > 4) and &NOBS_API = 0 %Then 
 %Do;
 *=================================================================================================
 						LIST OF DATA RECORDS ONLY IN BANK API TABLE REPORT
