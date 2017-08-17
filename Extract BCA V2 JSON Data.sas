@@ -1,140 +1,32 @@
-%Macro Main(API_DSN,File);
-
-Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
-
-Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Temp";
-
-%Macro Import(Filename,Dsn);
-/**********************************************************************
-*   PRODUCT:   SAS
-*   VERSION:   9.4
-*   CREATOR:   External File Interface
-*   DATE:      22JUN17
-*   DESC:      Generated SAS Datastep Code
-*   TEMPLATE SOURCE:  (None Specified.)
-***********************************************************************/
-Data WORK.&Dsn    ;
-   %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-   infile "&Filename" delimiter = ',' Termstr=CRLF
-MISSOVER DSD lrecl=32767 firstobs=2 ;
-      informat XPath $100. ;
-      informat Name $14. ;
-      informat ConstraintID $2. ;
-      informat MinOccurs best32. ;
-      informat MaxOccurs $9. ;
-      informat Data_type $26. ;
-      informat Length $1. ;
-      informat MinLength $ 250. ;
-      informat MaxLength $ 250. ;
-      informat Pattern $20. ;
-      informat Code_Name $25. ;
-      informat EnhancedDefinition $1024. ;
-      informat XMLTag $4. ;
-      format XPath $100. ;
-      format Name $14. ;
-      format ConstraintID $2. ;
-      format MinOccurs best12. ;
-      format MaxOccurs $9. ;
-      format Data_type $26. ;
-      format Length $1. ;
-      format MinLength $ 250. ;
-      format MaxLength $ 250. ;
-      format Pattern $20. ;
-      format Code_Name $25. ;
-      format EnhancedDefinition $1024. ;
-      format XMLTag $4. ;
-
-	  input @;
-
-	  If Substr(Xpath,1,1) EQ '"' then
-	  Do;
-			_Infile_ = Tranwrd(_Infile_,',','');
-	  End;
-
-   input
-               XPath $
-               Name $
-               ConstraintID $
-               MinOccurs
-               MaxOccurs $
-               Data_type $
-               Length $
-               MinLength
-               MaxLength
-               Pattern $
-               Code_Name $
-               EnhancedDefinition $
-               XMLTag $
-   ;
-   if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
-   run;
-
-Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/;
-	Length Pattern Hierarchy &API_DSN._Lev1 $ 250;
-	Set Work.&Dsn;
-
-	If XPath NE '';
-
-	If "&Dsn" EQ 'ATM' Then 
-	Do;
-		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),16),'/','-');
-	End;
-
-	If "&Dsn" EQ 'BRA' Then 
-	Do;
-		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),19),'/','-');
-	End;
-
-	&API_DSN._Lev1 = Hierarchy;
-Run;
-
-Proc Sort Data = OBData.&Dsn;
-	By Hierarchy;
-Run;
-
-%Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\UML\&API_DSN.l_001_001_01DD.csv,&API_DSN);
-/*%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\UML\bral_001_001_01DD.csv,BCH);*/
 
 
-/*
-*====================================================================================================
-=								API EXTRACT															=
-=====================================================================================================;
-*--- The Main macro will execute the code to extract data from the API end points ---;
-%Macro API(Url,Bank,API);
+%Macro Main(GitHub_Path,Version,Bank_Name);
+*--- Set X path variable to the default directory ---;
+*X "cd H:\StV\Open Banking\SAS\Data\Temp";
 
-Filename API Temp;
- 
-*--- Proc HTTP assigns the GET method in the URL to access the data ---;
-Proc HTTP
-	Url = "&Url."
- 	Method = "GET"
- 	Out = API;
-Run;
- 
-*--- The JSON engine will extract the data from the JSON script ---; 
-Libname LibAPIs JSON Fileref=API;
+%Let Path = C:\inetpub\wwwroot\sasweb\Data;
+*--- Change directory to default location on PC to save data extracted from Google API ---;
+X "CD &Path\Temp";
 
-*--- Proc datasets will create the datasets to examine resulting tables and structures ---;
-Proc Datasets Lib = LibAPIs; 
-Quit;
+*--- Set the Library path where the permanent datasets will be saved ---;
+Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 
+*--- Assign Global Macro variable to use in all Macros in the various code sections ---;
+%Global H_Num;
+%Global No_Obs;
+%Global API;
 
-Data Work.&Bank._API;
-	Set LibAPIs.Alldata;
-Run;
-%Mend API;
-%API(http://localhost/sasweb/data/temp/payment_initiation_swagger.json,Test,PIS);
-*/
-
-
+*--- Set the SYSTEM Error macro variable to zero ---;
+%Let SYSTEM_ERROR = 0;
 
 *--- Set system options to track comments in the log file ---;
 *Options DMSSYNCHK;
+Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
+
 
 *--- The Main macro will execute the code to extract data from the API end points ---;
 %Macro Schema(Url,JSON,API_SCH);
+
 *--- Set a temporary file name to extract the content of the Schema JSON file into ---;
 Filename API Temp;
  
@@ -180,7 +72,7 @@ Run;
 Data Work.&JSON
 	(Rename=(Var3 = Data_Element Var2 = Hierarchy));
 
-	Length Bank_API $ 8 Var2 $ 250 Var3 $ 250 P1 - P&H_Num $ 250 Value $ 1024;
+	Length Bank_API $ 8 Var2 $ 250 Var3 $ 250 P1 - P&H_Num $ 250 ;
 
 	RowCnt = _N_;
 
@@ -303,7 +195,7 @@ Data Work.&JSON;
 
 	By Hierarchy;
 
-	Length Columns $ 30 Value $ 1024;
+	Length Columns $ 30;
 
 	If Attribute = 'required' then 
 	Do;
@@ -387,7 +279,7 @@ Data Work.&JSON._2;
 	By HierCnt Counter;
 
 		Call Symput(Compress('Variable_Name'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Trim(Left(Columns)));
-		Call Symput(Compress('Variable_Value'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Trim(Left(Value)));
+		Call Symput(Compress('Variable_Value'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Tranwrd(Trim(Left(Value)),'"',''));
 
 	If Last.HierCnt and Last.Counter then
 	Do;
@@ -407,7 +299,7 @@ Run;
 %Put _ALL_;
 
 	Data Work.Schema_Columns;
-		Length Hierarchy $ 250  Description $ 1024;
+		Length Hierarchy $ 250;
 	Run;
 
 %Do i = 1 %To %Eval(&HierCnt);
@@ -415,17 +307,19 @@ Run;
 	%Put i = &i;
 
 	Data Work.Unique_Columns&i;
-		Length Hierarchy $ 250  Description $ 1024;
 		Set Work.&JSON._2(Where=(HierCnt = &i));
 		By HierCnt Counter;
 
 		If Last.HierCnt and Last.Counter;
 
-			%Do j = 1 %To %Eval(&&Test_&i);
+		%Let Cnt = %Eval(&&Test_&HierCnt);
+
+			%Do j = 1 %To &Cnt;
 				%Put j = &j;
 				Length &&Variable_Name_&i._&j  $ 250;
 
-				%Let Varname = &&Variable_Name_&i._&j.;
+				%Let Varname = %Sysfunc(Translate(&&Variable_Name_&i._&j.,' ','_'));
+
 				&Varname = "&&Variable_Value_&i._&j.";
 			%End;
 	Run;
@@ -445,116 +339,25 @@ Run;
 		pattern
 		minItems
 		Flag
-		enum1 - enum33
-		Hierarchy1
-		Table)*/;
-/*		Length Table $ 16 Hierarchy1 Swagger_Lev1 $ 250;*/
+		enum1 - enum33)*/;
 		Set Work.Schema_Columns
 			Work.Unique_Columns&i;
 
-/*			Hierarchy = (Tranwrd(Trim(Left(Hierarchy)),'items-',''));*/
+			Hierarchy = (Tranwrd(Trim(Left(Hierarchy)),'items-',''));
 
 /*		If Hierarchy EQ '' then Delete;*/
-
-/*		Hierarchy1 = Trim(Left(Substr(Hierarchy, index(Hierarchy, '-D') + 1)));*/
-/*		Table  = 'Swagger_Sch';*/
 	Run;
 
+	Proc Sort Data = Work.Schema_Columns
+		Out = OBData.Schema_Output;
+		By Hierarchy;
+	Run;
 
 %End;
 
 
-	Proc Sort Data = Work.Schema_Columns
-		Out = OBData.&API_SCH/*(Drop = Hierarchy Rename=(Hierarchy1 = Hierarchy))*/;
-		By Hierarchy;
-	Run;
-
-
 %Mend VarVal;
 %VarVal();
-
-
-
-
-
-
-Data OBData.Compare_&API_DSN/*(Keep = Hierarchy Table MinLength MaxLength Type Class
-	&API_DSN._Lev1
-	EnhancedDefinition Description Desc_Flag &API_DSN._MaxLength &API_DSN._MinLength
-	Min_Length_Flag Max_Length_Flag)*/;
-
-	Length Infile $ 4
-	Hierarchy $ 250
-	Swagger_Lev1 $ 250
-	&API_DSN._Lev1 $ 250
-	Description $ 1024
-	EnhancedDefinition $ 1024
-	Desc_Flag $ 8
-	XPath $ 100 
-	Codes $ 30;
-
-	Merge OBData.Swagger_&API_DSN(In=a)
-	OBdata.&API_DSN(In=b);
-
-	By Hierarchy;
-
-	If a and b then Infile = 'Both';
-	If a and not b then Infile = 'Swag';
-	If b and not a then Infile = 'ATM';
-
-	Swagger_Lev1 = Hierarchy;
-
-*--- Find mismatches between EhancedDefinition and Description variables ---;
-If Trim(Left(EnhancedDefinition)) NE Trim(Left(Description)) then 
-	Do;
-		Desc_Flag = 'Mismatch';
-	End;
-	Else Do;
-		Desc_Flag = 'Match';
-	End;
-/*
-*--- Compare the length values of the Class and MinLength/MacLength variablesv ---;
-If Substr(Class,1,3) in ('Min','Max') Then
-Do;
-
-	If Substr(Class,1,3) EQ "Min" Then
-	Do;
-		UML_MinLength = Scan(Substr(Trim(Left(Class)),4),1,'Min');
-		UML_MaxLength = Scan(Substr(Reverse(Trim(Left(Class))),5),1,'xaM');
-	End;
-	If Substr(Class,1,3) EQ "Max" Then
-	Do;
-		UML_MaxLength = Reverse(Substr(Reverse(Substr(Trim(Left(Class)),4)),5));
-		UML_MinLength = '0';
-	End;
-
-	If MaxLength NE UML_MaxLength Then
-	Do;
-		Max_Length_Flag = 'Mismatch';
-	End;
-	Else Do;
-		Max_Length_Flag = 'Match';
-	End;
-
-	If MinLength NE UML_MinLength Then
-	Do;
-		Min_Length_Flag = 'Mismatch';
-	End;
-	Else Do;
-		Min_Length_Flag = 'Match';
-	End;
-End;
-*/
-Run;
-
-
-
-Proc Sort Data = OBData.Compare_&API_DSN;
-	By Hierarchy;
-Run;
-
-%Mend Schema;
-%Schema(http://localhost/sasweb/data/temp/json/&File..json,&API_DSN,Swagger_&API_DSN);
 
 %Macro ReturnButton();
 Data _Null_;
@@ -585,6 +388,7 @@ Data _Null_;
 		Put '</HEAD>';
 		Put '<BODY>';
 
+
 		Put '<p></p>';
 		Put '<HR>';
 		Put '<p></p>';
@@ -608,6 +412,8 @@ Data _Null_;
 		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
 			"&_WebPass"
 			'>';
+	    Put '<INPUT TYPE=hidden NAME=_WebUser VALUE="vamola@mac.com">';
+	    Put '<INPUT TYPE=hidden NAME=_WebPass VALUE="Test">';
 		Put '</Form>';
 		Put '</td>';
 		Put '</tr>';
@@ -626,31 +432,110 @@ Data _Null_;
 Run;
 %Mend ReturnButton;
 
-*--- Set Title Date in Proc Print ---;
-%Macro Fdate(Fmt,Fmt2);
-   %Global Fdate FdateTime;
-   Data _Null_;
-      Call Symput("Fdate",Left(Put("&Sysdate"d,&Fmt)));
-      Call Symput("FdateTime",Left(Put("&Sysdate"d,&Fmt2)));
-  Run;
-%Mend Fdate;
-%Fdate(worddate12., datetime.);
 
+*--- The Header Macro inserts the OB Test Application Banner on top of the web reports ---;
+%Macro Header();
 
-ODS _All_ Close;
-ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
+Data _Null_;
+		File _Webout;
 
-	Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
-	Title2 "Comparison of %Sysfunc(UPCASE(&File)) UML and JSON File Structures - %Sysfunc(UPCASE(&Fdate))";
+Put '<HTML>';
+Put '<HEAD>';
+Put '<TITLE>OB TESTING</TITLE>';
+Put '</HEAD>';
 
-Proc Print Data = OBData.Compare_&API_DSN(Where=(Desc_Flag EQ 'Mismatch'));
+Put '<BODY>';
+
+Put '<table style="width: 100%; height: 5%" border="0">';
+   Put '<tr>';
+      Put '<td valign="top" style="background-color: lightblue; color: orange">';
+	Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cant find image" style="width:100%;height:8%px;">';
+      Put '</td>';
+   Put '</tr>';
+Put '</table>';
+Put '</BODY>';
+
+		Put '<p><br></p>';
+
+Put '</HTML>';
+
 Run;
+%Mend Header;
 
-%ReturnButton;
 
-ODS HTML Close;
-ODS Listing;
+
+%Macro No_Errors(Bank_Name, Version);
+*=================================================================================================
+						NO ERROR REPORT
+==================================================================================================;
+
+/*%Header();*/
+
+*--- Set Output Delivery Parameters  ---;
+		ODS _All_ Close;
+/*
+		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
+			Contents="&Bank._&API._Contents.html" 
+			Frame="&Bank._&API._Frame.html" 
+			Style=HTMLBlue;
+*/
+  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
+
+		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
+		Title2 "%Sysfunc(UPCASE(&Bank_Name)) %Sysfunc(UPCASE(&Version)) SCHEMA DATA REPORT - %Sysfunc(UPCASE(&Fdate))";
+
+		Proc Print Data =  OBData.Schema_Output;
+		Run;
+
+*--- Add bottom of report Menu ReturnButton code here ---;
+			%ReturnButton();
+
+			*--- Close Output Delivery Parameters  ---;
+		ODS HTML Close;
+		ODS Listing;	
+
+	%Mend No_Errors;
+	%No_Errors(&Bank_Name, &Version);
+
+
+%Mend Schema;
+%Schema(&GitHub_Path,&Version,&Bank_Name);
 
 %Mend Main;
-%Main(ATM,ATM);
-%Main(BRA,branch);
+
+*====================================================================================
+*				MACRO HEADER
+*%Macro Main(GitHub_Path,Github_API,API_Path,Main_API,Version,Bank_Name);
+*====================================================================================;
+*--- COMMERCIAL-CREDIT-CARDS ---;
+%Main(http://localhost/sasweb/Data/Temp/JSON/business_current_account.json,
+V2,
+Sch_v2);
+
+
+/*
+%Main(&SCH_Link,
+&SCH_Name,
+&API_Link,
+&API_Name,
+&Perm_Sch_Table,
+&Version_C,
+&BankName_C);
+
+
+%API(https://openapi.bankofireland.com/open-banking/v1.2/&Path,Bank_of_Ireland,&Main_API);
+%API(https://api.bankofscotland.co.uk/open-banking/v1.2/&Path,Bank_of_Scotland,&Main_API);
+%API(https://atlas.api.barclays/open-banking/v1.3/&Path,Barclays,&Main_API);
+%API(https://obp-api.danskebank.com/open-banking/v1.2/&Path,Danske_Bank,&Main_API);
+%API(https://api.firsttrustbank.co.uk/open-banking/v1.2/&Path,First_Trust_Bank,&Main_API);
+%API(https://api.halifax.co.uk/open-banking/v1.2/&Path,Halifax,&Main_API);
+%API(https://api.hsbc.com/open-banking/v1.2/&Path,HSBC,&Main_API);
+%API(https://api.lloydsbank.com/open-banking/v1.2/&Path,Lloyds_Bank,&Main_API);
+%API(https://openapi.nationwide.co.uk/open-banking/v1.2/&Path,Nationwide,&Main_API);
+%API(https://openapi.natwest.com/open-banking/v1.2/&Path,Natwest,&Main_API);
+%API(https://openapi.rbs.co.uk/open-banking/v1.2/&Path,RBS,&Main_API);
+%API(https://api.santander.co.uk/retail/open-banking/v1.2/&Path,Santander,&Main_API);
+%API(https://openapi.ulsterbank.co.uk/open-banking/v1.2/&Path,Ulster_Bank,&Main_API);
+*/
+
+

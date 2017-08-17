@@ -33,9 +33,8 @@
 Data _Null_;
 		File _Webout;
 
-		Put '<HTML>';
-		Put '<HEAD>';
 		Put '<html xmlns="http://www.w3.org/1999/xhtml">';
+		Put '<head>';
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
 		Put '<title>OB TESTING</title>';
@@ -61,6 +60,8 @@ Data _Null_;
 		Put '<p></p>';
 		Put '<HR>';
 		Put '<p></p>';
+
+		Put '<p><br></p>';
 
 		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
@@ -99,9 +100,87 @@ Data _Null_;
 Run;
 %Mend ReturnButton;
 
+
+%Macro Header();
+
+Data _Null_;
+		File _Webout;
+
+Put '<HTML>';
+Put '<HEAD>';
+Put '<TITLE>OB TESTING</TITLE>';
+Put '</HEAD>';
+
+Put '<BODY>';
+
+Put '<table style="width: 100%; height: 5%" border="0">';
+   Put '<tr>';
+      Put '<td valign="top" style="background-color: lightblue; color: orange">';
+	Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cant find image" style="width:100%;height:8%px;">';
+      Put '</td>';
+   Put '</tr>';
+Put '</table>';
+Put '</BODY>';
+
+		Put '<p><br></p>';
+
+Put '</HTML>';
+
+Run;
+%Mend Header;
+
+*--- Set Title Date in Proc Print ---;
+%Macro Fdate(Fmt);
+   %Global Fdate;
+   Data _Null_;
+      Call Symput("Fdate",Left(Put("&Sysdate"d,&Fmt)));
+   Run;
+%Mend Fdate;
+%Fdate(Worddate.)
+
+%Macro Template;
+Proc Template;
+ define style OBStyle;
+ notes "My Simple Style";
+ class body /
+ backgroundcolor = white
+ color = black
+ fontfamily = "Palatino"
+ ;
+ class systemtitle /
+ fontfamily = "Verdana, Arial"
+ fontsize = 16pt
+ fontweight = bold
+ ;
+ class table /
+ backgroundcolor = #f0f0f0
+ bordercolor = red
+ borderstyle = solid
+ borderwidth = 1pt
+ cellpadding = 5pt
+ cellspacing = 0pt
+ frame = void
+ rules = groups
+ ;
+ class header, footer /
+ backgroundcolor = #c0c0c0
+ fontfamily = "Verdana, Arial"
+ fontweight = bold
+ ;
+ class data /
+ fontfamily = "Palatino"
+ ;
+ end; 
+
+Run;
+%Mend Template
+%Template;
+
 %Macro CMA9_Reports(API);
-*--- Set Output Delivery Parameters  ---;
-ODS _All_ Close;
+
+*--- Assign Library Path ---;
+/*Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";*/
+
 
 /*
 ODS HTML Body="Compare_CMA9_&API..html" 
@@ -110,16 +189,66 @@ ODS HTML Body="Compare_CMA9_&API..html"
 	Style=HTMLBlue;
 */
 
-ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
+/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
-ODS Graphics On;
+/*%Header();*/
 
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+title "Listing of Product Sales"; 
+*--- Set Output Delivery Parameters  ---;
+ODS _All_ Close;
+ods listing close; 
+
+ods tagsets.tableeditor file=_Webout
+    style=styles.OBStyle 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="Yes" 
+            frozen_rowheaders="Yes" 
+            ); 
+
+/*
 *--- Print ATMS Report ---;
 Proc Print Data = OBData.Stats;
 	Title1 "Open Banking";
 	Title2 "Error Report Statistics";
 Run;
+*/
+	
+Proc Report Data = OBData.Stats nowd
+	style(report)=[width=100%]
+	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+	style(header)=[background=lightskyblue foreground=black] 
+	style(column)=[background=lightcyan foreground=black];
 
+	Title1 "OPEN BANKING - STATUS REPORT";
+	Title2 "Statistical Analysis of API/SCHEMA Validations - %Sysfunc(UPCASE(&Fdate))";
+
+
+	Columns Date_Time
+	User_Name
+	Bank_Name
+	API_Name
+	Version_No
+	Fail_Obs
+	Nobs_Api
+	Nobs_Sch
+	API_LInk
+	SCH_Link;
+
+	Define Date_Time/ display 'Date Time' left style(column)=[width=5%];
+	Define User_Name / display 'User Name' left style(column)=[width=5%];
+	Define Bank_Name / display 'Bank Name' left style(column)=[width=5%];
+	Define API_Name / display 'API Name' left style(column)=[width=5%];
+	Define Version_No / display 'Version No' left style(column)=[width=5%];
+	Define Fail_Obs / display 'Failed Obervation No' left style(column)=[width=5%];
+	Define Nobs_Api / display 'API Observations Only' left style(column)=[width=5%];
+	Define Nobs_Sch / display 'SCH Observation Only' left style(column)=[width=5%];
+	Define API_LInk / display 'API End Point Link' left style(column)=[width=5%];
+	Define SCH_Link / display 'Github Schema Link' left style(column)=[width=5%];
+Run;
 
 %ReturnButton();
 
@@ -130,9 +259,6 @@ PROC EXPORT DATA = OPENDATA.CMA9_&API(Drop=Bank_API P Count RowCnt)
      PUTNAMES=YES;
 RUN;
 */
-
-*--- Close Output Delivery Parameters  ---;
-ODS HTML Close;
 
 /*
 ODS CSV File="&Path\CMA9_&API..csv";
@@ -149,8 +275,8 @@ Proc Print Data=OpenData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 Run;
 */
 
-ODS HTML Close;
-ODS Listing;
+ods tagsets.tableeditor close; 
+ods listing; 
 
 %Mend CMA9_Reports;
 *%CMA9_Reports(ATMS);

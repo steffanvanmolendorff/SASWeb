@@ -1,7 +1,9 @@
 %Global _service;
 
+%Macro Login();
 Data _NULL_;
 File _Webout;
+
 
 Put '<HTML>';
 Put '<HEAD>';
@@ -11,14 +13,14 @@ Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
 Put '<title>OB TESTING</title>';
 
 Put '<meta charset="utf-8" />';
-Put '<title>Open Data Test Harness</title>';
+Put '<title>Open Data Test Application</title>';
 Put '<meta name="description" content="">';
 Put '<meta name="author" content="">';
 	
 Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
 	
 Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-Put '<title>LRM</title>';
+Put '<title>OBIE</title>';
 
 Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
 Put '</script>';
@@ -76,11 +78,11 @@ Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login.sas">';
 Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 	"&_service"
 	'>';
+Put '</td>';
 Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
 	"&_debug"
 	'>';
 Put '</td>';
-
 Put '</tr>';
 Put '</table>';
 Put '</FORM>';
@@ -96,3 +98,5 @@ Put '</BODY>';
 Put '<HTML>';
 
 Run;
+%Mend Login;
+%Login();

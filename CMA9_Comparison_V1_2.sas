@@ -1,4 +1,3 @@
-Option Source Source2 MLogic MPrint Symbolgen;
 /*===============================================================================================*
 *																								*
 *	Program Name: CMA9 Product Comparison V1.0													*																							*
@@ -27,16 +26,26 @@ Option Source Source2 MLogic MPrint Symbolgen;
 *	Nex Update:																					*
 *																								*
 *===============================================================================================;*/
+*--- Set Program Options ---;
+/*Option Source Source2 MLogic MPrint Symbolgen;*/
+Options NOERRORABEND;
+
 *--- Set Default Data Library as macro variable ---;
 *--- Alternatively set the Data library in Proc Appsrv ---;
-
-%Let Path = C:\inetpub\wwwroot\sasweb\Data;
+/*
+%Let Path = C:\inetpub\wwwroot\sasweb\Data\Perm;
 
 *--- Set X path variable to the default directory ---;
 X "cd &Path";
 
 *--- Set the Library path where the permanent datasets will be saved ---;
-Libname OpenData "&Path";
+Libname OBData "&Path";
+*/
+
+%Global _action;
+%Global ErrorCode;
+%Global ErrorDesc;
+%Global Datasets;
 
 *--- The Macro Filter executes in the Where statement when the OpenData datasets are created ---;
 %Macro Filter();
@@ -135,26 +144,40 @@ Libname OpenData "&Path";
 
 %Mend Filter;
 
+*=====================================================================================================================================================
+--- Set the ERROR Code macro variables ---
+======================================================================================================================================================;
+%Macro ErrorCheck();
+;Run;Quit;
+%If &SysErr > 0 %Then
+%Do;
+	%Let ErrorCode = &SysErr;
+	%Let ErrorDesc = &SysErrorText;
+%End;
+%Mend ErrorCheck;
+
 
 *--- The Main macro will execute the code to extract data from the API end points ---;
 %Macro Main(Url,Bank,Api);
  
 Filename API Temp;
-/*Filename API "H:\STV\Open Banking\SAS\Temp";*/
- 
+
 *--- Proc HTTP assigns the GET method in the URL to access the data ---;
 Proc HTTP
 	Url = "&Url."
  	Method = "GET"
  	Out = API;
-Run;
+%ErrorCheck;
+
  
 *--- The JSON engine will extract the data from the JSON script ---; 
+Options ERRORCHECK=NORMAL;
 Libname LibAPIs JSON Fileref=API;
+%ErrorCheck;
 
 *--- Proc datasets will create the datasets to examine resulting tables and structures ---;
 Proc Datasets Lib = LibAPIs; 
-Quit;
+%ErrorCheck;
 
 Data Work.&Bank._&API
 	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P7 Value 
@@ -199,40 +222,77 @@ Var3 = Reverse(Scan(Left(Trim(Reverse(Var2))),1,'-',' '));
 		Test = 1; 
 	End;
 
-Run;
+%ErrorCheck;
 
 *--- Sort data by Data_Element ---;
 Proc Sort Data = Work.&Bank._&API;
  By P1 - P7;
-Run;
+%ErrorCheck;
 
 /*Proc Print Data = Work.&Bank._&API;*/
 /**	Where V NE 0;*/
 /*Run;*/
 
 %Mend Main;
-/*
+
+%Macro RunAPI();
+
 *------------------------------------------------------------------------------------------------------
 											ATMS
 -------------------------------------------------------------------------------------------------------;
-
-%Main(https://openapi.bankofireland.com/open-banking/v1.2/atms,Bank_of_Ireland,ATMS);
-%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/atms,Bank_of_Scotland,ATMS);
-%Main(https://atlas.api.barclays/open-banking/v1.3/atms,Barclays,ATMS);
-%Main(https://obp-api.danskebank.com/open-banking/v1.2/atms,Danske_Bank,ATMS);
-%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/atms,First_Trust_Bank,ATMS);
-%Main(https://api.halifax.co.uk/open-banking/v1.2/atms,Halifax,ATMS);
-%Main(https://api.hsbc.com/open-banking/v1.2/atms,HSBC,ATMS);
-%Main(https://api.lloydsbank.com/open-banking/v1.2/atms,Lloyds_Bank,ATMS);
-%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/atms,Nationwide,ATMS);
-%Main(https://openapi.natwest.com/open-banking/v1.2/atms,Natwest,ATMS);
-%Main(https://openapi.rbs.co.uk/open-banking/v1.2/atms,RBS,ATMS);
-%Main(https://api.santander.co.uk/retail/open-banking/v1.2/atms,Santander,ATMS);
-%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.2/atms,Ulster_Bank,ATMS);
+%If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
+%Do;
+	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/atms)) %Then 
+	%Do;
+	%Main(https://openapi.bankofireland.com/open-banking/v1.2/atms,Bank_of_Ireland,ATM);
+	%End;
+	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/atms,Bank_of_Scotland,ATM);
+	%Main(https://atlas.api.barclays/open-banking/v1.3/atms,Barclays,ATM);
+	%Main(https://obp-api.danskebank.com/open-banking/v1.2/atms,Danske_Bank,ATM);
+	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/atms,First_Trust_Bank,ATM);
+	%Main(https://api.halifax.co.uk/open-banking/v1.2/atms,Halifax,ATM);
+	%Main(https://api.hsbc.com/open-banking/v1.2/atms,HSBC,ATM);
+	%Main(https://api.lloydsbank.com/open-banking/v1.2/atms,Lloyds_Bank,ATM);
+	%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/atms,Nationwide,ATM);
+	%Main(https://openapi.natwest.com/open-banking/v1.2/atms,Natwest,ATM);
+	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/atms,RBS,ATM);
+	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/atms,Santander,ATM);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/atms,Ulster_Bank,ATM);
+%End;
 
 *--- Find unique Hierarchy values for ATMS ---;
 %Macro UniqueATM(API);
-Data Work.NoDUP_CMA9_&API;
+
+	%Let Datasets =;
+	%Macro TestDsn(DsName);
+		%If %Sysfunc(exist(&DsName)) %Then
+		%Do;
+			%Let DSNX = &DsName;
+			%Put DSNX = &DSNX;
+
+			%Let Datasets = &Datasets &DSNX;
+			%Put Datasets = &Datasets;
+		%End;
+	%Mend TestDsn;
+	%TestDsn(Bank_of_Ireland_&API);
+	%TestDsn(Bank_of_Scotland_&API);
+	%TestDsn(Barclays_&API);
+	%TestDsn(Danske_Bank_&API);
+	%TestDsn(Halifax_&API);
+	%TestDsn(Lloyds_Bank_&API);
+	%TestDsn(Nationwide_&API);
+	%TestDsn(Natwest_&API);
+	%TestDsn(RBS_&API);
+	%TestDsn(Santander_&API);
+	%TestDsn(Ulster_Bank_&API);
+
+	Data Work.NoDUP_CMA9_&API;
+		Set &Datasets;
+		By P1-P7;
+	Run;
+
+/*
+	Data Work.NoDUP_CMA9_&API;
 	Set Work.Bank_of_Ireland_&API
 		Work.Bank_of_Scotland_&API
 		Work.Barclays_&API
@@ -247,6 +307,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.Ulster_Bank_&API;
 	By P1-P7;
 	Run;
+*/
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
@@ -254,50 +315,98 @@ Data Work.NoDUP_CMA9_&API;
 	Run;
 
 %Mend UniqueATM;
-%UniqueATM(ATMS);
+%If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
+%Do;
+%UniqueATM(ATM);
+%End;
 
+%If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
+%Do;
 
 *--- Append ATMS Datasets ---;
-Data OpenData.CMA9_ATMS(Drop = P1-P7);
-	Merge OpenData.NoDUP_CMA9_ATMS
-	Bank_of_Ireland_ATMS
-	Bank_of_Scotland_ATMS
-	Barclays_ATMS
-	Danske_Bank_ATMS
-	Halifax_ATMS
-	HSBC_ATMS
-	Lloyds_Bank_ATMS
-	Nationwide_ATMS
-	Natwest_ATMS
-	RBS_ATMS
-	Santander_ATMS
-	Ulster_Bank_ATMS;
+Data OpenData.CMA9_ATM(Drop = P1-P7);
+
+	Merge OpenData.NoDUP_CMA9_ATM
+	&Datasets;
+
+/*	
+	Merge OpenData.NoDUP_CMA9_ATM
+	Bank_of_Ireland_ATM
+	Bank_of_Scotland_ATM
+	Barclays_ATM
+	Danske_Bank_ATM
+	Halifax_ATM
+	HSBC_ATM
+	Lloyds_Bank_ATM
+	Nationwide_ATM
+	Natwest_ATM
+	RBS_ATM
+	Santander_ATM
+	Ulster_Bank_ATM;
+*/
 	By Hierarchy;
 
 *--- Call the macro in the Where statement to filter the required data elements ---;
 *	Where Data_Element in (%Filter);
 
 Run;
-
+%End;
 *------------------------------------------------------------------------------------------------------
 											BRANCHES
 -------------------------------------------------------------------------------------------------------;
-%Main(https://openapi.bankofireland.com/open-banking/v1.2/branches,Bank_of_Ireland,BRANCHES);
-%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/branches,Bank_of_Scotland,BRANCHES);
-%Main(https://atlas.api.barclays/open-banking/v1.3/branches,Barclays,BRANCHES);
-%Main(https://obp-api.danskebank.com/open-banking/v1.2/branches,Danske_Bank,BRANCHES);
-%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/branches,First_Trust_Bank,BRANCHES);
-%Main(https://api.halifax.co.uk/open-banking/v1.2/branches,Halifax,BRANCHES);
-%Main(https://api.hsbc.com/open-banking/v1.2/branches,HSBC,BRANCHES);
-%Main(https://api.lloydsbank.com/open-banking/v1.2/branches,Lloyds_Bank,BRANCHES);
-%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/branches,Nationwide,BRANCHES);
-%Main(https://openapi.natwest.com/open-banking/v1.2/branches,Natwest,BRANCHES);
-%Main(https://openapi.rbs.co.uk/open-banking/v1.2/branches,RBS,BRANCHES);
-%Main(https://api.santander.co.uk/retail/open-banking/v1.2/branches,Santander,BRANCHES);
-%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.2/branches,Ulster_Bank,BRANCHES);
+%If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
+%Do;
+	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/branches)) %Then 
+	%Do;
+	%Main(https://openapi.bankofireland.com/open-banking/v1.2/branches,Bank_of_Ireland,BCH);
+	%End;
+	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/branches,Bank_of_Scotland,BCH);
+	%Main(https://atlas.api.barclays/open-banking/v1.3/branches,Barclays,BCH);
+	%Main(https://obp-api.danskebank.com/open-banking/v1.2/branches,Danske_Bank,BCH);
+	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/branches,First_Trust_Bank,BCH);
+	%Main(https://api.halifax.co.uk/open-banking/v1.2/branches,Halifax,BCH);
+	%Main(https://api.hsbc.com/open-banking/v1.2/branches,HSBC,BCH);
+	%Main(https://api.lloydsbank.com/open-banking/v1.2/branches,Lloyds_Bank,BCH);
+	%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/branches,Nationwide,BCH);
+	%Main(https://openapi.natwest.com/open-banking/v1.2/branches,Natwest,BCH);
+	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/branches,RBS,BCH);
+	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/branches,Santander,BCH);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/branches,Ulster_Bank,BCH);
+%End;
 
 *--- Get unique Hierarchy values for Branches ---;
 %Macro UniqueBRANCHES(API);
+
+
+	%Let Datasets =;
+	%Macro TestDsn(DsName);
+		%If %Sysfunc(exist(&DsName)) %Then
+		%Do;
+			%Let DSNX = &DsName;
+			%Put DSNX = &DSNX;
+
+			%Let Datasets = &Datasets &DSNX;
+			%Put Datasets = &Datasets;
+		%End;
+	%Mend TestDsn;
+	%TestDsn(Bank_of_Ireland_&API);
+	%TestDsn(Bank_of_Scotland_&API);
+	%TestDsn(Barclays_&API);
+	%TestDsn(Danske_Bank_&API);
+	%TestDsn(Halifax_&API);
+	%TestDsn(Lloyds_Bank_&API);
+	%TestDsn(Nationwide_&API);
+	%TestDsn(Natwest_&API);
+	%TestDsn(RBS_&API);
+	%TestDsn(Santander_&API);
+	%TestDsn(Ulster_Bank_&API);
+
+	Data Work.NoDUP_CMA9_&API;
+		Set &Datasets;
+		By P1-P7;
+	Run;
+
+/*
 Data Work.NoDUP_CMA9_&API;
 	Set Work.Bank_of_Ireland_&API
 		Work.Bank_of_Scotland_&API
@@ -313,6 +422,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.Ulster_Bank_&API;
 	By P1-P7;
 	Run;
+*/
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
@@ -320,54 +430,101 @@ Data Work.NoDUP_CMA9_&API;
 	Run;
 
 %Mend UniqueBRANCHES;
-%UniqueBRANCHES(BRANCHES);
+
+%If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
+%Do;
+%UniqueBRANCHES(BCH);
+%End;
+
+%If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
+%Do;
 
 *--- Append BRANCHES Datasets ---;
-Data OpenData.CMA9_BRANCHES(Drop = P1-P7);
-	Merge OpenData.NoDUP_CMA9_BRANCHES
-	Work.Bank_of_Ireland_BRANCHES
-	Work.Bank_of_Scotland_BRANCHES
-	Work.Barclays_BRANCHES
-	Work.Danske_Bank_BRANCHES
-	Work.Halifax_BRANCHES
-	Work.HSBC_BRANCHES
-	Work.Lloyds_Bank_BRANCHES
-	Work.Nationwide_BRANCHES
-	Work.Natwest_BRANCHES
-	Work.RBS_BRANCHES
-	Work.Santander_BRANCHES
-	Work.Ulster_Bank_BRANCHES;
+Data OpenData.CMA9_BCH(Drop = P1-P7);
+	Merge OpenData.NoDUP_CMA9_BCH
+	&Datasets;
+
+
+/*
+	Work.Bank_of_Ireland_BCH
+	Work.Bank_of_Scotland_BCH
+	Work.Barclays_BCH
+	Work.Danske_Bank_BCH
+	Work.Halifax_BCH
+	Work.HSBC_BCH
+	Work.Lloyds_Bank_BCH
+	Work.Nationwide_BCH
+	Work.Natwest_BCH
+	Work.RBS_BCH
+	Work.Santander_BCH
+	Work.Ulster_Bank_BCH;
+*/
+
 	By Hierarchy;
 
 *--- Call the macro in the Where statement to filter the required data elements ---;
 *	Where Data_Element in (%Filter);
 
 Run;
-*/
+%End;
 *------------------------------------------------------------------------------------------------------
 											PCA
 -------------------------------------------------------------------------------------------------------;
-%Main(https://openapi.bankofireland.com/open-banking/v1.2/personal-current-accounts,Bank_of_Ireland,PCA);
-%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/personal-current-accounts,Bank_of_Scotland,PCA);
-%Main(https://atlas.api.barclays/open-banking/v1.3/personal-current-accounts,Barclays,PCA);
-/*%Main(https://obp-api.danskebank.com/open-banking/v1.2/personal-current-accounts,Danske_Bank,PCA);*/
-%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/personal-current-accounts,First_Trust_Bank,PCA);
-%Main(https://api.halifax.co.uk/open-banking/v1.2/personal-current-accounts,Halifax,PCA);
-%Main(https://api.hsbc.com/open-banking/v1.2/personal-current-accounts,HSBC,PCA);
-%Main(https://api.lloydsbank.com/open-banking/v1.2/personal-current-accounts,Lloyds_Bank,PCA);
-%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/personal-current-accounts,Nationwide,PCA);
-%Main(https://openapi.natwest.com/open-banking/v1.2/personal-current-accounts,Natwest,PCA);
-%Main(https://openapi.rbs.co.uk/open-banking/v1.2/personal-current-accounts,RBS,PCA);
-%Main(https://api.santander.co.uk/retail/open-banking/v1.2/personal-current-accounts,Santander,PCA);
-%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.2/personal-current-accounts,Ulster_Bank,PCA);
-
+%If "&_action" EQ "CMA9 COMPARISON PCA" %Then
+%Do;
+	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/personal-current-accounts)) %Then 
+	%Do;
+	%Main(https://openapi.bankofireland.com/open-banking/v1.2/personal-current-accounts,Bank_of_Ireland,PCA);
+	%End;
+	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/personal-current-accounts,Bank_of_Scotland,PCA);
+	%Main(https://atlas.api.barclays/open-banking/v1.3/personal-current-accounts,Barclays,PCA);
+	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/personal-current-accounts,First_Trust_Bank,PCA);
+	%Main(https://api.halifax.co.uk/open-banking/v1.2/personal-current-accounts,Halifax,PCA);
+	%Main(https://api.hsbc.com/open-banking/v1.2/personal-current-accounts,HSBC,PCA);
+	%Main(https://api.lloydsbank.com/open-banking/v1.2/personal-current-accounts,Lloyds_Bank,PCA);
+	%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/personal-current-accounts,Nationwide,PCA);
+	%Main(https://openapi.natwest.com/open-banking/v1.2/personal-current-accounts,Natwest,PCA);
+	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/personal-current-accounts,RBS,PCA);
+	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/personal-current-accounts,Santander,PCA);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/personal-current-accounts,Ulster_Bank,PCA);
+%End;
 *--- Get unique Hierarchy values for PCA ---;
 %Macro UniquePCA(API);
-Data Work.NoDUP_CMA9_&API;
+
+
+	%Let Datasets =;
+	%Macro TestDsn(DsName);
+		%If %Sysfunc(exist(&DsName)) %Then
+		%Do;
+			%Let DSNX = &DsName;
+			%Put DSNX = &DSNX;
+
+			%Let Datasets = &Datasets &DSNX;
+			%Put Datasets = &Datasets;
+		%End;
+	%Mend TestDsn;
+	%TestDsn(Bank_of_Ireland_&API);
+	%TestDsn(Bank_of_Scotland_&API);
+	%TestDsn(Barclays_&API);
+	%TestDsn(Halifax_&API);
+	%TestDsn(Lloyds_Bank_&API);
+	%TestDsn(Nationwide_&API);
+	%TestDsn(Natwest_&API);
+	%TestDsn(RBS_&API);
+	%TestDsn(Santander_&API);
+	%TestDsn(Ulster_Bank_&API);
+
+	Data Work.NoDUP_CMA9_&API;
+		Set &Datasets;
+		By P1-P7;
+	Run;
+
+
+/*
+	Data Work.NoDUP_CMA9_&API;
 	Set Work.Bank_of_Ireland_&API
 		Work.Bank_of_Scotland_&API
 		Work.Barclays_&API
-/*		Work.Danske_Bank_&API*/
 		Work.First_Trust_Bank_&API
 		Work.Halifax_&API
 		Work.HSBC_&API
@@ -379,22 +536,28 @@ Data Work.NoDUP_CMA9_&API;
 		Work.Ulster_Bank_&API;
 	By P1-P7;
 	Run;
-
+*/
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
 %Mend UniquePCA;
-%UniquePCA(PCA);
+%If "&_action" EQ "CMA9 COMPARISON PCA" %Then
+%Do;
+	%UniquePCA(PCA);
+%End;
 
+%If "&_action" EQ "CMA9 COMPARISON PCA" %Then
+%Do;
 *--- Append PCA Datasets ---;
-Data OpenData.CMA9_PCA(Drop = P1-P7);
-	Merge OpenData.NoDUP_CMA9_PCA
+Data OBData.CMA9_PCA(Drop = P1-P7);
+	Merge OBData.NoDUP_CMA9_PCA
+	&Datasets;
+/*
 	Work.Bank_of_Ireland_PCA
 	Work.Bank_of_Scotland_PCA
 	Work.Barclays_PCA
-/*	Work.Danske_Bank_PCA*/
 	Work.First_Trust_Bank_PCA
 	Work.Halifax_PCA
 	Work.HSBC_PCA
@@ -404,11 +567,12 @@ Data OpenData.CMA9_PCA(Drop = P1-P7);
 	Work.RBS_PCA
 	Work.Santander_PCA
 	Work.Ulster_Bank_PCA;
+*/
 	By Hierarchy;
 Run;
 
-Data OpenData.CMA9_PCA;
-	Set OpenData.CMA9_PCA;
+Data OBData.CMA9_PCA;
+	Set OBData.CMA9_PCA;
 *--- Call the macro in the Where statement to filter the required data elements ---;
 /*	Where Data_Element in (%Filter);*/
 
@@ -425,27 +589,68 @@ Data OpenData.CMA9_PCA;
 	'ProductURL1http'
 	'ProductURL1htts:');
 Run;
-
+%End;
 *------------------------------------------------------------------------------------------------------
 											BCA
 -------------------------------------------------------------------------------------------------------;
-%Main(https://api.aibgb.co.uk/open-banking/v1.2/business-current-accounts,AIB_Group,BCA);
-%Main(https://openapi.bankofireland.com/open-banking/v1.2/business-current-accounts,Bank_of_Ireland,BCA);
-%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/business-current-accounts,Bank_of_Scotland,BCA);
-%Main(https://atlas.api.barclays/open-banking/v1.3/business-current-accounts,Barclays,BCA);
-%Main(https://obp-api.danskebank.com/open-banking/v1.2/business-current-accounts,Danske_Bank,BCA);
-%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/business-current-accounts,First_Trust_Bank,BCA);
-/*%Main(https://api.halifax.co.uk/open-banking/v1.2/business-current-accounts,Halifax,BCA);*/
-%Main(https://api.hsbc.com/open-banking/v1.2/personal-current-accounts,HSBC,BCA);
-%Main(https://api.lloydsbank.com/open-banking/v1.2/business-current-accounts,Lloyds_Bank,BCA);
-/*%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/business-current-accounts,Nationwide,BCA);*/
-%Main(https://openapi.natwest.com/open-banking/v1.2/business-current-accounts,Natwest,BCA);
-%Main(https://openapi.rbs.co.uk/open-banking/v1.2/business-current-accounts,RBS,BCA);
-%Main(https://api.santander.co.uk/retail/open-banking/v1.2/business-current-accounts,Santander,BCA);
-%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.2/business-current-accounts,Ulster_Bank,BCA);
+%If "&_action" EQ "CMA9 COMPARISON BCA" %Then
+%Do;
+%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/business-current-accounts)) %Then 
+%Do;
+	%Main(https://api.aibgb.co.uk/open-banking/v1.2/business-current-accounts,AIB_Group,BCA);
+%End;
+	%Main(https://openapi.bankofireland.com/open-banking/v1.2/business-current-accounts,Bank_of_Ireland,BCA);
+	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/business-current-accounts,Bank_of_Scotland,BCA);
+	%Main(https://atlas.api.barclays/open-banking/v1.3/business-current-accounts,Barclays,BCA);
+	%Main(https://obp-api.danskebank.com/open-banking/v1.2/business-current-accounts,Danske_Bank,BCA);
+	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/business-current-accounts,First_Trust_Bank,BCA);
+	%Main(https://api.hsbc.com/open-banking/v1.2/personal-current-accounts,HSBC,BCA);
+	%Main(https://api.lloydsbank.com/open-banking/v1.2/business-current-accounts,Lloyds_Bank,BCA);
+	%Main(https://openapi.natwest.com/open-banking/v1.2/business-current-accounts,Natwest,BCA);
+	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/business-current-accounts,RBS,BCA);
+	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/business-current-accounts,Santander,BCA);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/business-current-accounts,Ulster_Bank,BCA);
+	%Main(https://openapi.coutts.co.uk/open-banking/v1.3/business-current-accounts,Coutts,BCA);
+	%Main(https://openapi.adambank.co.uk/open-banking/v1.3/business-current-accounts,Adam_Bank,BCA);
 
+%End;
 *--- Get unique Hierarchy values for BCA ---;
 %Macro UniqueBCA(API);
+
+	%Let Datasets =;
+	%Macro TestDsn(DsName);
+		%If %Sysfunc(exist(&DsName)) %Then
+		%Do;
+			%Let DSNX = &DsName;
+			%Put DSNX = &DSNX;
+
+			%Let Datasets = &Datasets &DSNX;
+			%Put Datasets = &Datasets;
+		%End;
+	%Mend TestDsn;
+	%TestDsn(AIB_Group_&API);
+	%TestDsn(Bank_of_Ireland_&API);
+	%TestDsn(Bank_of_Scotland_&API);
+	%TestDsn(Barclays_&API);
+	%TestDsn(Danske_Bank_&API);
+	%TestDsn(First_Trust_Bank_&API);
+	%TestDsn(HSBC_&API);
+	%TestDsn(Lloyds_Bank_&API);
+	%TestDsn(Natwest_&API);
+	%TestDsn(RBS_&API);
+	%TestDsn(Santander_&API);
+	%TestDsn(Ulster_Bank_&API);
+	%TestDsn(Coutts_&API);
+	%TestDsn(Adam_Bank_&API);
+
+
+	Data Work.NoDUP_CMA9_&API;
+		Set &Datasets;
+		By P1-P7;
+	Run;
+
+
+/*
 Data Work.NoDUP_CMA9_&API;
 	Set Work.AIB_Group_&API
 		Work.Bank_of_Ireland_&API
@@ -453,47 +658,55 @@ Data Work.NoDUP_CMA9_&API;
 		Work.Barclays_&API
 		Work.Danske_Bank_&API
 		Work.First_Trust_Bank_&API
-	/*	Work.Halifax_BCA*/
 		Work.HSBC_&API
 		Work.Lloyds_Bank_&API
-	/*	Work.Nationwide_BCA*/
 		Work.Natwest_&API
 		Work.RBS_&API
 		Work.Santander_&API
-		Work.Ulster_Bank_&API;
+		Work.Ulster_Bank_&API
+		;
 	By P1-P7;
 	Run;
+*/
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
+		Out = OBData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
 %Mend UniqueBCA;
-%UniqueBCA(BCA);
+%If "&_action" EQ "CMA9 COMPARISON BCA" %Then
+%Do;
+	%UniqueBCA(BCA);
+%End;
 
+%If "&_action" EQ "CMA9 COMPARISON BCA" %Then
+%Do;
 *--- Append BCA Datasets ---;
-Data OpenData.CMA9_BCA(Drop = P1-P7);
-	Merge OpenData.NoDUP_CMA9_BCA
+Data OBData.CMA9_BCA(Drop = P1-P7);
+	Merge OBData.NoDUP_CMA9_BCA
+	&Datasets;
+
+/*
 	Work.AIB_Group_BCA
 	Work.Bank_of_Ireland_BCA
 	Work.Bank_of_Scotland_BCA
 	Work.Barclays_BCA
 	Work.Danske_Bank_BCA
 	Work.First_Trust_Bank_BCA
-/*	Work.Halifax_BCA*/
 	Work.HSBC_BCA
 	Work.Lloyds_Bank_BCA
-/*	Work.Nationwide_BCA*/
 	Work.Natwest_BCA
 	Work.RBS_BCA
 	Work.Santander_BCA
-	Work.Ulster_Bank_BCA;
+	Work.Ulster_Bank_BCA
+	;
+*/
 	By Hierarchy;
 Run;
 
-Data OpenData.CMA9_BCA;
-	Set OpenData.CMA9_BCA;
+Data OBData.CMA9_BCA;
+	Set OBData.CMA9_BCA;
 *--- Call the macro in the Where statement to filter the required data elements ---;
 /*	Where Data_Element in (%Filter);*/
 
@@ -512,77 +725,115 @@ Data OpenData.CMA9_BCA;
 	'ProductURL1h'
 	'ProductURL1http:/');
 Run;
-
+%End;
 *------------------------------------------------------------------------------------------------------
 											SME
 -------------------------------------------------------------------------------------------------------;
-%Main(https://api.aibgb.co.uk/open-banking/v1.2/unsecured-sme-loans,AIB_Group, SME);
-%Main(https://openapi.bankofireland.com/open-banking/v1.2/unsecured-sme-loans,Bank_of_Ireland,SME);
-%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/unsecured-sme-loans,Bank_of_Scotland,SME);
-%Main(https://atlas.api.barclays/open-banking/v1.3/unsecured-sme-loans,Barclays,SME);
-%Main(https://obp-api.danskebank.com/open-banking/v1.2/unsecured-sme-loans,Danske_Bank,SME);
-%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/unsecured-sme-loans,First_Trust_Bank,SME);
-/*%Main(https://api.halifax.co.uk/open-banking/v1.2/unsecured-sme-loans,Halifax,SME);*/
-%Main(https://api.hsbc.com/open-banking/v1.2/unsecured-sme-loans,HSBC,SME);
-%Main(https://api.lloydsbank.com/open-banking/v1.2/unsecured-sme-loans,Lloyds_Bank,SME);
-/*%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/unsecured-sme-loans,Nationwide,SME);*/
-%Main(https://openapi.natwest.com/open-banking/v1.2/unsecured-sme-loans,Natwest,SME);
-%Main(https://openapi.rbs.co.uk/open-banking/v1.2/unsecured-sme-loans,RBS,SME);
-%Main(https://api.santander.co.uk/retail/open-banking/v1.2/unsecured-sme-loans,Santander,SME);
-%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.2/unsecured-sme-loans,Ulster_Bank,SME);
-
+%If "&_action" EQ "CMA9 COMPARISON SME" %Then
+%Do;
+	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/unsecured-sme-loans)) %Then 
+	%Do;
+	%Main(https://api.aibgb.co.uk/open-banking/v1.2/unsecured-sme-loans,AIB_Group, SME);
+	%End;
+	%Main(https://openapi.bankofireland.com/open-banking/v1.2/unsecured-sme-loans,Bank_of_Ireland,SME);
+	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/unsecured-sme-loans,Bank_of_Scotland,SME);
+	%Main(https://atlas.api.barclays/open-banking/v1.3/unsecured-sme-loans,Barclays,SME);
+	%Main(https://obp-api.danskebank.com/open-banking/v1.2/unsecured-sme-loans,Danske_Bank,SME);
+	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/unsecured-sme-loans,First_Trust_Bank,SME);
+	%Main(https://api.hsbc.com/open-banking/v1.2/unsecured-sme-loans,HSBC,SME);
+	%Main(https://api.lloydsbank.com/open-banking/v1.2/unsecured-sme-loans,Lloyds_Bank,SME);
+	%Main(https://openapi.natwest.com/open-banking/v1.2/unsecured-sme-loans,Natwest,SME);
+	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/unsecured-sme-loans,RBS,SME);
+	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/unsecured-sme-loans,Santander,SME);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/unsecured-sme-loans,Ulster_Bank,SME);
+%End;
 *--- Get unique Hierarchy values for SME ---;
 %Macro UniqueSME(API);
-Data Work.NoDUP_CMA9_&API;
 
+	%Let Datasets =;
+	%Macro TestDsn(DsName);
+		%If %Sysfunc(exist(&DsName)) %Then
+		%Do;
+			%Let DSNX = &DsName;
+			%Put DSNX = &DSNX;
+
+			%Let Datasets = &Datasets &DSNX;
+			%Put Datasets = &Datasets;
+		%End;
+	%Mend TestDsn;
+	%TestDsn(AIB_Group_&API);
+	%TestDsn(Bank_of_Ireland_&API);
+	%TestDsn(Bank_of_Scotland_&API);
+	%TestDsn(Barclays_&API);
+	%TestDsn(Danske_Bank_&API);
+	%TestDsn(First_Trust_Bank_&API);
+	%TestDsn(HSBC_&API);
+	%TestDsn(Lloyds_Bank_&API);
+	%TestDsn(Natwest_&API);
+	%TestDsn(RBS_&API);
+	%TestDsn(Santander_&API);
+	%TestDsn(Ulster_Bank_&API);
+
+	Data Work.NoDUP_CMA9_&API;
+		Set &Datasets;
+		By P1-P7;
+	Run;
+
+/*
+Data Work.NoDUP_CMA9_&API;
 	Set Work.AIB_Group_&API
 		Work.Bank_of_Ireland_&API
 		Work.Bank_of_Scotland_&API
 		Work.Barclays_&API
 		Work.Danske_Bank_&API
 		Work.First_Trust_Bank_&API
-	/*	Work.Halifax_SME*/
 		Work.HSBC_&API
 		Work.Lloyds_Bank_&API
-	/*	Work.Nationwide_SME*/
 		Work.Natwest_&API
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
 	By P1-P7;
-	Run;
+Run;
+*/
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
+		Out = OBData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
 %Mend UniqueSME;
-%UniqueSME(SME);
+%If "&_action" EQ "CMA9 COMPARISON SME" %Then
+%Do;
+	%UniqueSME(SME);
+%End;
 
-
+%If "&_action" EQ "CMA9 COMPARISON SME" %Then
+%Do;
 *--- Append SME Datasets ---;
-Data OpenData.CMA9_SME(Drop = P1-P7);
-	Merge OpenData.NoDUP_CMA9_SME
+Data OBData.CMA9_SME(Drop = P1-P7);
+	Merge OBData.NoDUP_CMA9_SME
+	&Datasets;
+
+/*
 	Work.AIB_Group_SME
 	Work.Bank_of_Ireland_SME
 	Work.Bank_of_Scotland_SME
 	Work.Barclays_SME
 	Work.Danske_Bank_SME
 	Work.First_Trust_Bank_SME
-/*	Work.Halifax_SME*/
 	Work.HSBC_SME
 	Work.Lloyds_Bank_SME
-/*	Work.Nationwide_SME*/
 	Work.Natwest_SME
 	Work.RBS_SME
 	Work.Santander_SME
 	Work.Ulster_Bank_SME;
+*/
 	By Hierarchy;
 Run;
 
-Data OpenData.CMA9_SME;
-	Set OpenData.CMA9_SME;
+Data OBData.CMA9_SME;
+	Set OBData.CMA9_SME;
 *--- Call the macro in the Where statement to filter the required data elements ---;
 /*	Where Data_Element in (%Filter);*/
 
@@ -597,71 +848,93 @@ Data OpenData.CMA9_SME;
 	'ProductTypeName'
 	'ProductURL1https:');
 Run;
-
+%End;
 *------------------------------------------------------------------------------------------------------
 											CCC
 -------------------------------------------------------------------------------------------------------;
-%Main(https://openapi.bankofireland.com/open-banking/v1.2/commercial-credit-cards,Bank_of_Ireland,CCC);
-/*%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/commercial-credit-cards,Bank_of_Scotland,CCC);*/
-%Main(https://atlas.api.barclays/open-banking/v1.3/commercial-credit-cards,Barclays,CCC);
-/*%Main(https://obp-api.danskebank.com/open-banking/v1.2/commercial-credit-cards,Danske_Bank,CCC);*/
-/*%Main(https://api.halifax.co.uk/open-banking/v1.2/commercial-credit-cards,Halifax,CCC);*/
-%Main(https://api.hsbc.com/open-banking/v1.2/commercial-credit-cards,HSBC,CCC);
-%Main(https://api.lloydsbank.com/open-banking/v1.2/commercial-credit-cards,Lloyds_Bank,CCC);
-/*%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/commercial-credit-cards,Nationwide,CCC);*/
-%Main(https://openapi.natwest.com/open-banking/v1.2/commercial-credit-cards,Natwest,CCC);
-%Main(https://openapi.rbs.co.uk/open-banking/v1.2/commercial-credit-cards,RBS,CCC);
-%Main(https://api.santander.co.uk/retail/open-banking/v1.2/commercial-credit-cards,Santander,CCC);
-/*%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.2/commercial-credit-cards,Ulster_Bank,CCC);*/
-
+%If "&_action" EQ "CMA9 COMPARISON CCC" %Then
+%Do;
+	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/commercial-credit-cards)) %Then 
+	%Do;
+	%Main(https://openapi.bankofireland.com/open-banking/v1.2/commercial-credit-cards,Bank_of_Ireland,CCC);
+	%End;
+	%Main(https://atlas.api.barclays/open-banking/v1.3/commercial-credit-cards,Barclays,CCC);
+	%Main(https://api.hsbc.com/open-banking/v1.2/commercial-credit-cards,HSBC,CCC);
+	%Main(https://api.lloydsbank.com/open-banking/v1.2/commercial-credit-cards,Lloyds_Bank,CCC);
+	%Main(https://openapi.natwest.com/open-banking/v1.2/commercial-credit-cards,Natwest,CCC);
+	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/commercial-credit-cards,RBS,CCC);
+	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/commercial-credit-cards,Santander,CCC);
+%End;
 *--- Get unique Hierarchy values for CCC ---;
 %Macro UniqueCCC(API);
-Data Work.NoDUP_CMA9_&API;
 
-	Set Work.Bank_of_Ireland_CCC
-	/*	Work.Bank_of_Scotland_CCC*/
-		Work.Barclays_CCC
-	/*	Work.Danske_Bank_CCC*/
-	/*	Work.Halifax_CCC*/
-		Work.HSBC_CCC
-		Work.Lloyds_Bank_CCC
-	/*	Work.Nationwide_CCC*/
-		Work.Natwest_CCC
-		Work.RBS_CCC
-		Work.Santander_CCC
-	/*	Work.Ulster_Bank_CCC;*/;
-	By P1-P7;
+	%Let Datasets =;
+	%Macro TestDsn(DsName);
+		%If %Sysfunc(exist(&DsName)) %Then
+		%Do;
+			%Let DSNX = &DsName;
+			%Put DSNX = &DSNX;
+
+			%Let Datasets = &Datasets &DSNX;
+			%Put Datasets = &Datasets;
+		%End;
+	%Mend TestDsn;
+	%TestDsn(Bank_of_Ireland_&API);
+	%TestDsn(Barclays_&API);
+	%TestDsn(HSBC_&API);
+	%TestDsn(Lloyds_Bank_&API);
+	%TestDsn(Natwest_&API);
+	%TestDsn(RBS_&API);
+	%TestDsn(Santander_&API);
+
+	Data Work.NoDUP_CMA9_&API;
+		Set &Datasets;
+		By P1-P7;
 	Run;
 
+/*
+Data Work.NoDUP_CMA9_&API;
+	Set Work.Bank_of_Ireland_CCC
+		Work.Barclays_CCC
+		Work.HSBC_CCC
+		Work.Lloyds_Bank_CCC
+		Work.Natwest_CCC
+		Work.RBS_CCC
+		Work.Santander_CCC;
+	By P1-P7;
+	Run;
+*/
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
+		Out = OBData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
 %Mend UniqueCCC;
-%UniqueCCC(CCC);
+%If "&_action" EQ "CMA9 COMPARISON CCC" %Then
+%Do;
+	%UniqueCCC(CCC);
+%End;
 
-
+%If "&_action" EQ "CMA9 COMPARISON CCC" %Then
+%Do;
 *--- Append CCC Datasets ---;
-Data OpenData.CMA9_CCC(Drop = P1-P7);
-	Merge OpenData.NoDUP_CMA9_CCC
+Data OBData.CMA9_CCC(Drop = P1-P7);
+	Merge OBData.NoDUP_CMA9_CCC
+	&Datasets;
+/*
 	Work.Bank_of_Ireland_CCC
-/*	Work.Bank_of_Scotland_CCC*/
 	Work.Barclays_CCC
-/*	Work.Danske_Bank_CCC*/
-/*	Work.Halifax_CCC*/
 	Work.HSBC_CCC
 	Work.Lloyds_Bank_CCC
-/*	Work.Nationwide_CCC*/
 	Work.Natwest_CCC
 	Work.RBS_CCC
-	Work.Santander_CCC
-/*	Work.Ulster_Bank_CCC;*/;
+	Work.Santander_CCC;
+*/
 	By Hierarchy;
 Run;
 
-Data OpenData.CMA9_CCC;
-	Set OpenData.CMA9_CCC;
+Data OBData.CMA9_CCC;
+	Set OBData.CMA9_CCC;
 *--- Call the macro in the Where statement to filter the required data elements ---;
 /*	Where Data_Element in (%Filter);*/
 
@@ -673,6 +946,11 @@ Data OpenData.CMA9_CCC;
 	'ProductType'
 	'ProductURL1http:/');
 Run;
+%End;
+%Mend RunAPI;
+%RunAPI;
+
+
 
 *--- Set Title Date in Proc Print ---;
 %Macro Fdate(Fmt);
@@ -681,12 +959,124 @@ Run;
       Call Symput("Fdate",Left(Put("&Sysdate"d,&Fmt)));
    Run;
 %Mend Fdate;
-%Fdate(Worddate.)
+%Fdate(Worddate.);
+
+
+%Macro Template;
+Proc Template;
+ define style OBStyle;
+ notes "My Simple Style";
+ class body /
+ backgroundcolor = white
+ color = black
+ fontfamily = "Palatino"
+ ;
+ class systemtitle /
+ fontfamily = "Verdana, Arial"
+ fontsize = 16pt
+ fontweight = bold
+ ;
+ class table /
+ backgroundcolor = #f0f0f0
+ bordercolor = red
+ borderstyle = solid
+ borderwidth = 1pt
+ cellpadding = 5pt
+ cellspacing = 0pt
+ frame = void
+ rules = groups
+ ;
+ class header, footer /
+ backgroundcolor = #c0c0c0
+ fontfamily = "Verdana, Arial"
+ fontweight = bold
+ ;
+ class data /
+ fontfamily = "Palatino"
+ ;
+ end; 
+
+Run;
+%Mend Template
+%Template;
+
+%Macro ReturnButton();
+Data _Null_;
+		File _Webout;
+
+		Put '<html xmlns="http://www.w3.org/1999/xhtml">';
+		Put '<head>';
+		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+		Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
+		Put '<title>OB TESTING</title>';
+
+		Put '<meta charset="utf-8" />';
+		Put '<title>Open Data Test Harness</title>';
+		Put '<meta name="description" content="">';
+		Put '<meta name="author" content="">';
+
+		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
+
+		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+		Put '<title>LRM</title>';
+
+		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '</script>';
+
+		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+
+		Put '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>';
+
+		Put '</HEAD>';
+		Put '<BODY>';
+
+		Put '<p></p>';
+		Put '<HR>';
+		Put '<p></p>';
+
+		Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+		Put '</Form>';
+		Put '</td>';
+		Put '</tr>';
+		Put '</Table>';
+
+		Put '<Table align="center" style="width: 100%; height: 5%" border="0">';
+		Put '<td valign="top" style="background-color: White; color: black">';
+		Put '<H3>All Rights Reserved</H3>';
+		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
+		Put '</td>';
+		Put '</Table>';
+
+		Put '</BODY>';
+		Put '<HTML>';
+		
+Run;
+%Mend ReturnButton;
+
+
 
 *--- Run Macro to Print the CMA9 Reports for ATMS, BRANCHES, PCA, etc ---;
 %Macro CMA9_Reports(API);
 *--- Set Output Delivery Parameters  ---;
-ODS _All_ Close;
+/*ODS _All_ Close;*/
 
 /*
 ODS HTML Body="Compare_CMA9_&API..html" 
@@ -694,19 +1084,161 @@ ODS HTML Body="Compare_CMA9_&API..html"
 	Frame="Compare_frame_&API..html" 
 	Style=HTMLBlue;
 */
-ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
+/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
-ODS Graphics On;
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+title "Listing of Product Sales"; 
+ods listing close; 
+/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
+ods tagsets.tableeditor file=_Webout
+    style=styles.OBStyle 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="0" 
+            frozen_rowheaders="0" 
+            ); 
 
 *--- Sort dataset by the RowCnt value to set the table in the original JSON script order ---; 
-Proc Sort Data = OpenData.CMA9_&API;
+Proc Sort Data = OBData.CMA9_&API;
 	By RowCnt;
 Run;
 
 *--- Print ATMS Report ---;
-Proc Print Data = OpenData.CMA9_&API(Drop=Bank_API P Count RowCnt);
+/*Proc Print Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);*/
+/*Run;*/
+
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
+
+Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
+			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+			style(header)=[background=lightskyblue foreground=black] 
+			style(column)=[background=lightcyan foreground=black];
+
+%If "&_action" EQ "CMA9 COMPARISON CCC" %Then
+%Do;
+
+		Columns Hierarchy 
+		Data_Element
+		Bank_of_Ireland
+		Barclays
+		HSBC
+		Lloyds_Bank
+		Natwest
+		RBS
+		Santander;
+
+		Define Hierarchy  / display 'Hierarchy' left;
+		Define Data_Element / display 'Data Element' left;
+		Define Bank_of_Ireland / display 'Bank of Ireland' left;
+		Define Barclays / display 'Barclays Bank' left;
+		Define HSBC / display 'HSBC' left;
+		Define Lloyds_Bank / display 'Lloyds Bank' left;
+		Define Natwest / display 'Natwest' left;
+		Define RBS / display 'RBS' left;
+		Define Santander / display 'Santander' left;
+%End;
+
+%If "&_action" EQ "CMA9 COMPARISON SME" %Then
+%Do;
+		Columns Hierarchy 
+		Data_Element
+		Bank_of_Ireland
+		Bank_of_Scotland
+		Barclays
+		First_Trust_Bank
+		HSBC
+		Lloyds_Bank
+		Natwest
+		RBS
+		Santander
+		Ulster_Bank;
+
+
+		Define Hierarchy  / display 'Hierarchy' left;
+		Define Data_Element / display 'Data Element' left;
+		Define Bank_of_Ireland / display 'Bank of Ireland' left;
+		Define Bank_of_Scotland / display 'Bank of Scotland' left;
+		Define Barclays / display 'Barclays Bank' left;
+		Define First_Trust_Bank / display 'First Trust Bank' left;
+		Define HSBC / display 'HSBC' left;
+		Define Lloyds_Bank / display 'Lloyds Bank' left;
+		Define Natwest / display 'Natwest' left;
+		Define RBS / display 'RBS' left;
+		Define Santander / display 'Santander' left;
+		Define Ulster_Bank / display 'Ulster Bank' left;
+%End;
+
+%If "&_action" EQ "CMA9 COMPARISON BCA" %Then
+%Do;
+		Columns Hierarchy 
+		Data_Element
+		Bank_of_Ireland
+		Bank_of_Scotland
+		Barclays
+		First_Trust_Bank
+		HSBC
+		Lloyds_Bank
+		Natwest
+		RBS
+		Santander
+		Ulster_Bank
+		Coutts
+		Adam_Bank
+		;
+
+
+		Define Hierarchy  / display 'Hierarchy' left;
+		Define Data_Element / display 'Data Element' left;
+		Define Bank_of_Ireland / display 'Bank of Ireland' left;
+		Define Bank_of_Scotland / display 'Bank of Scotland' left;
+		Define Barclays / display 'Barclays Bank' left;
+		Define First_Trust_Bank / display 'First Trust Bank' left;
+		Define HSBC / display 'HSBC' left;
+		Define Lloyds_Bank / display 'Lloyds Bank' left;
+		Define Natwest / display 'Natwest' left;
+		Define RBS / display 'RBS' left;
+		Define Santander / display 'Santander' left;
+		Define Ulster_Bank / display 'Ulster Bank' left;
+		Define Coutts / display 'Coutts' left;
+		Define Adam_Bank / display 'Adam Bank' left;
+
+%End;
+
+%If "&_action" EQ "CMA9 COMPARISON PCA" %Then
+%Do;
+		Columns Hierarchy 
+		Data_Element
+		Bank_of_Ireland
+		Bank_of_Scotland
+		Barclays
+		First_Trust_Bank
+		HSBC
+		Lloyds_Bank
+		Natwest
+		RBS
+		Santander
+		Ulster_Bank;
+
+
+		Define Hierarchy  / display 'Hierarchy' left;
+		Define Data_Element / display 'Data Element' left;
+		Define Bank_of_Ireland / display 'Bank of Ireland' left;
+		Define Bank_of_Scotland / display 'Bank of Scotland' left;
+		Define Barclays / display 'Barclays Bank' left;
+		Define First_Trust_Bank / display 'First Trust Bank' left;
+		Define HSBC / display 'HSBC' left;
+		Define Lloyds_Bank / display 'Lloyds Bank' left;
+		Define Natwest / display 'Natwest' left;
+		Define RBS / display 'RBS' left;
+		Define Santander / display 'Santander' left;
+		Define Ulster_Bank / display 'Ulster Bank' left;
+%End;
+
+
+
 Run;
 
 /*
@@ -718,7 +1250,7 @@ RUN;
 */
 
 *--- Close Output Delivery Parameters  ---;
-ODS HTML Close;
+/*ODS HTML Close;*/
 
 /*
 ODS CSV File="&Path\CMA9_&API..csv";
@@ -735,17 +1267,47 @@ Proc Print Data=OpenData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 Run;
 ODS HTML Close;
 */
-ODS Listing;
+
+%ReturnButton;
+
+ods tagsets.tableeditor close; 
+ods listing; 
 
 %Mend CMA9_Reports;
 /*
 %CMA9_Reports(ATMS);
 %CMA9_Reports(BRANCHES);
 */
-%CMA9_Reports(PCA);
-%CMA9_Reports(BCA);
-%CMA9_Reports(SME);
-%CMA9_Reports(CCC);
+
+%Macro APIReport;
+%If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
+%Do;
+	%CMA9_Reports(ATM);
+%End;
+%Else %If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
+%Do;
+	%CMA9_Reports(BCH);
+%End;
+%Else %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
+%Do;
+	%CMA9_Reports(PCA);
+%End;
+%Else %If "&_action" EQ "CMA9 COMPARISON BCA" %Then
+%Do;
+	%CMA9_Reports(BCA);
+%End;
+%Else %If "&_action" EQ "CMA9 COMPARISON SME" %Then
+%Do;
+	%CMA9_Reports(SME);
+%End;
+%Else %If "&_action" EQ "CMA9 COMPARISON CCC" %Then
+%Do;
+	%CMA9_Reports(CCC);
+%End;
+%Mend APIReport;
+%APIReport;
+
+
 
 /*
 PROC EXPORT DATA = Work.Danske_Bank_PCA

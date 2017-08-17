@@ -1,8 +1,13 @@
-Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
+*=====================================================================================================================================================
+--- Set system options to track comments in the log file ---
+======================================================================================================================================================;
+/*
+Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN SPOOL;
+OPTIONS NOSYNTAXCHECK;
 
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
-
-Data OBData._Null_;
+*/
+Data Work._Null_;
 _BankName = "&_BankName";
 _APIName = "&_APIName";
 _VersionNo = "&_VersionNo";
@@ -20,19 +25,66 @@ Run;
 %Global BankName_C;
 %Global Version_C;
 %Global Sch_Version;
-%Global SysError;
+%Global FDate;
 /*
 %Let _BankName = Barclays;
 %Let _APIName = BCA;
 %Let _VersionNo = v1.3;
 */
+*=====================================================================================================================================================
+--- Macro Imports read the API_Config CSV sheet and saves the values in macro variables to use in program below ---
+======================================================================================================================================================;
 %Macro Import(Filename);
+/*
 PROC IMPORT DATAFILE="&Filename"
- 	OUT=Work.API_Config
+ 	OUT=OBData.API_Config
  	DBMS=csv
  	REPLACE;
  	GETNAMES=Yes;
 RUN;
+*/
+ *=====================================================================================================================================================
+ **********************************************************************
+ *   PRODUCT:   SAS
+ *   VERSION:   9.4
+ *   CREATOR:   External File Interface
+ *   DATE:      04JUL17
+ *   DESC:      Generated SAS Datastep Code
+ *   TEMPLATE SOURCE:  (None Specified.)
+ ***********************************************************************
+======================================================================================================================================================;
+Data Work.API_CONFIG    ;
+    %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Perm\API_Config.csv' delimiter = ',' MISSOVER
+	DSD lrecl=32767 firstobs=2 ;
+       informat Bank_Name $20. ;
+       informat API_Abb $3. ;
+       informat API_Link $60. ;
+       informat API_Name $25. ;
+       informat SCH_Link $81. ;
+       informat SCH_Name $24. ;
+       informat Perm_SCH_Table $10. ;
+       informat Version $4. ;
+       format Bank_Name $20. ;
+       format API_Abb $3. ;
+       format API_Link $60. ;
+       format API_Name $25. ;
+       format SCH_Link $81. ;
+       format SCH_Name $24. ;
+       format Perm_SCH_Table $10. ;
+       format Version $4. ;
+    input
+                Bank_Name $
+                API_Abb $
+                API_Link $
+                API_Name $
+                SCH_Link $
+                SCH_Name $
+                Perm_SCH_Table $
+                Version $
+    ;
+    if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+Run;
 
 Data OBData._Null_;
 	Set Work.API_Config(Where=(Trim(Left(Bank_Name)) EQ "&_BankName" and Trim(Left(API_Abb)) EQ "&_APIName" and Trim(Left(Version)) EQ "&_VersionNo"));
@@ -50,27 +102,34 @@ Run;
 %Import(C:\inetpub\wwwroot\sasweb\Data\Perm\API_Config.csv);
 
 
-
-
-
+*=====================================================================================================================================================
+--- MAIN MACRO START ---
+======================================================================================================================================================;
 %Macro Main(GitHub_Path,Github_API,API_Path,Main_API,API_SCH,Version,Bank_Name);
-
-*--- Set X path variable to the default directory ---;
-*X "cd H:\StV\Open Banking\SAS\Data\Temp";
+*=====================================================================================================================================================
+--- Set X path variable to the default directory ---
+======================================================================================================================================================;
 /*
-%Let Path = C:\inetpub\wwwroot\sasweb\Data;
-*--- Change directory to default location on PC to save data extracted from Google API ---;
-X "CD &Path\Perm";
+X "cd H:\StV\Open Banking\SAS\Data\Temp";
 
-*--- Set the Library path where the permanent datasets will be saved ---;
+%Let Path = C:\inetpub\wwwroot\sasweb\Data;
+*=====================================================================================================================================================
+--- Change directory to default location on PC to save data extracted from Google API ---
+======================================================================================================================================================;
+X "CD &Path\Perm";
+*=====================================================================================================================================================
+--- Set the Library path where the permanent datasets will be saved ---
+======================================================================================================================================================;
 Libname OBData "&Path\Perm";
 */
-*--- Assign Global Macro variable to use in all Macros in the various code sections ---;
+*=====================================================================================================================================================
+--- Assign Global Macro variable to use in all Macros in the various code sections ---
+======================================================================================================================================================;
 %Global H_Num;
 %Global No_Obs;
 %Global API;
-
-
+%Global ErrorCode;
+%Global ErrorDesc;
 
 	%Let BankName_C = &BankName_C;
 	%Let API_Link = &API_Link;
@@ -81,6 +140,9 @@ Libname OBData "&Path\Perm";
 	%Let Version_C = &Version_C;
 	%Let Sch_Version = &Sch_Version;
 
+	%Let ErrorCode = 0;
+	%Let ErrorDesc=;
+
 
 	%Put Bank_Name = "&BankName_C";
 	%Put API_Link = "&API_Link";
@@ -90,13 +152,21 @@ Libname OBData "&Path\Perm";
 	%Put Perm_Sch_Table = "&Perm_Sch_Table";
 	%Put Version = "&Version_C";
 	%Put Sch_Version = "Sch_Version";
-
-
-*--- Set system options to track comments in the log file ---;
-*Options DMSSYNCHK;
-Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
-
-*--- Set Title Date in Proc Print ---;
+*=====================================================================================================================================================
+--- Set the ERROR Code macro variables ---
+======================================================================================================================================================;
+%Macro ErrorCheck();
+;Run;Quit;
+%If &SysErr > 0 %Then
+%Do;
+	%Let ErrorCode = &SysErr;
+	%Let ErrorDesc = &SysErrorText;
+%End;
+%Mend ErrorCheck;
+%ErrorCheck;
+*=====================================================================================================================================================
+--- Set Title Date in Proc Print ---
+======================================================================================================================================================;
 %Macro Fdate(Fmt,Fmt2);
    %Global Fdate FdateTime;
    Data _Null_;
@@ -105,6 +175,81 @@ Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
   Run;
 %Mend Fdate;
 
+
+%Macro Sys_Errors(Bank, API);
+
+*=====================================================================================================================================================
+--- Run Header code to include OPEN BANKING Imaage at the top of the Report ---
+======================================================================================================================================================;
+%Header();
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+======================================================================================================================================================;
+		ODS _All_ Close;
+	/*
+				ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
+					Contents="&Bank._&API._Contents.html" 
+					Frame="&Bank._&API._Frame.html" 
+					Style=HTMLBlue;
+	*/
+  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
+
+	Data Work.System_Error;
+		Length ERROR_DESC $ 100;
+
+					ERROR_DESC = '';
+					Output;
+					ERROR_DESC = "     There are crytical system Errors in the execution of the program    ";
+					Output;
+					ERROR_DESC = '';
+					Output;
+					ERROR_DESC = '   Validate that the correct Version no was selected in the previous screen   ';
+					Output;
+					ERROR_DESC = '';
+					Output;
+					ERROR_DESC = "   *** Error Code: &ErrorCode - Error Description: &ErrorDesc ***   ";
+					Output;
+					ERROR_DESC = '';
+					Output;
+					ERROR_DESC = '   Contact the OBIE System Administrator - Email: steffan.vanmolendorff@openbanking.org.uk - Mobile: +44 749 7002 765   ';
+					Output;
+					ERROR_DESC = '';
+					Output;
+				Run;
+
+
+				Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
+	/*			Title2 "%Sysfunc(UPCASE(&Bank)) %Sysfunc(UPCASE(&API)) API HAS DATA VALIDATION ERRORS - %Sysfunc(UPCASE(&Fdate))";*/
+
+				Proc Report Data =  OBData.System_Error nowd
+					style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+					style(header)=[background=lightskyblue foreground=black] 
+					style(column)=[background=lightcyan foreground=black];
+
+					Columns ERROR_DESC;
+
+					Define ERROR_DESC / display 'System Execution Error' left;
+
+					Compute ERROR_DESC;
+					If ERROR_DESC NE '' then 
+						Do;
+							call define(_col_,'style',"style=[foreground=Red background=pink font_weight=bold]");
+						End;
+					Endcomp;
+
+				Run;
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
+		%ReturnButton();
+
+	ODS Listing;
+
+%Mend Sys_Errors;
+/*	%Sys_Errors(&_BankName, &_APIName);*/
+*=====================================================================================================================================================
+--- Macro code for the Resubmit-Return button at the bottom of the reports ---
+======================================================================================================================================================;
 %Macro ReturnButton();
 Data _Null_;
 		File _Webout;
@@ -127,10 +272,35 @@ Data _Null_;
 		Put '<title>LRM</title>';
 
 		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+
+
+/*	
+		*--- JS ---;
+		Put 'var bar = new ProgressBar.Circle(container, {';
+  		Put 'strokeWidth: 6,';
+  		Put 'easing: 'easeInOut',';
+  		Put 'duration: 1400,';
+  		Put 'color: '#FFEA82',';
+  		Put 'trailColor: '#eee',';
+  		Put 'trailWidth: 1,';
+  		Put 'svgStyle: null';
+		Put '})';
+		Put 'bar.animate(1.0);';
+*/
+
 		Put '</script>';
 
 		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
 
+/*
+		*--- CSS ---;
+		Put '#container';
+		Put '{';
+  		Put 'margin: 20px;';
+  		Put 'width: 200px;';
+  		Put 'height: 200px;';
+		Put '}';
+*/
 		Put '</HEAD>';
 		Put '<BODY>';
 
@@ -177,129 +347,69 @@ Data _Null_;
 		
 Run;
 %Mend ReturnButton;
-
-%Macro Sys_Errors(Bank, API);
-
-*--- Set Output Delivery Parameters  ---;
-			ODS _All_ Close;
-/*
-			ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
-				Contents="&Bank._&API._Contents.html" 
-				Frame="&Bank._&API._Frame.html" 
-				Style=HTMLBlue;
-*/
-	  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
-
-			Data Work.System_Error;
-
-			Length ERROR_DESC $ 100;
-
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = "There are crytical system Errors in the execution of the program.";
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = "*** Error Code: &SYSERR ***";
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = "*** Error Description: &syserrortext ***";
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = 'Please contact the System Administrator - Steffan van Molendorff.';
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = 'Steffan van Molendorff - Open Banking Limited';
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = 'Email: steffan.vanmolendorff@openbanking.org.uk';
-				Output;
-				ERROR_DESC = '';
-				Output;
-				ERROR_DESC = 'UK Mobile: +44 749 7002 765';
-				Output;
-				ERROR_DESC = '';
-				Output;
-			Run;
-
-			Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
-			Title2 "%Sysfunc(UPCASE(&Bank)) %Sysfunc(UPCASE(&API)) API HAS DATA VALIDATION ERRORS - %Sysfunc(UPCASE(&Fdate))";
-
-			Proc Report Data =  Work.System_Error nowd
-				style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-				style(header)=[background=lightskyblue foreground=black] 
-				style(column)=[background=lightcyan foreground=black];
-
-				Columns ERROR_DESC;
-
-				Define ERROR_DESC / display 'System Execution Error' left;
-
-				Compute ERROR_DESC;
-				If ERROR_DESC NE '' then 
-					Do;
-						call define(_col_,'style',"style=[foreground=Red background=pink font_weight=bold]");
-					End;
-				Endcomp;
-
-			Run;
-*--- Add bottom of report Menu ReturnButton code here ---;
-			%ReturnButton();
-
-*--- Close Output Delivery Parameters  ---;
-		ODS HTML Close;
-		ODS Listing;	
-%Mend Sys_Errors;
-
-
-*--- The Main macro will execute the code to extract data from the API end points ---;
+*=====================================================================================================================================================
+--- The Main macro will execute the code to extract data from the API end points ---
+======================================================================================================================================================;
 %Macro Schema(Url,JSON,API_SCH);
-
-/* create a macro to use at end of data and proc steps. */
-%Macro Runquit; 
-; Run; Quit;
-%If %Eval(&SysErr. > 4) %Then
-%Do;
-	%Sys_Errors(&_BankName, &_APIName);
-%End;
-%Mend Runquit;
-
-*--- Set a temporary file name to extract the content of the Schema JSON file into ---;
+*=====================================================================================================================================================
+--- Set a temporary file name to extract the content of the Schema JSON file into ---
+======================================================================================================================================================;
 Filename API Temp;
- 
-*--- Proc HTTP assigns the GET method in the URL to access the data contained within the Schema ---;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
+*=====================================================================================================================================================
+--- Proc HTTP assigns the GET method in the URL to access the data contained within the Schema ---
+======================================================================================================================================================;
 Proc HTTP
 	Url = "&Url."
  	Method = "GET" Verbose
  	Out = API;
-%Runquit;
-
-*--- The JSON engine will extract the data from the JSON script ---; 
+Run;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
+*=====================================================================================================================================================
+--- The JSON engine will extract the data from the JSON script ---
+======================================================================================================================================================;
 Libname LibAPIs JSON Fileref=API;
-
-*--- Proc datasets will create the datasets to examine resulting tables and structures ---;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
+*=====================================================================================================================================================
+--- Proc datasets will create the datasets to examine resulting tables and structures ---
+======================================================================================================================================================;
 Proc Datasets Lib = LibAPIs; 
-%Runquit;
-
-*--- Create the Bank Schema dataset ---;
+Run;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
+*=====================================================================================================================================================
+--- Create the Bank Schema dataset ---
+======================================================================================================================================================;
 Data Work.&JSON;
 	Set LibAPIs.Alldata(Where=(V NE 0));
-%Runquit;
-
-*--- Sort the Bank Schema file ---;
+Run;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
+*=====================================================================================================================================================
+--- Sort the Bank Schema file ---
+======================================================================================================================================================;
 Proc Sort Data = Work.&JSON
 	Out = Work.H_Num;
 	By Descending P;
-%Runquit;
+Run;
 
 Data Work._Null_;
-*--- The variable V contains the first level of the Hierarchy which has no Bank information ---;
-*--- Keep only the highest value of P which will be used in the macro variable H_Num ---;
+*=====================================================================================================================================================
+--- The variable V contains the first level of the Hierarchy which has no Bank information ---
+--- Keep only the highest value of P which will be used in the macro variable H_Num ---
+======================================================================================================================================================;
 	Set Work.H_Num(Obs=1 Keep = P);
-*--- Create a macro variable H_Num to store the hiighest number of Hierarchical levels which will be used in code iterations ---;
+*=====================================================================================================================================================
+--- Create a macro variable H_Num to store the hiighest number of Hierarchical levels which will be used in code iterations ---
+======================================================================================================================================================;
 	Call Symput('H_Num', Compress(Put(P,3.)));
 Run;
 
@@ -311,15 +421,19 @@ Data Work.&JSON
 	RowCnt = _N_;
 
 	Set Work.&JSON;
-
-*--- Create Array concatenate variables P1 to P7 which will create the Hierarchy ---;
+*=====================================================================================================================================================
+--- Create Array concatenate variables P1 to P7 which will create the Hierarchy ---
+======================================================================================================================================================;
 	Array Cat{&H_Num} P1 - P&H_Num;
-
-*--- The Do-Loop will create the Hierarchy of Level 1 to 7 (P1 - P7) ---;
+*=====================================================================================================================================================
+--- The Do-Loop will create the Hierarchy of Level 1 to 7 (P1 - P7) ---
+======================================================================================================================================================;
 	If P = 1 Then
 	Do;
 		Do i = 1 to P;
-	*--- If it is the first data field then do ---;
+*=====================================================================================================================================================
+--- If it is the first data field then do ---
+======================================================================================================================================================;
 			Var2 = Trim(Left(Cat{i}));
 			Count = i;
 		End;
@@ -330,7 +444,9 @@ Data Work.&JSON
 		Do i = 1 to P-1;
 			If i = 1 Then 
 			Do;
-	*--- If it is the first data field then do ---;
+*=====================================================================================================================================================
+--- If it is the first data field then do ---
+======================================================================================================================================================;
 				Var2 = Trim(Left(Cat{i}));
 				Count = i;
 			End;
@@ -341,14 +457,15 @@ Data Work.&JSON
 			End;
 		End;
 	End;
-
-	*--- Create variable to list the API value i.e. ATM or Branches ---;
+*=====================================================================================================================================================
+--- Create variable to list the API value i.e. ATM or Branches ---
+======================================================================================================================================================;
 	Bank_API = "Schema";
-
-*--- Extract only the last level of the Hierarchy ---;
+*=====================================================================================================================================================
+--- Extract only the last level of the Hierarchy ---
+======================================================================================================================================================;
 	Var3 = Left(Trim(Var2));
 Run;
-
 
 Data Work.&JSON;
 	Set Work.&JSON;
@@ -378,8 +495,6 @@ Proc Sort Data = Work.&JSON
 	Out = Work.&JSON;
 	By Hierarchy;
 Run;
-
-
 
 Data Work.&JSON(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy));
 	Set Work.&JSON;
@@ -423,7 +538,6 @@ Proc Sort Data = Work.&JSON
 	By Hierarchy;
 Run;
 
-
 Data Work.&JSON;
 	Set Work.&JSON;
 
@@ -442,26 +556,33 @@ Data Work.&JSON;
 		Columns = Attribute;
 	End;
 
-
 	If Reverse(Scan(Reverse(Trim(Left(New_Data_Element))),1,'-')) in 
 		('type','description','minLength','maxLength','format','additionalProperties','title','uniqueItems','pattern','minItems','mandatory',
 		'enum1','enum2','enum3','enum4','enum5','enum6','enum7','enum8','enum9','enum10',
 		'enum11','enum12','enum13','enum14','enum15','enum16','enum17','enum18','enum19','enum20',
-		'enum21','enum22','enum23','enum24','enum25','enum26','enum27','enum28','enum29','enum30'
-		'enum31','enum32','enum33','enum34','enum35','enum36','enum37','enum38','enum39','enum40') then
+		'enum21','enum22','enum23','enum24','enum25','enum26','enum27','enum28','enum29','enum30',
+		'enum31','enum32','enum33','enum34','enum35','enum36','enum37','enum38','enum39','enum40',
+		'enum41','enum42','enum43','enum44','enum45','enum46','enum47','enum48','enum49','enum50',
+		'enum51','enum52','enum53','enum54','enum55','enum56','enum57','enum58','enum59','enum60',
+		'enum61','enum62','enum63','enum64','enum65','enum66','enum67','enum68','enum69','enum70',
+		'enum71','enum72','enum73','enum74','enum75','enum76','enum77','enum78','enum79','enum80',
+		'enum81','enum82','enum83','enum84','enum85','enum86','enum87','enum88','enum89','enum90',
+		'enum91','enum92','enum93','enum94','enum95','enum96','enum97','enum98','enum99','enum100',
+		'enum101','enum102','enum103','enum104','enum105','enum106','enum107','enum108','enum109','enum110') then
 	Do;
 		Columns = Reverse(Scan(Reverse(New_Data_Element),1,'-'));
 	End;
-
-*--- Ensure that the Column variable has no blank spaces to avoide errors to avoide macro Variable_Name failure ---; 
+*=====================================================================================================================================================
+--- Ensure that the Column variable has no blank spaces to avoide errors to avoide macro Variable_Name failure ---
+======================================================================================================================================================;
 	If Columns = '' then 
 	Do;
 		Columns = Attribute;
 	End;
 Run;
-
-
-*--- Create Enum Counter (EnumCnt)to append to Columns variable values where Columns contain enum ---; 
+*=====================================================================================================================================================
+--- Create Enum Counter (EnumCnt)to append to Columns variable values where Columns contain enum ---
+======================================================================================================================================================;
 Proc Sort Data = Work.&JSON
 	Out = Work.&JSON;
 	By Hierarchy Attribute;
@@ -504,10 +625,10 @@ Proc Sort Data = Work.&JSON._1
 	By HierCnt Counter;
 Run;
 
-
 %Macro VarVal();
-
-*--- TBC ---;
+*=====================================================================================================================================================
+--- TBC ---
+======================================================================================================================================================;
 Data Work.&JSON._2;
 	Set Work.&JSON._1(Where=(Columns NE ''));
 	By HierCnt Counter;
@@ -517,13 +638,10 @@ Data Work.&JSON._2;
 
 	If Last.HierCnt and Last.Counter then
 	Do;
-
 		Call Symput('HierCnt',Trim(Left(Put(HierCnt,6.))));
 		Call Symput(Compress('Test'||'_'||Put(HierCnt,8.)),Trim(Left(Put(Counter,8.))));
-
 	End;
 Run;
-
 
 %Put HierCnt = &HierCnt;
 %Put ***;
@@ -555,7 +673,6 @@ Run;
 			%End;
 	Run;
 
-
 	Data Work.Schema_Columns
 		(Keep = Hierarchy 
 		Type
@@ -586,63 +703,71 @@ Run;
 
 %End;
 
-
 %Mend VarVal;
 %VarVal();
-
-
-
-
 *====================================================================================================
 =								API EXTRACT															=
 =====================================================================================================;
-*--- The Main macro will execute the code to extract data from the API end points ---;
+*====================================================================================================
+--- The Main macro will execute the code to extract data from the API end points ---
+=====================================================================================================;
 %Macro API(Url,Bank,API);
-
-/* create a macro to use at end of data and proc steps. */
-%Macro Runquit; 
-; Run; Quit;
-%If %Eval(&SysErr. > 4) %Then
-%Do;
-	%Sys_Errors(&Bank, &API);
-%End;
-%Mend Runquit;
-
 
 Filename API Temp;
  
-*--- Proc HTTP assigns the GET method in the URL to access the data ---;
+*=====================================================================================================================================================
+--- Proc HTTP assigns the GET method in the URL to access the data ---
+======================================================================================================================================================;
 Proc HTTP
 	Url = "&Url."
  	Method = "GET"
  	Out = API;
-%Runquit;
-
-*--- The JSON engine will extract the data from the JSON script ---; 
+Run;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
+*=====================================================================================================================================================
+--- The JSON engine will extract the data from the JSON script ---
+======================================================================================================================================================;
 Libname LibAPIs JSON Fileref=API;
-
-*--- Proc datasets will create the datasets to examine resulting tables and structures ---;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
+*=====================================================================================================================================================
+--- Proc datasets will create the datasets to examine resulting tables and structures ---
+======================================================================================================================================================;
 Proc Datasets Lib = LibAPIs; 
-%Runquit;
+Run;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
 
 Data Work.&Bank._API;
 	Set LibAPIs.Alldata;
-%Runquit;
+Run;
+/*%Let ErrorCode = %Eval(&SysErr);*/
+/*%Let ErrorDesc = &SysErrorText;*/
+%ErrorCheck;
 
-*--- Sort the Bank Schema file ---;
+*=====================================================================================================================================================
+--- Sort the Bank Schema file ---
+======================================================================================================================================================;
 Proc Sort Data = Work.&Bank._API
 	Out = Work.H_Num;
 	By Descending P;
 Run;
 
 Data Work._Null_;
-*--- The variable V contains the first level of the Hierarchy which has no Bank information ---;
-*--- Keep only the highest value of P which will be used in the macro variable H_Num ---;
+*=====================================================================================================================================================
+--- The variable V contains the first level of the Hierarchy which has no Bank information ---
+--- Keep only the highest value of P which will be used in the macro variable H_Num ---
+======================================================================================================================================================;
 	Set Work.H_Num(Obs=1 Keep = P);
-*--- Create a macro variable H_Num to store the hiighest number of Hierarchical levels which will be used in code iterations ---;
+*=====================================================================================================================================================
+--- Create a macro variable H_Num to store the hiighest number of Hierarchical levels which will be used in code iterations ---
+======================================================================================================================================================;
 	Call Symput('H_Num', Compress(Put(P,3.)));
 Run;
-
 
 Data Work.&Bank._API;
 
@@ -650,23 +775,29 @@ Data Work.&Bank._API;
 
 	RowCnt = _N_;
 
-*--- The variable V contains the first level of the Hierarchy which has no Bank information ---;
+*=====================================================================================================================================================
+--- The variable V contains the first level of the Hierarchy which has no Bank information ---
+======================================================================================================================================================;
 	Set LibAPIs.Alldata(Where=(V NE 0));
-
-
-*--- Create Array concatenate variables P1 to P7 which will create the Hierarchy ---;
+*=====================================================================================================================================================
+--- Create Array concatenate variables P1 to P7 which will create the Hierarchy ---
+======================================================================================================================================================;
 	Array Cat{&H_Num} P1 - P&H_Num;
-
-*--- The Do-Loop will create the Hierarchy of Level 1 to 7 (P1 - P7) ---;
+*=====================================================================================================================================================
+--- The Do-Loop will create the Hierarchy of Level 1 to 7 (P1 - P7) ---
+======================================================================================================================================================;
 	Do i = 1 to P;
 		If i = 1 Then 
 		Do;
-*--- If it is the first data field then do ---;
+*=====================================================================================================================================================
+--- If it is the first data field then do ---
+======================================================================================================================================================;
 			Var2 = Trim(Left(Cat{i}));
 			Count = i;
 		End;
-
-*--- All subsequent data fields are concatenated to form the Hierarchy variable as in the reports ---;
+*=====================================================================================================================================================
+--- All subsequent data fields are concatenated to form the Hierarchy variable as in the reports ---
+======================================================================================================================================================;
 		Else Do;
 			If Var2 NE '' then
 			Do;
@@ -676,12 +807,13 @@ Data Work.&Bank._API;
 		End;
 		Retain Var2;
 	End;
-
-
-*--- Create variable to list the API value i.e. ATM or Branches ---;
+*=====================================================================================================================================================
+--- Create variable to list the API value i.e. ATM or Branches ---
+======================================================================================================================================================;
 	Bank_API = "&API";
-
-*--- Extract only the last level of the Hierarchy ---;
+*=====================================================================================================================================================
+--- Extract only the last level of the Hierarchy ---
+======================================================================================================================================================;
 	Var3 = Reverse(Scan(Left(Trim(Reverse(Var2))),1,'-',' '));
 
 	If "&Bank" EQ 'Bank_of_Ireland' and "&API" EQ 'commercial-credit-cards' Then
@@ -693,14 +825,15 @@ Data Work.&Bank._API;
 
 Run;
 
-
 Data Work.&Bank._API
 	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P&H_Num Value
-	Rename=(Var3 = Data_Element Var2 = Hierarchy Value = &Bank)) Work.X;
+	Rename=(Var3 = Data_Element Var2 = Hierarchy Value = &Bank));
 
 	Set Work.&Bank._API;
 
-*--- For ATMS do the following amendments to the Hierarchy values ---;
+*=====================================================================================================================================================
+--- For ATMS do the following amendments to the Hierarchy values ---
+======================================================================================================================================================;
 	If Trim(Left(Bank_API)) = 'atms' then
 	Do;
 
@@ -724,9 +857,9 @@ Data Work.&Bank._API
 			Var2 = 'data-SupportedLanguages';
 		End;
 	End;
-
-
-*--- For BRANCHES do the following amendments to the Hierarchy values ---;
+*=====================================================================================================================================================
+--- For BRANCHES do the following amendments to the Hierarchy values ---
+======================================================================================================================================================;
 	If Trim(Left(Bank_API)) = 'branches' then
 	Do;
 
@@ -750,10 +883,9 @@ Data Work.&Bank._API
 			Var2 = 'CustomerSegment';
 		End;
 	End;
-
-
-
-	*--- For BUSINESS-CURRENT-ACCOUNTS do the following amendments to the Hierarchy values ---;
+*=====================================================================================================================================================
+--- For BUSINESS-CURRENT-ACCOUNTS do the following amendments to the Hierarchy values ---
+======================================================================================================================================================;
 /*	If Trim(Left(Bank_API)) = 'business-current-accounts' then*/
 /*	Do;*/
 /*		If Trim(Left(Var2)) in ('data-AccessChannels-Acces','AccessChannels-Acce') then */
@@ -787,24 +919,25 @@ Data Work.&Bank._API
 /*	End;*/
 
 Run;
-
-
-*--- Remove the value data- from the Hierarchy value ---;
+*=====================================================================================================================================================
+--- Remove the value data- from the Hierarchy value ---
+======================================================================================================================================================;
 Data Work.&Bank._API;
 	Set Work.&Bank._API;
 	Hierarchy = Trim(Left(Tranwrd(Hierarchy,'data-','')));
 Run;
-
-
-*--- Sort data by Data_Element ---;
+*=====================================================================================================================================================
+--- Sort data by Data_Element ---
+======================================================================================================================================================;
 Proc Sort Data = Work.&Bank._API(Keep = Hierarchy &Bank RowCnt Rename=(&Bank = &Bank._Value));
  By Hierarchy &Bank._Value;
 Run;
-
-*--- Manually change the data (Edit Mode) in OpenData.&Bank._&API._Schema_Fail datasets ---;
+*=====================================================================================================================================================
+--- Manually change the data (Edit Mode) in OpenData.&Bank._&API._Schema_Fail datasets ---
+======================================================================================================================================================;
 Data Work.&Bank._API
 		Work._A_&Bank._API
-		Work._S_&Bank._API;
+		Work._S_&Bank._API   OBData.X;
 
 	Length Hierarchy $ 250
 	Table $ 32;
@@ -830,15 +963,15 @@ Data Work.&Bank._API
 		Output Work.&Bank._API;
 	End;
 Run;
-
-
-*--- Sort data by Data_Element ---;
+*=====================================================================================================================================================
+--- Sort data by Data_Element ---
+======================================================================================================================================================;
 Proc Sort Data = Work.&Bank._API;
  By RowCnt;
 Run;
-
-
-*--- Create Failed Test Dataset for Testing purposes in the output report ---;
+*=====================================================================================================================================================
+--- Create Failed Test Dataset for Testing purposes in the output report ---
+======================================================================================================================================================;
 Data Work.&Bank._API_Failed;
 	Set Work.&Bank._API;
 
@@ -859,12 +992,10 @@ Data Work.&Bank._API_Failed;
 	If Trim(Left(Pattern)) = ('[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?') Then &Bank._Value = Trim(Left(Barclays_Value ))||'_ABC';
 *	If Trim(Left(Pattern)) = ('[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?') Then Barclays_Value = '';
 */
-
-
-
 Run;
-
-*--- Test the minLength and maxLenght of a data value ---;
+*=====================================================================================================================================================
+--- Test the minLength and maxLenght of a data value ---
+======================================================================================================================================================;
 %Macro Test_VarLength(Bank, API);
 
 Data Work.&Bank._API;
@@ -890,8 +1021,9 @@ Run;
 %Mend Test_VarLength;
 %Test_VarLength(&Bank, &API);
 
-
-*--- Test for the URI Format of the Bank URI data value ---;
+*=====================================================================================================================================================
+--- Test for the URI Format of the Bank URI data value ---
+======================================================================================================================================================;
 %Macro Test_Format(Bank, API);
 
 Data Work.&Bank._API;
@@ -940,7 +1072,9 @@ Run;
 %Test_Format(&Bank, &API);
 
 
-*--- Test if the Mandatory Flag does have a data value ---;
+*=====================================================================================================================================================
+--- Test if the Mandatory Flag does have a data value ---
+======================================================================================================================================================;
 %Macro Test_Mandatory(Bank, API);
 
 Data Work.&Bank._API;
@@ -963,8 +1097,9 @@ Run;
 %Mend Test_Mandatory;
 %Test_Mandatory(&Bank, &API);
 
-
-*--- Test if the all Enum variable values are unique ---;
+*=====================================================================================================================================================
+--- Test if the all Enum variable values are unique ---
+======================================================================================================================================================;
 %Macro Test_Enum(Bank, API);
 
 Proc Contents Data = Work.&Bank._API
@@ -1027,6 +1162,9 @@ Run;
 %Test_Enum(&Bank, &API);
 
 
+*=====================================================================================================================================================
+--- Test if the all PATTERN variable values are unique ---
+======================================================================================================================================================;
 %Macro Pattern();
 
 Data Work.&Bank._API;
@@ -1046,7 +1184,9 @@ Data Work.&Bank._API;
 	Pattern_Result_5 
 	Pattern_Result_6 $ 6;
 
-*--- Test the 1st of 6 Pattern Values ---;
+*=====================================================================================================================================================
+*--- Test the 1st of 6 Pattern Values ---
+======================================================================================================================================================;
 	If Trim(Left(Pattern)) = '[A-Z]{2}' then
 	Do;
 		Pattern1 = Substr(Scan(Pattern,1,']'),2);
@@ -1080,7 +1220,9 @@ Data Work.&Bank._API;
 	End;
 
 
-*--- Test the 2nd of 6 Pattern Values ---;
+*=====================================================================================================================================================
+*--- Test the 1st of 6 Pattern Values ---
+======================================================================================================================================================;
 	If Trim(Left(Pattern)) = '^(([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9].\d{3})|(^24:00:00\.000)(?:Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$' then
 	Do;
 		Pattern3 = Input(Compress(Tranwrd(Tranwrd(Trim(Left(&Bank._Value)),':',''),'.','')),8.);
@@ -1092,9 +1234,11 @@ Data Work.&Bank._API;
 			Pattern_Result_2_Desc = "4. &Bank value is missing";
 		End;
 
-*--- Pattern3 variable has the : and . translated to missing which creates a number value ---;
-*--- Pattern4 variable identifies the number position of the : and sets a numeric value ---;
-*--- If both Pattern3 and Pattern4 are numbers gt than 0 then there is no character values in the &Bank_Value variable ---;
+*=====================================================================================================================================================
+--- Pattern3 variable has the : and . translated to missing which creates a number value ---
+--- Pattern4 variable identifies the number position of the : and sets a numeric value ---
+--- If both Pattern3 and Pattern4 are numbers gt than 0 then there is no character values in the &Bank_Value variable ---
+======================================================================================================================================================;
 		Else If Pattern3 >= 0 and Pattern4 <= 0 then
 		Do;
 			Pattern_Result_2 = 'Failed';
@@ -1115,7 +1259,9 @@ Data Work.&Bank._API;
 
 
 
-	*--- Test the 3rd of 6 Pattern Values ---;
+*=====================================================================================================================================================
+--- Test the 3rd of 6 Pattern Values ---
+======================================================================================================================================================;
 	If Trim(Left(Pattern)) = '^-?\d{1,3}\.\d{1,8}$' then
 	Do;
 		Pattern5 = Input(Compress(Tranwrd(Trim(Left(&Bank._Value)),'.','')),8.);
@@ -1127,9 +1273,11 @@ Data Work.&Bank._API;
 			Pattern_Result_3_Desc = "7. &Bank value is missing";
 		End;
 
-*--- Pattern5 variable has . translated to missing which creates a number value ---;
-*--- Pattern6 variable identifies the number position of the . and sets a numeric value ---;
-*--- If both Pattern3 and Pattern4 are numbers gt than 0 then there is no character values in the &Bank_Value variable ---;
+*=====================================================================================================================================================
+--- Pattern5 variable has . translated to missing which creates a number value ---
+--- Pattern6 variable identifies the number position of the . and sets a numeric value ---
+--- If both Pattern3 and Pattern4 are numbers gt than 0 then there is no character values in the &Bank_Value variable ---
+======================================================================================================================================================;
 		Else If Pattern5 >= 0 and Pattern6 <= 0 then
 		Do;
 			Pattern_Result_3 = 'Failed';
@@ -1148,11 +1296,9 @@ Data Work.&Bank._API;
 
 	End;
 
-
-
-
-
-*--- Test the 4th of 6 Pattern Values ---;
+*=====================================================================================================================================================
+--- Test the 4th of 6 Pattern Values ---
+======================================================================================================================================================;
 	If Trim(Left(Pattern)) = '^[+][0-9]{1,3}-[0-9()+-]{1,30}$' then
 	Do;
 		Pattern7 = Substr(&Bank._Value,1,1);
@@ -1166,9 +1312,11 @@ Data Work.&Bank._API;
 			Pattern_Result_4_Desc = "10. &Bank value is missing";
 		End;
 
-*--- Pattern5 variable has . translated to missing which creates a number value ---;
-*--- Pattern6 variable identifies the number position of the . and sets a numeric value ---;
-*--- If both Pattern3 and Pattern4 are numbers gt than 0 then there is no character values in the &Bank_Value variable ---;
+*=====================================================================================================================================================
+--- Pattern5 variable has . translated to missing which creates a number value ---
+--- Pattern6 variable identifies the number position of the . and sets a numeric value ---
+--- If both Pattern3 and Pattern4 are numbers gt than 0 then there is no character values in the &Bank_Value variable ---
+======================================================================================================================================================;
 		Else If Pattern7 NE '+' and Pattern8 NE '-' then
 		Do;
 			Pattern_Result_4 = 'Failed';
@@ -1188,9 +1336,9 @@ Data Work.&Bank._API;
 	End;
 
 
-
-
-*--- Test the 5th of 6 Pattern Values ---;
+*=====================================================================================================================================================
+--- Test the 5th of 6 Pattern Values ---
+======================================================================================================================================================;
 	If Trim(Left(Pattern)) = '[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?' then
 	Do;
 		Pattern11 = Substr(&Bank._Value,1,6);
@@ -1204,9 +1352,11 @@ Data Work.&Bank._API;
 			Pattern_Result_5_Desc = "13. &Bank value is missing";
 		End;
 
-*--- Pattern5 variable has . translated to missing which creates a number value ---;
-*--- Pattern6 variable identifies the number position of the . and sets a numeric value ---;
-*--- If both Pattern3 and Pattern4 are numbers gt than 0 then there is no character values in the &Bank_Value variable ---;
+*=====================================================================================================================================================
+--- Pattern5 variable has . translated to missing which creates a number value ---
+--- Pattern6 variable identifies the number position of the . and sets a numeric value ---
+--- If both Pattern3 and Pattern4 are numbers gt than 0 then there is no character values in the &Bank_Value variable ---
+======================================================================================================================================================;
 		Else If IndexC(Pattern11,"0","1","2","3","4","5","6","7","8","9") then
 		Do;
 			Pattern_Result_5 = 'Failed';
@@ -1232,8 +1382,9 @@ Data Work.&Bank._API;
 	End;
 
 
-
-*--- Test the 6th of 6 Pattern Values ---;
+*=====================================================================================================================================================
+--- Test the 6th of 6 Pattern Values ---
+======================================================================================================================================================;
 	If Trim(Left(Pattern)) = '[A-Z]{3}' then
 	Do;
 		Pattern15 = Substr(Scan(Pattern,1,']'),2);
@@ -1274,6 +1425,9 @@ Run;
 %Pattern();
 
 
+*=====================================================================================================================================================
+--- Create test PASS and FAIL datasets based on above test cases ---
+======================================================================================================================================================;
 Data Work.Pass
 	Work.Fail1(Keep = Hierarchy &Bank._Value RowCnt Test_Var_Length_Desc Test_Var_Length)
 	Work.Fail2(Keep = Hierarchy &Bank._Value RowCnt Test_Format_Value_Desc Test_Format_Value)
@@ -1298,7 +1452,9 @@ Data Work.Pass
 	Pattern_Result_5_Desc $ 100
 	Pattern_Result_6_Desc $ 100;
 
-*--- Combine test results with test descriptions for each variable value being tested ---;
+*=====================================================================================================================================================
+--- Combine test results with test descriptions for each variable value being tested ---
+======================================================================================================================================================;
 		If Test_Var_Length EQ 'Failed' then
 		Do;
 			If Test_Var_Length = 'Failed' then
@@ -1407,7 +1563,9 @@ Data Work.Pass
 
 Run;
 
-
+*=====================================================================================================================================================
+--- Sort FAIL datasets by RowCnt to get the dataset order correct  ---
+======================================================================================================================================================;
 %Macro Sort(Dsn);
 
 Proc Sort Data = &Dsn;
@@ -1424,7 +1582,9 @@ Run;
 %Sort(Work.Fail8);
 %Sort(Work.Fail9);
 %Sort(Work.Fail10);
-
+*=====================================================================================================================================================
+--- Merge all FAIL datasets by RowCnt for reporting purposes  ---
+======================================================================================================================================================;
 Data Work.Fail;
 	Merge Work.Fail1
 	Work.Fail2
@@ -1438,27 +1598,33 @@ Data Work.Fail;
 	Work.Fail10;
 	By RowCnt;
 Run;
-
-
-*--- Test if the Fail dataset contains any observations to select the correct report to print ---;
+*=====================================================================================================================================================
+--- Test if the Fail dataset contains any observations to select the correct report to print ---
+======================================================================================================================================================;
 %Let dsid = %sysfunc(open(Work.Fail)); 
 %Let NOBS = %sysfunc(attrn(&dsid,nobs)); 
 %Let rc = %sysfunc(close(&dsid)); 
 %Put NOBS = &NOBS;
 
-
-*--- Test if the _A_BANK_API dataset contains any observations which did not match with the Schema values ---;
+*=====================================================================================================================================================
+--- Test if the _A_BANK_API dataset contains any observations which did not match with the Schema values ---
+======================================================================================================================================================;
 %Let dsid = %sysfunc(open(Work._a_&Bank._API)); 
 %Let NOBS_API = %sysfunc(attrn(&dsid,nobs)); 
 %Let rc = %sysfunc(close(&dsid)); 
 %Put NOBS_API = &NOBS_API;
 
-*--- Test if the _S_BANK_API dataset contains any observations which did not match with the API values ---;
+*=====================================================================================================================================================
+--- Test if the _S_BANK_API dataset contains any observations which did not match with the API values ---
+======================================================================================================================================================;
 %Let dsid = %sysfunc(open(Work._s_&Bank._API)); 
 %Let NOBS_SCH = %sysfunc(attrn(&dsid,nobs)); 
 %Let rc = %sysfunc(close(&dsid)); 
 %Put NOBS_SCH = &NOBS_SCH;
 
+*=====================================================================================================================================================
+--- Create a temporary dataset to store the details of the current request being executed ---
+======================================================================================================================================================;
 Data Work.Stats;
 	Length Date_Time 8.
 	User_Name $ 50
@@ -1471,8 +1637,8 @@ Data Work.Stats;
 	API_Link $ 250
 	SCH_Link $ 250;
 
-
-	User_Name	 = "&_WebUser";
+*--- Save the macro variable values in dataset variables and append to existing Stats table ---;
+	User_Name = "&_WebUser";
 	Date_Time = DateTime();
 	Bank_Name = "&_BankName";
 	API_Name = "&_APINAME";
@@ -1484,104 +1650,121 @@ Data Work.Stats;
 	SCH_Link = "&SCH_Link";
 	Format Date_Time datetime.;
 Run;
-
+*=====================================================================================================================================================
+--- Append current request values to historic Stats table ---
+======================================================================================================================================================;
 Data OBData.Stats;
 	Set OBData.Stats
 	Work.Stats;
 Run;
 
+*--- Sort Stats history by Date Time to show the latest executed process results on the 1st line of the report ---;
 Proc Sort Data = OBData.Stats;
 	By Descending Date_Time;
 Run;
 
 %Fdate(worddate12., datetime.);
+*=====================================================================================================================================================
+--- The Header Macro inserts the OB Test Application Banner on top of the web reports ---
+======================================================================================================================================================;
+%Macro Header();
 
+Data _Null_;
+		File _Webout;
 
-*--- Run Macro to Print the CMA9 Reports for ATMS, BRANCHES, PCA, etc ---;
+Put '<HTML>';
+Put '<HEAD>';
+Put '<TITLE>OB TESTING</TITLE>';
+Put '</HEAD>';
+
+Put '<BODY>';
+
+Put '<table style="width: 100%; height: 5%" border="0">';
+   Put '<tr>';
+      Put '<td valign="top" style="background-color: lightblue; color: orange">';
+	Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cant find image" style="width:100%;height:8%px;">';
+      Put '</td>';
+   Put '</tr>';
+Put '</table>';
+Put '</BODY>';
+
+		Put '<p><br></p>';
+
+		Put '<div id="container"></div>';
+
+Put '</HTML>';
+
+Run;
+%Mend Header;
+*=====================================================================================================================================================
+--- Proc Template creates the style OBStyle and the macro is called by Proc Report ---
+======================================================================================================================================================;
+%Macro Template;
+Proc Template;
+ define style OBStyle;
+ notes "My Simple Style";
+ class body /
+ backgroundcolor = white
+ color = black
+ fontfamily = "Palatino"
+ ;
+ class systemtitle /
+ fontfamily = "Verdana, Arial"
+ fontsize = 16pt
+ fontweight = bold
+ ;
+ class table /
+ backgroundcolor = #f0f0f0
+ bordercolor = red
+ borderstyle = solid
+ borderwidth = 1pt
+ cellpadding = 5pt
+ cellspacing = 0pt
+ frame = void
+ rules = groups
+ ;
+ class header, footer /
+ backgroundcolor = #c0c0c0
+ fontfamily = "Verdana, Arial"
+ fontweight = bold
+ ;
+ class data /
+ fontfamily = "Palatino"
+ ;
+ end; 
+
+Run;
+%Mend Template
+%Template;
+*=====================================================================================================================================================
+--- Run Macro to Print the CMA9 Reports for ATMS, BRANCHES, PCA, etc ---
+======================================================================================================================================================;
 %Macro Print_Results(Bank, API);
 
-
-
-
-
-%If %Eval(&SysErr. > 4) and &NOBS = 0 %Then 
+%If &ErrorCode > 0 %Then 
 %Do;
-	%Macro No_Errors(Bank, API);
-*=================================================================================================
-						NO ERROR REPORT
-==================================================================================================;
-*--- Set Output Delivery Parameters  ---;
-		ODS _All_ Close;
-/*
-		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
-			Contents="&Bank._&API._Contents.html" 
-			Frame="&Bank._&API._Frame.html" 
-			Style=HTMLBlue;
-*/
-  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
-
-		ODS Graphics On;
-
-		Data Work.No_Obs;
-
-		Length ERROR_DESC $ 100;
-
-			ERROR_DESC = '';
-			Output;
-			ERROR_DESC = "There are no Errors recorded in the &Bank API Data";
-			Output;
-			ERROR_DESC = '';
-			Output;
-			ERROR_DESC = "The Schema structure and &Bank API data match";
-			Output;
-			ERROR_DESC = '';
-			Output;
-		Run;
-
-		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
-		Title2 "%Sysfunc(UPCASE(&Bank)) %Sysfunc(UPCASE(&API)) SCHEMA vs. API VALIDATION REPORT - %Sysfunc(UPCASE(&Fdate))";
-		Title4 "";
-		Title5 "&API_Link";
-		Title6 "&SCH_Link";
-
-		Proc Report Data =  Work.No_Obs nowd
-			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black];
-
-		Columns ERROR_DESC ;
-
-		Define ERROR_DESC / display 'CLEAN SCHEMA vs. API VALIDATION REPORT' left;
-
-		Compute ERROR_DESC;
-
-		If ERROR_DESC NE '' then 
-			Do;
-				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
-			End;
-		Endcomp;
-
-		Run;
-
-*--- Add bottom of report Menu ReturnButton code here ---;
-			%ReturnButton();
-
-			*--- Close Output Delivery Parameters  ---;
-		ODS HTML Close;
-		ODS Listing;	
-
-	%Mend No_Errors;
-	%No_Errors(&Bank, &API);
-
+	%Sys_Errors(&_BankName, &_APIName);
 %End;
-%Else %If %Eval(&SysErr. > 4) and &NOBS > 0 %Then 
-%Do;
-*=================================================================================================
-						LIST OF ERRORS REPORT
-==================================================================================================;
-	%Macro API_Errors(Bank, API);
 
-*--- Set Output Delivery Parameters  ---;
+%If &ErrorCode = 0 and &NOBS > 0 %Then 
+%Do;
+
+
+
+
+*=====================================================================================================================================================
+						LIST OF ERRORS REPORT
+=====================================================================================================================================================;
+%Macro API_Errors(Bank, API);
+
+*=====================================================================================================================================================
+--- Run Header code to include OPEN BANKING Imaage at the top of the Report ---
+=====================================================================================================================================================;
+/*%Header();*/
+
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+=====================================================================================================================================================;
 		ODS _All_ Close;
 /*
 		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
@@ -1589,9 +1772,24 @@ Run;
 			Frame="&Bank._&API._Frame.html" 
 			Style=HTMLBlue;
 */
-  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
+/*  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
-		ODS Graphics On;
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+=====================================================================================================================================================;
+ODS _All_ Close;
+ods listing close; 
+
+ods tagsets.tableeditor file=_Webout
+    style=styles.OBStyle 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="0" 
+            frozen_rowheaders="0" 
+            ); 
 
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
@@ -1617,9 +1815,9 @@ Run;
 		Pattern_Result_4_Desc
 		Pattern_Result_5_Desc
 		Pattern_Result_6_Desc;
-
-
-*--- Define columns in the report output ---;
+*=====================================================================================================================================================
+--- Define columns in the report output ---
+=====================================================================================================================================================;
 		Define Hierarchy / display 'Hierarchy' left;
 		Define &Bank._Value  / display "&Bank Value" left;
 
@@ -1709,36 +1907,70 @@ Run;
 			End;
 		Endcomp;
 
-		Run;
-
-*--- Close Output Delivery Parameters  ---;
-		ODS HTML Close;
-		ODS Listing;	
-
-*--- Add bottom of report Menu ReturnButton code here ---;
+Run;
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
 	%ReturnButton();
 
-	%Mend API_Errors;
-	%API_Errors(&Bank, &API);
+
+
+ods tagsets.tableeditor close; 
+ods listing; 
+
+%Mend API_Errors;
+%API_Errors(&Bank, &API);
+
+*=====================================================================================================================================================
+						EXPORT REPORT RESULTS TO RESULTS FOLDER
+=====================================================================================================================================================;
+%Macro ExportXL(Path);
+Proc Export Data = Work.Fail
+ 	Outfile = "&Path"
+	DBMS = CSV REPLACE;
+	PUTNAMES=YES;
+Run;
+%Mend ExportXL;
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&Bank._&_APIName._Fail.csv);
+
 %End;
-%Else %If %Eval(&SysErr. > 4) and &NOBS_API = 0 %Then 
+
+
+%Else %If &ErrorCode = 0 and &NOBS_API > 0 %Then 
 %Do;
-*=================================================================================================
+*=====================================================================================================================================================
 						LIST OF DATA RECORDS ONLY IN BANK API TABLE REPORT
-==================================================================================================;
-	%Macro API_MisMatch(Bank, API);
+======================================================================================================================================================;
+%Macro API_MisMatch(Bank, API);
 
-	*--- Print Report with reocrds only in the Bank API dataset ---;
+*=====================================================================================================================================================
+--- Print Report with reocrds only in the Bank API dataset ---
+=====================================================================================================================================================;
 
-		ODS _All_ Close;
+/*		ODS _All_ Close;*/
 /*		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
 			Contents="&Bank._&API._Contents.html" 
 			Frame="&Bank._&API._Frame.html" 
 			Style=Brick;
 */
-   		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
+/*   		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
-		ODS Graphics On;
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+======================================================================================================================================================;
+ODS _All_ Close;
+ods listing close; 
+
+ods tagsets.tableeditor file=_Webout
+    style=styles.OBStyle 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="0" 
+            frozen_rowheaders="0" 
+            ); 
 
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
@@ -1758,39 +1990,264 @@ Run;
 		Define Hierarchy / display 'Data Hierarchy' left;
 		Define &Bank._Value / display "&Bank. Value" left;
 
-
 		Compute Hierarchy;
 
 		If Hierarchy NE '' then 
 			Do;
-	*			call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
+				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
 			End;
 		Endcomp;
 
 		Run;
-
-*--- Add bottom of report Menu ReturnButton code here ---;
-	%ReturnButton();
-
-*--- Close Output Delivery Parameters  ---;
-		ODS HTML;
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
+%ReturnButton();
+*=====================================================================================================================================================
+--- Open Output Delivery Parameters  ---
+======================================================================================================================================================;
+		ODS HTML Close;	
 		ODS Listing;	
 
 	%Mend API_Mismatch;
 	%API_Mismatch(&Bank, &API);
 
+ods tagsets.tableeditor close; 
+ods listing; 
+
+
+*=====================================================================================================================================================
+						EXPORT REPORT RESULTS TO RESULTS FOLDER
+=====================================================================================================================================================;
+%Macro ExportXL(Path);
+Proc Export Data = Work._a_&Bank._API
+ 	Outfile = "&Path"
+	DBMS = CSV REPLACE;
+	PUTNAMES=YES;
+Run;
+%Mend ExportXL;
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\_a_&Bank._&_APIName..csv);
+
+%End;
+
+%Else %If &ErrorCode = 0 and &NOBS_SCH > 0 %Then 
+%Do;
+*=====================================================================================================================================================
+						LIST OF DATA RECORDS ONLY IN BANK API TABLE REPORT
+======================================================================================================================================================;
+%Macro API_MisMatch(Bank, API);
+
+*=====================================================================================================================================================
+--- Print Report with reocrds only in the Bank API dataset ---
+======================================================================================================================================================;
+/*		ODS _All_ Close;*/
+/*		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
+			Contents="&Bank._&API._Contents.html" 
+			Frame="&Bank._&API._Frame.html" 
+			Style=Brick;
+*/
+/*   		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
+
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+======================================================================================================================================================;
+ODS _All_ Close;
+ods listing close; 
+
+ods tagsets.tableeditor file=_Webout
+    style=styles.OBStyle 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="0" 
+            frozen_rowheaders="0" 
+            ); 
+
+		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
+		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
+		Title3 "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
+		Title4 "";
+		Title5 "&API_Link";
+		Title6 "&SCH_Link";
+
+		Proc Report Data =  Work._s_&Bank._API nowd
+			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+			style(header)=[background=lightskyblue foreground=black] 
+			style(column)=[background=lightcyan foreground=black];
+
+		Columns Hierarchy
+		&Bank._Value;
+
+		Define Hierarchy / display 'Data Hierarchy' left;
+		Define &Bank._Value / display "&Bank. Value" left;
+
+
+		Compute Hierarchy;
+
+		If Hierarchy NE '' then 
+			Do;
+				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
+			End;
+		Endcomp;
+
+		Run;
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
+	%ReturnButton();
+*=====================================================================================================================================================
+--- Open Output Delivery Parameters  ---
+======================================================================================================================================================;
+		ODS HTML Close;	
+		ODS Listing;	
+
+	%Mend API_Mismatch;
+	%API_Mismatch(&Bank, &API);
+
+ods tagsets.tableeditor close; 
+ods listing; 
+
+*=====================================================================================================================================================
+						EXPORT REPORT RESULTS TO RESULTS FOLDER
+=====================================================================================================================================================;
+%Macro ExportXL(Path);
+Proc Export Data = Work._s_&Bank.&_API
+ 	Outfile = "&Path"
+	DBMS = CSV REPLACE;
+	PUTNAMES=YES;
+Run;
+%Mend ExportXL;
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\_s_&Bank._&_APIName..csv);
+
+%End;
+
+%Else %If &ErrorCode = 0 and &NOBS = 0 %Then 
+%Do;
+*=====================================================================================================================================================
+						NO ERROR REPORT
+======================================================================================================================================================;
+%Macro No_Errors(Bank, API);
+
+*=====================================================================================================================================================
+--- Run Header code to include OPEN BANKING Imaage at the top of the Report ---
+======================================================================================================================================================;
+/*%Header();*/
+
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+======================================================================================================================================================;
+		ODS _All_ Close;
+/*
+		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
+			Contents="&Bank._&API._Contents.html" 
+			Frame="&Bank._&API._Frame.html" 
+			Style=HTMLBlue;
+*/
+/*  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
+
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+======================================================================================================================================================;
+ODS _All_ Close;
+ods listing close; 
+
+ods tagsets.tableeditor file=_Webout
+    style= OBStyle 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="0" 
+            frozen_rowheaders="0" 
+            ); 
+
+		Data Work.No_Obs;
+
+		Length ERROR_DESC $ 100;
+
+			ERROR_DESC = '';
+			Output;
+			ERROR_DESC = "There are NO DATA VALIDATION ERRORS recorded in the &Bank API Data";
+			Output;
+			ERROR_DESC = '';
+			Output;
+			ERROR_DESC = " *** All Data Validation Test Cases Passed Successfuly *** ";
+			Output;
+			ERROR_DESC = '';
+			Output;
+		Run;
+
+		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
+		Title2 "%Sysfunc(UPCASE(&Bank)) %Sysfunc(UPCASE(&API)) SCHEMA vs. API VALIDATION REPORT - %Sysfunc(UPCASE(&Fdate))";
+		Title4 "";
+		Title5 "&API_Link";
+		Title6 "&SCH_Link";
+
+		Proc Report Data =  Work.No_Obs nowd
+			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+			style(header)=[background=lightskyblue foreground=black] 
+			style(column)=[background=lightcyan foreground=black];
+
+		Columns ERROR_DESC ;
+
+		Define ERROR_DESC / display 'CLEAN SCHEMA vs. API VALIDATION REPORT' left;
+
+		Compute ERROR_DESC;
+
+		If ERROR_DESC NE '' then 
+			Do;
+				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
+			End;
+		Endcomp;
+
+		Run;
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
+	%ReturnButton();
+*=====================================================================================================================================================
+--- Open Output Delivery Parameters  ---
+======================================================================================================================================================;
+ods tagsets.tableeditor close; 
+ods listing; 
+
+	%Mend No_Errors;
+	%No_Errors(&Bank, &API);
+
+*=====================================================================================================================================================
+						EXPORT REPORT RESULTS TO RESULTS FOLDER
+=====================================================================================================================================================;
+%Macro ExportXL(Path);
+Proc Export Data = Work.No_Obs
+ 	Outfile = "&Path"
+	DBMS = CSV REPLACE;
+	PUTNAMES=YES;
+Run;
+%Mend ExportXL;
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&Bank._&APIName._No_Obs.csv);
+
+
 %End;
 
 %Mend Print_Results;
 %Print_Results(&Bank, &API);
-
-
+*=====================================================================================================================================================
+--- The values are passed from the Main macro to resolve in the macro below which allows execution of the API data extract ---
+======================================================================================================================================================;
 %Mend API;
 %API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-
+*=====================================================================================================================================================
+--- The values are passed from the Mmain macro to resolve in the macro below which allows execution of the API data extract ---
+======================================================================================================================================================;
 %Mend Schema;
 %Schema(&GitHub_Path/%Sysfunc(Tranwrd(&Github_API..json,'-','_')),&Bank_Name,&API_SCH);
-
+*=====================================================================================================================================================
+--- The values are passed from the UI to resolve in the macro below which allows execution of the API data extract ---
+======================================================================================================================================================;
 %Mend Main;
 
 %Main(&SCH_Link,
@@ -1802,10 +2259,7 @@ Run;
 &BankName_C);
 
 /*
-
 https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master/personal_current_account.json
-
-
 *====================================================================================
 *				MACRO HEADER
 *%Macro Main(GitHub_Path,Github_API,API_Path,Main_API,Version,Bank_Name);

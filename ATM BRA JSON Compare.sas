@@ -1,3 +1,5 @@
+%Global _APINamme;
+
 %Macro Main(API_DSN,File);
 
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
@@ -17,28 +19,28 @@ Data WORK.&Dsn    ;
    %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
    infile "&Filename" delimiter = ',' Termstr=CRLF
 MISSOVER DSD lrecl=32767 firstobs=2 ;
-      informat XPath $100. ;
+      informat XPath $250. ;
       informat Name $14. ;
       informat ConstraintID $2. ;
       informat MinOccurs best32. ;
       informat MaxOccurs $9. ;
       informat Data_type $26. ;
       informat Length $1. ;
-      informat MinLength $ 250. ;
-      informat MaxLength $ 250. ;
+      informat MinLength $ 25. ;
+      informat MaxLength $ 25. ;
       informat Pattern $20. ;
       informat Code_Name $25. ;
       informat EnhancedDefinition $1024. ;
       informat XMLTag $4. ;
-      format XPath $100. ;
+      format XPath $250. ;
       format Name $14. ;
       format ConstraintID $2. ;
       format MinOccurs best12. ;
       format MaxOccurs $9. ;
       format Data_type $26. ;
       format Length $1. ;
-      format MinLength $ 250. ;
-      format MaxLength $ 250. ;
+      format MinLength $ 25. ;
+      format MaxLength $ 25. ;
       format Pattern $20. ;
       format Code_Name $25. ;
       format EnhancedDefinition $1024. ;
@@ -48,7 +50,7 @@ MISSOVER DSD lrecl=32767 firstobs=2 ;
 
 	  If Substr(Xpath,1,1) EQ '"' then
 	  Do;
-			_Infile_ = Tranwrd(_Infile_,',','');
+/*			_Infile_ = Tranwrd(_Infile_,',','');*/
 	  End;
 
    input
@@ -70,7 +72,7 @@ MISSOVER DSD lrecl=32767 firstobs=2 ;
    run;
 
 Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/;
-	Length Pattern Hierarchy &API_DSN._Lev1 $ 250;
+	Length Pattern Hierarchy $ 500 &API_DSN._Lev1 $ 250;
 	Set Work.&Dsn;
 
 	If XPath NE '';
@@ -83,6 +85,11 @@ Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy
 	If "&Dsn" EQ 'BRA' Then 
 	Do;
 		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),19),'/','-');
+	End;
+
+	If "&Dsn" EQ 'PCA' Then 
+	Do;
+		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),16),'/','-');
 	End;
 
 	&API_DSN._Lev1 = Hierarchy;
@@ -407,7 +414,7 @@ Run;
 %Put _ALL_;
 
 	Data Work.Schema_Columns;
-		Length Hierarchy $ 250  Description $ 1024;
+		Length Hierarchy $ 500  Description $ 1024;
 	Run;
 
 %Do i = 1 %To %Eval(&HierCnt);
@@ -415,7 +422,7 @@ Run;
 	%Put i = &i;
 
 	Data Work.Unique_Columns&i;
-		Length Hierarchy $ 250  Description $ 1024;
+		Length Hierarchy $ 500  Description $ 1024;
 		Set Work.&JSON._2(Where=(HierCnt = &i));
 		By HierCnt Counter;
 
@@ -423,7 +430,7 @@ Run;
 
 			%Do j = 1 %To %Eval(&&Test_&i);
 				%Put j = &j;
-				Length &&Variable_Name_&i._&j  $ 250;
+/*				Length &&Variable_Name_&i._&j  $ 250;*/
 
 				%Let Varname = &&Variable_Name_&i._&j.;
 				&Varname = "&&Variable_Value_&i._&j.";
@@ -458,6 +465,8 @@ Run;
 
 /*		Hierarchy1 = Trim(Left(Substr(Hierarchy, index(Hierarchy, '-D') + 1)));*/
 /*		Table  = 'Swagger_Sch';*/
+
+		Swagger_&API_DSN._Lev1 = Hierarchy;
 	Run;
 
 
@@ -478,31 +487,59 @@ Run;
 
 
 
-Data OBData.Compare_&API_DSN/*(Keep = Hierarchy Table MinLength MaxLength Type Class
+Data OBData.Compare_&API_DSN(Keep = Hierarchy 
 	&API_DSN._Lev1
-	EnhancedDefinition Description Desc_Flag &API_DSN._MaxLength &API_DSN._MinLength
-	Min_Length_Flag Max_Length_Flag)*/;
+	Swagger_&API_DSN._Lev1
+	EnhancedDefinition
+	Description
+	Desc_Flag
+	&API_DSN._MaxLength 
+	&API_DSN._MinLength
+	Swag_MinLength
+	Swag_MaxLength
+	MinLength_Flag
+	MaxLength_Flag
+	Swagger_Pattern
+	&API_DSN._Pattern
+	Pattern_Flag 
+	Rename=(Description = Swagger_Desc 
+	EnhancedDefinition = &API_DSN._Desc ));
 
-	Length Infile $ 4
-	Hierarchy $ 250
-	Swagger_Lev1 $ 250
+	Length Hierarchy $ 500
+	Swagger_&API_DSN._Lev1 $ 250
 	&API_DSN._Lev1 $ 250
+
 	Description $ 1024
 	EnhancedDefinition $ 1024
 	Desc_Flag $ 8
-	XPath $ 100 
-	Codes $ 30;
 
-	Merge OBData.Swagger_&API_DSN(In=a)
-	OBdata.&API_DSN(In=b);
+	Swag_MinLength $ 25
+	&API_DSN._MinLength $ 25
+	MinLength_Flag $ 8
+
+	Swag_MaxLength $ 25
+	&API_DSN._MaxLength $ 25
+	MaxLength_Flag $ 8;
+
+	Merge OBData.Swagger_&API_DSN(In=a
+	Rename=(Pattern = Swagger_Pattern
+	MinLength = Swag_MinLength
+	MaxLength = Swag_MaxLength))
+
+	OBdata.&API_DSN(In=b
+	Rename=(Pattern = &API_DSN._Pattern
+	MinLength = &API_DSN._MinLength
+	MaxLength = &API_DSN._MaxLength));
 
 	By Hierarchy;
 
-	If a and b then Infile = 'Both';
-	If a and not b then Infile = 'Swag';
-	If b and not a then Infile = 'ATM';
+	Where Hierarchy in ("Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-FeatureBenefitIte");
 
-	Swagger_Lev1 = Hierarchy;
+/*	If a and b then Infile = 'Both';*/
+/*	If a and not b then Infile = 'Swag';*/
+/*	If b and not a then Infile = 'ATM';*/
+
+	Swagger_&API_DSN._Lev1 = Hierarchy;
 
 *--- Find mismatches between EhancedDefinition and Description variables ---;
 If Trim(Left(EnhancedDefinition)) NE Trim(Left(Description)) then 
@@ -512,36 +549,52 @@ If Trim(Left(EnhancedDefinition)) NE Trim(Left(Description)) then
 	Else Do;
 		Desc_Flag = 'Match';
 	End;
-/*
-*--- Compare the length values of the Class and MinLength/MacLength variablesv ---;
-If Substr(Class,1,3) in ('Min','Max') Then
+
+
+*--- Find mismatches between Swagger_Pattern and API_Pattern variables ---;
+If Trim(Left(Swagger_Pattern)) NE '' or Trim(Left(&API_DSN._Pattern)) NE '' Then 
 Do;
-
-	If Substr(Class,1,3) EQ "Min" Then
+	If Trim(Left(Swagger_Pattern)) NE Trim(Left(&API_DSN._Pattern)) then 
 	Do;
-		UML_MinLength = Scan(Substr(Trim(Left(Class)),4),1,'Min');
-		UML_MaxLength = Scan(Substr(Reverse(Trim(Left(Class))),5),1,'xaM');
-	End;
-	If Substr(Class,1,3) EQ "Max" Then
-	Do;
-		UML_MaxLength = Reverse(Substr(Reverse(Substr(Trim(Left(Class)),4)),5));
-		UML_MinLength = '0';
-	End;
-
-	If MaxLength NE UML_MaxLength Then
-	Do;
-		Max_Length_Flag = 'Mismatch';
+		Pattern_Flag = 'Mismatch';
 	End;
 	Else Do;
-		Max_Length_Flag = 'Match';
+		Pattern_Flag = 'Match';
 	End;
+End;
 
-	If MinLength NE UML_MinLength Then
+*--- Compare the length values of the Swagger and API MinLength/MaxLength variables ---;
+If Swag_MinLength NE '' or &API_DSN._MinLength NE '' Then
+Do;
+	If Swag_MinLength NE &API_DSN._MinLength Then
 	Do;
-		Min_Length_Flag = 'Mismatch';
+		MinLength_Flag = 'Mismatch';
 	End;
 	Else Do;
-		Min_Length_Flag = 'Match';
+		MinLength_Flag = 'Match';
+	End;
+End;
+
+If Swag_MaxLength NE '' or &API_DSN._MaxLength NE '' Then
+Do;
+	If Swag_MaxLength NE &API_DSN._MaxLength Then
+	Do;
+		MaxLength_Flag = 'Mismatch';
+	End;
+	Else Do;
+		MaxLength_Flag = 'Match';
+	End;
+End;
+
+/*
+If Name NE '' or Code_Name NE '' Then
+Do;
+	If Name NE Code_Name Then
+	Do;
+		CodeName_Flag = 'Mismatch';
+	End;
+	Else Do;
+		CodeName_Flag = 'Match';
 	End;
 End;
 */
@@ -636,21 +689,228 @@ Run;
 %Mend Fdate;
 %Fdate(worddate12., datetime.);
 
+%Macro Template;
+Proc Template;
+ define style OBStyle;
+ notes "My Simple Style";
+ class body /
+ backgroundcolor = white
+ color = black
+ fontfamily = "Palatino"
+ ;
+ class systemtitle /
+ fontfamily = "Verdana, Arial"
+ fontsize = 16pt
+ fontweight = bold
+ ;
+ class table /
+ backgroundcolor = #f0f0f0
+ bordercolor = red
+ borderstyle = solid
+ borderwidth = 1pt
+ cellpadding = 5pt
+ cellspacing = 0pt
+ frame = void
+ rules = groups
+ ;
+ class header, footer /
+ backgroundcolor = #c0c0c0
+ fontfamily = "Verdana, Arial"
+ fontweight = bold
+ ;
+ class data /
+ fontfamily = "Palatino"
+ ;
+ end; 
+
+Run;
+%Mend Template
+%Template;
+
 
 ODS _All_ Close;
+/*
 ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
-
 	Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 	Title2 "Comparison of %Sysfunc(UPCASE(&File)) UML and JSON File Structures - %Sysfunc(UPCASE(&Fdate))";
 
-Proc Print Data = OBData.Compare_&API_DSN(Where=(Desc_Flag EQ 'Mismatch'));
+Proc Print Data = OBData.Compare_&API_DSN	;
 Run;
 
 %ReturnButton;
+*/
 
-ODS HTML Close;
-ODS Listing;
+/*ODS HTML File="C:\inetpub\wwwroot\sasweb\data\Results\&API_DSN._JSON_COMPARE_&FDate..xls";*/
+
+/*
+Proc Print Data=OBData.Compare_&API_DSN;
+	Title1 "Open Banking - &API_DSN";
+	Title2 "&API_DSN Comparison Report - %Sysfunc(UPCASE(&Fdate))";
+Run;
+*/
+
+/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
+
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+title "Listing of Product Sales"; 
+*--- Set Output Delivery Parameters  ---;
+ODS _All_ Close;
+ods listing close; 
+
+ods tagsets.tableeditor file=_Webout
+    style=styles.OBStyle 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="0" 
+            frozen_rowheaders="0" 
+            ); 
+
+
+
+Proc Report Data = OBData.Compare_&API_DSN nowd
+	style(report)=[width=100%]
+	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+	style(header)=[background=lightskyblue foreground=black] 
+	style(column)=[background=lightcyan foreground=black];
+
+	Title1 "Open Banking - &API_DSN";
+	Title2 "&API_DSN Comparison Report - %Sysfunc(UPCASE(&Fdate))";
+
+
+	Columns Hierarchy
+	Swagger_&API_DSN._Lev1
+	&API_DSN._Lev1
+
+	Swagger_Desc
+	&API_DSN._Desc
+	Desc_Flag
+
+	Swag_MinLength
+	&API_DSN._MinLength
+	MinLength_Flag
+
+	Swag_MaxLength
+	&API_DSN._MaxLength
+	MaxLength_Flag
+
+	Swagger_Pattern
+	&API_DSN._Pattern
+	Pattern_Flag;
+
+
+*--- Define columns in the report output ---;
+	Define Hierarchy / display 'Hierarchy' left style(column)=[width=15%];
+	Define Swagger_&API_DSN._Lev1 / display "Swagger &API_DSN Data Structure" left;
+	Define &API_DSN._Lev1 / display "API &API_DSN Data Structure" left;
+
+	Define Swagger_Desc / display 'Swagger Description' left;
+	Define &API_DSN._Desc / display "&API_DSN Description" left;
+	Define Desc_Flag / display 'Description Flag' left;
+
+	Define Swag_MinLength / display 'Swagger Min Length' left;
+	Define &API_DSN._MinLength / display "&API_DSN Min Length" left;
+	Define MinLength_Flag / display 'Min Length Flag' left;
+
+	Define Swag_MaxLength / display 'Swagger Max Length' left;
+	Define &API_DSN._MaxLength / display "&API_DSN Max Length" left;
+	Define MaxLength_Flag / display 'Max Length Flag' left;
+
+	Define Swagger_Pattern / display 'Swagger Pattern' left;
+	Define &API_DSN._Pattern / display "&API_DSN Pattern" left;
+	Define Pattern_Flag / display 'Pattern Flag' left;
+
+	Compute Desc_Flag;
+	If Desc_Flag = 'Mismatch' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=red background=pink font_weight=bold]");
+	End;
+	If Desc_Flag = 'Match' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=blue background=lightcyan font_weight=bold]");
+	End;
+	Endcomp;
+
+	Compute MinLength_Flag;
+	If MinLength_Flag = 'Mismatch' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=red background=pink font_weight=bold]");
+	End;
+	If MinLength_Flag = 'Match' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=blue background=lightcyan font_weight=bold]");
+	End;
+	Endcomp;
+
+	Compute MaxLength_Flag;
+	If MaxLength_Flag = 'Mismatch' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=red background=pink font_weight=bold]");
+	End;
+	If MaxLength_Flag = 'Match' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=blue background=lightcyan font_weight=bold]");
+	End;
+	Endcomp;
+
+	Compute Pattern_Flag;
+	If Pattern_Flag = 'Mismatch' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=red background=pink font_weight=bold]");
+	End;
+	If Pattern_Flag = 'Match' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=blue background=lightcyan font_weight=bold]");
+	End;
+	Endcomp;
+
+Run;
+%ReturnButton;
+
+*--- Open Output Delivery Parameters  ---;
+ods tagsets.tableeditor close; 
+ods listing; 
+
 
 %Mend Main;
+/*
+%Macro SelectAPI();
+%If "&_APIName" EQ "ATM" %Then
+%Do;
+	%Main(&_APIName,ATM);
+%End;
+%Else %If "&_APIName" EQ "BCH" %Then
+%Do;
+*--- API Config file contains BCH - change manually below to BRA ---;
+	%Main(BRA,branch);
+%End;
+%Else %If "&_APIName" EQ "PCA" %Then
+%Do;
+	%Main(&_APIName,personal_current_account);
+%End;
+%Else %If "&_APIName" EQ "BCA" %Then
+%Do;
+	%Main(&_APIName,personal_current_account);
+%End;
+%Else %If "&_APIName" EQ "SME" %Then
+%Do;
+	%Main(&_APIName,personal_current_account);
+%End;
+%Else %If "&_APIName" EQ "CCC" %Then
+%Do;
+	%Main(&_APIName,personal_current_account);
+%End;
+%Mend SelectAPI;
+%SelectAPI();
+*/
+/*
 %Main(ATM,ATM);
 %Main(BRA,branch);
+*/
+%Main(PCA,personal_current_account);
+
+
+
+
+

@@ -1,5 +1,6 @@
 %Macro Main();
 /*Libname OBData "C:\inetpub\wwwroot\sasweb\data\Perm";*/
+/*Libname OBData "C:\inetpub\wwwroot\sasweb\data\Temp";*/
 
 %Global _WebUser;
 %Global _WebPass;
@@ -7,6 +8,7 @@
 %Global _RegPass;
 %Global _service;
 %Global _debug;
+
 
 %Macro Valid();
 		File _Webout;
@@ -17,10 +19,10 @@
 		Put '<head>';
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
-		Put '<title>OB TESTING</title>';
+		Put '<title>OBIE</title>';
 
 		Put '<meta charset="utf-8" />';
-		Put '<title>Open Data Test Harness</title>';
+		Put '<title>Open Data Test Application</title>';
 		Put '<meta name="description" content="">';
 		Put '<meta name="author" content="">';
 			
@@ -36,7 +38,6 @@
 		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
 
 		Put '</HEAD>';
-		Put '<BODY>';
 
 		Put '<BODY>';
 		Put '<table style="width: 100%; height: 5%" border="0">';
@@ -47,30 +48,100 @@
 		Put '</tr>';
 		Put '</table>';
 
-		Put '<table style="width: 100%; height: 40%" border="0">';
+		Put '<table style="width: 100%; height: 5%" border="1">';
 		Put '<tr>';
-		Put '<td valign="middle" style="background-color: White; color: black">';
-		Put '<p><br><br></p>';
-		Put '<H1 align="center">OPEN BANKING - API STANDARDS</H1>';
-		Put '<p><br><br></p>';
-		Put '<H2 valign="top" align="center">API TEST APPLICATION</H2>';
-		Put '<p><br><br></p>';
-		Put '</td>';
+		Put '<td valign="middle" style="background-color: white; color: black" style="width: 100%; height: 40%" border="1">';
+		Put '<p><br></p>';
+		Put '<H1 align="center">OPEN BANKING - STANDARDS</H1>';
+/*		Put '<p><br></p>';*/
+		Put '<H2 valign="top" align="center">OPEN DATA & READ-WRITE TEST APPLICATION</H2>';
+/*		Put '<p><br></p>';*/
 		Put '</tr>';
-		Put '<tr>';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '</td>';
+		Put '</table>';
+/*		Put '<tr>';*/
+/*		Put '<td valign="center" align="center" style="background-color: lightblue; color: White" border="1">';*/
 
+		Put '<table style="width: 100%; height: 5%" border="1">';
 		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<tr>';
+
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
 		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="API LIVE APP">';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="API TEST APP">';
+		Put '<H1>OPEN DATA</H1>';
 		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON">';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="PARAMETERS">';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="STATISTICS">';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="UML JSON COMPARE">';
+		Put '<H2>OPEN DATA CMA9 COMPARISON REPORTS</H2>';
+/*		Put '<p><br></p>';*/
+		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON ATMS">';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON BRANCHES">';
 		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON PCA">';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON BCA">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON SME">';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON CCC">';
+		Put '<p><br></p>';
+
+		Put '<H2>OPEN DATA V2 CODELIST VALIDATION</H2>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="ATM CODELIST COMPARISON">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="BCH CODELIST COMPARISON">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="PCA CODELIST COMPARISON">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="BCA CODELIST COMPARISON">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="CCC CODELIST COMPARISON">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="SME CODELIST COMPARISON">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL CODELIST COMPARISON">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD JSON COMPARE">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD JSON COMPARE WITH CODENAMES">';
+		Put '<p><br></p>';
+/*		Put '<INPUT TYPE=submit NAME=_action VALUE="MASTER SWAGGER API JSON COMPARE">';
+		Put '<p><br></p>';
+*/
+/*
+		Put '<INPUT TYPE=submit NAME=_action VALUE="ATM BRA PCA DD JSON COMPARE">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="BCA DD JSON COMPARE">';
+		Put '<p><br></p>';
+*/
+
+/*		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';*/
+/*		Put '<p><br></p>';*/
+		Put '<H2>OPEN DATA V1 SCHEMA - API VALIDATION</H2>';
+/*		Put '<p><br></p>';*/
+		Put '<INPUT TYPE=submit NAME=_action VALUE="SELECT API PARAMETERS">';
+/*		Put '<p><br></p>';*/
+		Put '<INPUT TYPE=submit NAME=_action VALUE="STATISTICS REPORT">';
+		Put '<p><br></p>';
+
+/*		Put '<p><br></p>';*/
+		Put '<H2>OPEN DATA V2 SWAGGER VALIDATION</H2>';
+/*		Put '<p><br></p>';*/
+		Put '<INPUT TYPE=submit NAME=_action VALUE="VALIDATE PCA V2 SWAGGER">';
+/*		Put '<p><br></p>';*/
+		Put '<INPUT TYPE=submit NAME=_action VALUE="VALIDATE BCA V2 SWAGGER">';
+		Put '<p><br></p>';
+
+
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+		Put '<p><br></p>';
+		Put '<H1>READ / WRITE</H1>';
+		Put '<p><br></p>';
+		Put '<H2>OB PAYSET VALIDATION</H2>';
+/*		Put '<p><br></p>';*/
+		Put '<INPUT TYPE=submit NAME=_action VALUE="OBPaySet JSON COMPARE">';
+		Put '<p><br></p>';
+
+
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
+
+
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
 			'>';
@@ -85,13 +156,17 @@
 			'>';
 
 		Put '</Form>';
-
 		Put '</td>';
 		Put '</tr>';
+		Put '</table>';
+
+		Put '<table style="width: 100%; height: 5%" border="1">';
+		Put '<tr>';
 		Put '<td valign="top" style="background-color: White; color: black">';
 		Put '<H3>All Rights Reserved</H3>';
 		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
 		Put '</td>';
+		Put '</tr>';
 		Put '</table>';
 
 		Put '</BODY>';
@@ -160,6 +235,7 @@
 		Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
 			"&_debug"
 			'>';
+
 		Put '</Form>';
 
 		Put '</td>';
@@ -236,10 +312,10 @@
 			"&_debug"
 			'>';
 		Put '</Form>';
-
 		Put '</td>';
 		Put '</tr>';
 		Put '<td valign="top" style="background-color: White; color: black">';
+		Put '<p><br><br></p>';
 		Put '<H3>All Rights Reserved</H3>';
 		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
 		Put '</td>';
