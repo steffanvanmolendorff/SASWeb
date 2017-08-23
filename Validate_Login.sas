@@ -1,13 +1,23 @@
-%Macro Main();
-/*Libname OBData "C:\inetpub\wwwroot\sasweb\data\Perm";*/
-/*Libname OBData "C:\inetpub\wwwroot\sasweb\data\Temp";*/
-
 %Global _WebUser;
 %Global _WebPass;
 %Global _RegUser;
 %Global _RegPass;
 %Global _service;
 %Global _debug;
+%Global _SRVNAME;
+
+%Global _Host;
+%Global _Path;
+
+%Let _Host = &_SRVNAME;
+%Put _Host = &_Host;
+
+%Let _Path = http://&_Host/sasweb;
+%Put _Path = &_Path;
+
+%Macro Main();
+/*Libname OBData "C:\inetpub\wwwroot\sasweb\data\Perm";*/
+/*Libname OBData "C:\inetpub\wwwroot\sasweb\data\Temp";*/
 
 
 %Macro Valid();
@@ -32,10 +42,10 @@
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<title>LRM</title>';
 
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 		Put '</HEAD>';
 
@@ -43,7 +53,7 @@
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
 		Put '<td valign="top" style="background-color: lightblue; color: orange">';
-		Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cannot find image" style="width:100%;height:8%px;">';
+		Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 		Put '</td>';
 		Put '</tr>';
 		Put '</table>';
@@ -63,7 +73,7 @@
 /*		Put '<td valign="center" align="center" style="background-color: lightblue; color: White" border="1">';*/
 
 		Put '<table style="width: 100%; height: 5%" border="1">';
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<tr>';
 
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
@@ -99,9 +109,11 @@
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD JSON COMPARE">';
 		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD JSON COMPARE WITH CODENAMES">';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD SWAGGER COMPARE">';
 		Put '<p><br></p>';
-/*		Put '<INPUT TYPE=submit NAME=_action VALUE="MASTER SWAGGER API JSON COMPARE">';
+/*		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD JSON COMPARE WITH CODENAMES">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="MASTER SWAGGER API JSON COMPARE">';
 		Put '<p><br></p>';
 */
 /*
@@ -193,10 +205,10 @@
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<title>LRM</title>';
 
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 		Put '</HEAD>';
 		Put '<BODY>';
@@ -205,7 +217,7 @@
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
 		Put '<td valign="top" style="background-color: lightblue; color: orange">';
-		Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cannot find image" style="width:100%;height:8%px;">';
+		Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 		Put '</td>';
 		Put '</tr>';
 		Put '</table>';
@@ -223,7 +235,7 @@
 		Put '<tr>';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
 
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<H1 align="center">Registration Successful - Return to Login</H1>'; 
  		Put '<INPUT TYPE=submit VALUE="Re-Submit Details" valign="center">';
@@ -269,10 +281,10 @@
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<title>LRM</title>';
 
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 		Put '</HEAD>';
 		Put '<BODY>';
@@ -281,7 +293,7 @@
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
 		Put '<td valign="top" style="background-color: lightblue; color: orange">';
-		Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cannot find image" style="width:100%;height:8%px;">';
+		Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 		Put '</td>';
 		Put '</tr>';
 		Put '</table>';
@@ -299,7 +311,7 @@
 		Put '<tr>';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
 
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<H1 align="center">Invalid Login Details</H1>'; 
  		Put '<INPUT TYPE=submit VALUE="Re-Submit Details" valign="center">';
@@ -310,6 +322,9 @@
 			'>';
 		Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
 			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_Host VALUE=' /
+			"localhost"
 			'>';
 		Put '</Form>';
 		Put '</td>';

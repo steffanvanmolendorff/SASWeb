@@ -20,10 +20,10 @@
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<title>LRM</title>';
 
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 		Put '</HEAD>';
 		Put '<BODY>';
@@ -32,7 +32,7 @@
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
 		Put '<td valign="top" style="background-color: lightblue; color: orange">';
-		Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cannot find image" style="width:100%;height:8%px;">';
+		Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 		Put '</td>';
 		Put '</tr>';
 		Put '</table>';
@@ -50,7 +50,7 @@
 		Put '<tr>';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
 
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit NAME=_action VALUE="API LIVE APP">';
 		Put '<INPUT TYPE=submit NAME=_action VALUE="API TEST APP">';
@@ -112,10 +112,10 @@ Data _Null_;
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<title>LRM</title>';
 
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 		Put '</HEAD>';
 		Put '<BODY>';
@@ -126,7 +126,7 @@ Data _Null_;
 
 		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
 		Put '<p><br></p>';

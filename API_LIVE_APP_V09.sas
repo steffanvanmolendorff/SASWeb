@@ -26,6 +26,16 @@ Run;
 %Global Version_C;
 %Global Sch_Version;
 %Global FDate;
+
+%Global _Host;
+%Global _Path;
+
+%Let _Host = &_SRVNAME;
+%Put _Host = &_Host;
+
+%Let _Path = http://&_Host/sasweb;
+%Put _Path = &_Path;
+
 /*
 %Let _BankName = Barclays;
 %Let _APIName = BCA;
@@ -271,39 +281,13 @@ Data _Null_;
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<title>LRM</title>';
 
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
-
-
-/*	
-		*--- JS ---;
-		Put 'var bar = new ProgressBar.Circle(container, {';
-  		Put 'strokeWidth: 6,';
-  		Put 'easing: 'easeInOut',';
-  		Put 'duration: 1400,';
-  		Put 'color: '#FFEA82',';
-  		Put 'trailColor: '#eee',';
-  		Put 'trailWidth: 1,';
-  		Put 'svgStyle: null';
-		Put '})';
-		Put 'bar.animate(1.0);';
-*/
-
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
-/*
-		*--- CSS ---;
-		Put '#container';
-		Put '{';
-  		Put 'margin: 20px;';
-  		Put 'width: 200px;';
-  		Put 'height: 200px;';
-		Put '}';
-*/
 		Put '</HEAD>';
 		Put '<BODY>';
-
 
 		Put '<p></p>';
 		Put '<HR>';
@@ -311,7 +295,7 @@ Data _Null_;
 
 		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
 		Put '<p><br></p>';
@@ -328,8 +312,6 @@ Data _Null_;
 		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
 			"&_WebPass"
 			'>';
-	    Put '<INPUT TYPE=hidden NAME=_WebUser VALUE="vamola@mac.com">';
-	    Put '<INPUT TYPE=hidden NAME=_WebPass VALUE="Test">';
 		Put '</Form>';
 		Put '</td>';
 		Put '</tr>';
@@ -1682,7 +1664,7 @@ Put '<BODY>';
 Put '<table style="width: 100%; height: 5%" border="0">';
    Put '<tr>';
       Put '<td valign="top" style="background-color: lightblue; color: orange">';
-	Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cant find image" style="width:100%;height:8%px;">';
+	Put '<img src="'"&_Path/images/london.jpg"'" alt="Cant find image" style="width:100%;height:8%px;">';
       Put '</td>';
    Put '</tr>';
 Put '</table>';

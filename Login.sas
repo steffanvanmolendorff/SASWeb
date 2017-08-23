@@ -1,4 +1,12 @@
 %Global _service;
+%Global _Host;
+%Global _Path;
+
+%Let _Host = &_SRVNAME;
+%Put _Host = &_Host;
+
+%Let _Path = http://&_Host/sasweb;
+%Put _Path = &_Path;
 
 %Macro Login();
 Data _NULL_;
@@ -22,10 +30,10 @@ Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum
 Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 Put '<title>OBIE</title>';
 
-Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 Put '</script>';
 
-Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 Put '</HEAD>';
 
@@ -33,7 +41,7 @@ Put '<BODY>';
 Put '<table style="width: 100%; height: 5%" border="0">';
 Put '<tr>';
 Put '<td valign="top" style="background-color: lightblue; color: orange">';
-Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cannot find image" style="width:100%;height:8%px;">';
+Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 Put '</td>';
 Put '</tr>';
 Put '</table>';
@@ -51,7 +59,7 @@ Put '</tr>';
 Put '<tr>';
 Put '</table>';
 
-Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 Put '<table align="center" style="width: 100%; height: 20%" border="0">';
 Put '<tr>';
 

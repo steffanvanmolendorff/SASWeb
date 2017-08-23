@@ -30,6 +30,12 @@
 /*Option Source Source2 MLogic MPrint Symbolgen;*/
 Options NOERRORABEND;
 
+%Let _Host = &_SRVNAME;
+%Put _Host = &_Host;
+
+%Let _Path = http://&_Host/sasweb;
+%Put _Path = &_Path;
+
 *--- Set Default Data Library as macro variable ---;
 *--- Alternatively set the Data library in Proc Appsrv ---;
 /*
@@ -193,7 +199,7 @@ Data Work.&Bank._&API
 	Array Cat{7} P1 - P7;
 
 *--- The Do-Loop will create the Hierarchy of Level 1 to 7 (P1 - P7) ---;
-Do i = 1 to P;
+	Do i = 1 to P;
 		If i = 1 Then 
 		Do;
 *--- If it is the first data field then do ---;
@@ -279,6 +285,7 @@ Proc Sort Data = Work.&Bank._&API;
 	%TestDsn(Barclays_&API);
 	%TestDsn(Danske_Bank_&API);
 	%TestDsn(Halifax_&API);
+	%TestDsn(HSBC_&API);
 	%TestDsn(Lloyds_Bank_&API);
 	%TestDsn(Nationwide_&API);
 	%TestDsn(Natwest_&API);
@@ -1020,10 +1027,10 @@ Data _Null_;
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<title>LRM</title>';
 
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 		Put '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>';
 

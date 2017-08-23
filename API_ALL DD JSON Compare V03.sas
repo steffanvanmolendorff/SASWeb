@@ -1,6 +1,15 @@
 %Global _APINamme;
 /*%Let _APIName = SME;*/
 
+%Global _Host;
+%Global _Path;
+
+%Let _Host = &_SRVNAME;
+%Put _Host = &_Host;
+
+%Let _Path = http://&_Host/sasweb;
+%Put _Path = &_Path;
+
 %Macro Main(API_DSN,File);
 /*
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
@@ -110,7 +119,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V2_1\UML\&API_DSN.l_001_001_01DD.csv,&API_DSN);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\&_APIVersion\UML\&API_DSN.l_001_001_01DD.csv,&API_DSN);
 /*%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\UML\pcal_001_001_01DD.csv,PCA);*/
 
 
@@ -785,7 +794,7 @@ Proc Sort Data = OBData.Compare_&API_DSN;
 Run;
 
 %Mend Schema;
-%Schema(http://localhost/sasweb/data/temp/V2_1/json/&File..json,&API_DSN,Swagger_&API_DSN);
+%Schema(http://&_Host/sasweb/data/temp/&_APIVersion/json/&File..json,&API_DSN,Swagger_&API_DSN);
 
 %Macro ReturnButton();
 Data _Null_;
@@ -807,10 +816,10 @@ Data _Null_;
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		Put '<title>LRM</title>';
 
-		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
-		Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 		Put '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>';
 
@@ -823,7 +832,7 @@ Data _Null_;
 
 		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
 		Put '<p><br></p>';
@@ -952,7 +961,8 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 	style(column)=[background=lightcyan foreground=black];
 
 	Title1 "Open Banking - &API_DSN";
-	Title2 "&API_DSN Comparison Report - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "&API_DSN &_APIVersion Comparison Report - %Sysfunc(UPCASE(&Fdate))";
+	Title3 "&File";
 
 
 	Columns CountRows
@@ -1108,7 +1118,9 @@ Proc Export Data = OBData.Compare_&API_DSN
 	&API_DSN._MaxLength
 	MaxLength_Flag)
 
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&_APIName._DD_SWAGGER_Comparison_Final.csv"
+/* 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&_APIName._DD_SWAGGER_Comparison_Final.csv"*/
+	 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&File._DD_Comparison_Final.csv"
+
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
@@ -1119,7 +1131,7 @@ ods tagsets.tableeditor close;
 ods listing; 
 
 
-%Include "C:\inetpub\wwwroot\sasweb\source\Swagger DD CodeName Comparison V0.1.sas";
+/*%Include "C:\inetpub\wwwroot\sasweb\source\Swagger DD CodeName Comparison V0.1.sas";*/
 
 
 %Mend Main;
@@ -1127,29 +1139,58 @@ ods listing;
 /*	%Main(&_APIName,sme_loan);*/
 
 %Macro SelectAPI();
-%If "&_APIName" EQ "BCA" %Then
+%If "&_Swagger" EQ "SWAGGER" %Then
 %Do;
-	%Main(&_APIName,business_current_account);
+	%If "&_APIName" EQ "BCA" %Then
+	%Do;
+		%Main(&_APIName,bca_swagger);
+	%End;
+	%Else %If "&_APIName" EQ "PCA" %Then
+	%Do;
+		%Main(&_APIName,pca_swagger);
+	%End;
+	%Else %If "&_APIName" EQ "ATM" %Then
+	%Do;
+		%Main(&_APIName,atm_swagger);
+	%End;
+	%Else %If "&_APIName" EQ "BCH" %Then
+	%Do;
+		%Main(&_APIName,branch_swagger);
+	%End;
+	%Else %If "&_APIName" EQ "SME" %Then
+	%Do;
+		%Main(&_APIName,sme_loan_swagger);
+	%End;
+	%Else %If "&_APIName" EQ "CCC" %Then
+	%Do;
+		%Main(&_APIName,ccc_swagger);
+	%End;
 %End;
-%Else %If "&_APIName" EQ "PCA" %Then
-%Do;
-	%Main(&_APIName,personal_current_account);
-%End;
-%Else %If "&_APIName" EQ "ATM" %Then
-%Do;
-	%Main(&_APIName,atm);
-%End;
-%Else %If "&_APIName" EQ "BCH" %Then
-%Do;
-	%Main(&_APIName,branch);
-%End;
-%Else %If "&_APIName" EQ "SME" %Then
-%Do;
-	%Main(&_APIName,sme_loan);
-%End;
-%Else %If "&_APIName" EQ "CCC" %Then
-%Do;
-	%Main(&_APIName,commercial_credit_card);
+%Else %Do;
+	%If "&_APIName" EQ "BCA" %Then
+	%Do;
+		%Main(&_APIName,business_current_account);
+	%End;
+	%Else %If "&_APIName" EQ "PCA" %Then
+	%Do;
+		%Main(&_APIName,personal_current_account);
+	%End;
+	%Else %If "&_APIName" EQ "ATM" %Then
+	%Do;
+		%Main(&_APIName,atm);
+	%End;
+	%Else %If "&_APIName" EQ "BCH" %Then
+	%Do;
+		%Main(&_APIName,branch);
+	%End;
+	%Else %If "&_APIName" EQ "SME" %Then
+	%Do;
+		%Main(&_APIName,sme_loan);
+	%End;
+	%Else %If "&_APIName" EQ "CCC" %Then
+	%Do;
+		%Main(&_APIName,commercial_credit_card);
+	%End;
 %End;
 %Mend SelectAPI;
 %SelectAPI();

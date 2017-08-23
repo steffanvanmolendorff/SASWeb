@@ -1,5 +1,9 @@
 Options MPrint MLogic Source Source2 Symbolgen;
 
+*--- Set a Gloabl macro variable to determine if DD vs JSON or SWAGGER file will be executed ---;
+%Global _Swagger;
+%Let _Swagger=;
+
 %Macro Import(Filename);
 
  /**********************************************************************
@@ -40,7 +44,6 @@ Run;
 %Import(C:\inetpub\wwwroot\sasweb\Data\Perm\Bank_API_List.csv);
 
 *%Put _All_;
-
 
 
 %Macro Populate();
@@ -112,18 +115,17 @@ Put '<p></p>';
 
 	Put '<FORM NAME=check METHOD=GET ACTION="http://localhost/scripts/broker.exe">';
 
-	Put '<Table align="center" style="width: 100%; height: 30%" border="1">';
+	Put '<Table align="center" style="width: 70%; height: 30%" border="1">';
 	Put '<tr>';
+/**/
+/*	Put '<div id="myProgress">' /*/
+/*  			'<div id="myBar"></div>' /*/
+/*		'</div>';	*/
+/**/
+
 	Put '<td>';
-
-	Put '<div id="myProgress">' /
-  			'<div id="myBar"></div>' /
-		'</div>';	
-
-
-	Put '<td>';
-	Put '<div class="dropdown" align="center" style="float:center; width: 100%">';
-	Put '<b>SELECT API V2.0</b>';
+	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+	Put '<b>SELECT API CATEGORY</b>';
 	Put '<p></p>';
 
 	%If "&_action" EQ "ATM BRA PCA DD JSON COMPARE" %then
@@ -133,12 +135,27 @@ Put '<p></p>';
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 	%End;
+*=============================================================================================================================
+			Read Dataset for the JSON Comparison
+=============================================================================================================================;
 	%If "&_action" EQ "API_ALL DD JSON COMPARE" %then
 	%Do;
 				*--- Read Dataset UniqueNames ---;
 				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('ATM','BCH','PCA','BCA','SME','CCC')))));
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
+	%End;
+*=============================================================================================================================
+			Read Dataset for the SWAGGER Comparison
+=============================================================================================================================;
+	%If "&_action" EQ "API_ALL DD SWAGGER COMPARE" %then
+	%Do;
+				*--- Read Dataset UniqueNames ---;
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('ATM','BCH','PCA','BCA','SME','CCC')))));
+				*--- Count Observations ---;
+				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
+*--- Set Macro Variable to pass SWAGGER value to API_ALL DD JSON Comparison V03.sas file to execute DD vs. SWAGGER comparison ---;
+					%Let _Swagger = SWAGGER;
 	%End;
 	%If "&_action" EQ "BCA DD JSON COMPARE" %then
 	%Do;
@@ -149,7 +166,7 @@ Put '<p></p>';
 	%End;
 
 				*--- Populate Drop Down Box on HTML Page ---;
-				Put	'<select name="_APIName" size="6" onchange="this.form.submit()">' /;
+				Put	'<select name="_APIName" size="6">' /;
 				    %Do I = 1 %To &Count;
 				        %Let Rc = %Sysfunc(fetch(&Dsn,&i));
 				        %Let Start=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,API_Name))));
@@ -177,20 +194,18 @@ Put '<p></p>';
 				    %End;
 
 				    %Let Rc = %Sysfunc(Close(&Dsn));
-
+	Put '</div>';
 	Put '</td>';
+
 	Put '<td>';
-
-	Put '<b>SELECT VERSION NUMBER</b>';
-	Put '<SELECT NAME="_APIVersion" Size="6"</option>';
-	Put '<OPTION VALUE="V1_3">Version 1.3</option>';
-	Put '<OPTION VALUE="V2_0">Version 2.0</option>';
-	Put '<OPTION VALUE="V@_1">Version 2.1</option>';
-
-	Put '</td>';
-
+	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+	Put '<b>SELECT VERSION</b>';
+	Put '<p></p>';
+	Put '<SELECT NAME="_APIVersion" size="4" onchange="this.form.submit()"</option>';
+	Put '<OPTION VALUE="V1_3"> Version 1.3 </option>';
+	Put '<OPTION VALUE="V2_0"> Version 2.0 </option>';
+	Put '<OPTION VALUE="V2_1"> Version 2.1 </option>';
 	Put '</SELECT>';
-
 	Put '</div>';
 	Put '</td>';
 	Put '</tr>';
@@ -211,7 +226,7 @@ Put '<p></p>';
 	%Do;
 		Put '<INPUT TYPE=submit VALUE=Return align="center">';
 		Put '<p><br></p>';
-		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03 with Codes.sas">';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
 			'>';
@@ -223,6 +238,27 @@ Put '<p></p>';
 			'>';
 		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
 			"&_WebPass"
+			'>';
+	%End;
+	%Else %If "&_SWAGGER" EQ "SWAGGER" %Then
+	%Do;
+		Put '<INPUT TYPE=submit VALUE=Return align="center">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_Swagger VALUE=' /
+			"&_Swagger"
 			'>';
 	%End;
 

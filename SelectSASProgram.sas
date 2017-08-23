@@ -145,8 +145,17 @@ Options Source Source2 Symbolgen MLogic MPrint;
 
 %If "&_action" EQ "API_ALL DD JSON COMPARE" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
+
+%If "&_action" EQ "API_ALL DD SWAGGER COMPARE" %Then
+%Do;
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
+%End;
+
+
 
 %If "&_action" EQ "API_ALL DD JSON COMPARE WITH CODENAMES" %Then
 %Do;
