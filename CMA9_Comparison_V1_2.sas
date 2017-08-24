@@ -175,7 +175,10 @@ Proc HTTP
  	Out = API;
 %ErrorCheck;
 
- 
+ Data _Null_;
+	Sleeptime = Sleep(1);
+Run;
+
 *--- The JSON engine will extract the data from the JSON script ---; 
 Options ERRORCHECK=NORMAL;
 Libname LibAPIs JSON Fileref=API;
