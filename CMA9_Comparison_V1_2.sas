@@ -192,7 +192,7 @@ Data Work.&Bank._&API
 	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P7 Value 
 	Rename=(Var3 = Data_Element Var2 = Hierarchy Value = &Bank));
 
-	Length Bank_API $ 8 Var2 Value1 Value2 $ 1000 Var3 $ 100 P1 - P7 Value $ 1000;
+	Length Bank_API $ 8 Var2 Value1 Value2 $ 500 Var3 $ 100 P1 - P7 Value $ 500;
 
 	RowCnt = _N_;
 
@@ -263,7 +263,7 @@ Proc Sort Data = Work.&Bank._&API;
 	%Main(https://api.hsbc.com/open-banking/v1.2/atms,HSBC,ATM);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/atms,Lloyds_Bank,ATM);
 	%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/atms,Nationwide,ATM);
-	%Main(https://openapi.natwest.com/open-banking/v1.2/atms,Natwest,ATM);
+	%Main(https://openapi.natwest.com/open-banking/v1.3/atms,Natwest,ATM);
 	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/atms,RBS,ATM);
 	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/atms,Santander,ATM);
 	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/atms,Ulster_Bank,ATM);

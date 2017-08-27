@@ -607,7 +607,9 @@ Run;
 %VarVal();
 
 
-
+Proc JSON Out = "C:\inetpub\wwwroot\sasweb\data\results\Compare_&API_DSN..json";
+	Export OBData.Compare_&API_DSN;
+Run;
 
 
 
