@@ -320,7 +320,7 @@ Proc Sort Data = Work.&Bank._&API;
 */
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
+		Out = OBData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -334,13 +334,13 @@ Proc Sort Data = Work.&Bank._&API;
 %Do;
 
 *--- Append ATMS Datasets ---;
-Data OpenData.CMA9_ATM(Drop = P1-P7);
+Data OBData.CMA9_ATM(Drop = P1-P7);
 
-	Merge OpenData.NoDUP_CMA9_ATM
+	Merge OBData.NoDUP_CMA9_ATM
 	&Datasets;
 
 /*	
-	Merge OpenData.NoDUP_CMA9_ATM
+	Merge OBData.NoDUP_CMA9_ATM
 	Bank_of_Ireland_ATM
 	Bank_of_Scotland_ATM
 	Barclays_ATM
@@ -435,7 +435,7 @@ Data Work.NoDUP_CMA9_&API;
 */
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
+		Out = OBData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -450,8 +450,8 @@ Data Work.NoDUP_CMA9_&API;
 %Do;
 
 *--- Append BRANCHES Datasets ---;
-Data OpenData.CMA9_BCH(Drop = P1-P7);
-	Merge OpenData.NoDUP_CMA9_BCH
+Data OBData.CMA9_BCH(Drop = P1-P7);
+	Merge OBData.NoDUP_CMA9_BCH
 	&Datasets;
 
 
@@ -493,7 +493,7 @@ Run;
 	%Main(https://api.hsbc.com/open-banking/v1.2/personal-current-accounts,HSBC,PCA);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/personal-current-accounts,Lloyds_Bank,PCA);
 	%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/personal-current-accounts,Nationwide,PCA);
-	%Main(https://openapi.natwest.com/open-banking/v1.2/personal-current-accounts,Natwest,PCA);
+	%Main(https://openapi.natwest.com/open-banking/v1.3/personal-current-accounts,Natwest,PCA);
 	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/personal-current-accounts,RBS,PCA);
 	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/personal-current-accounts,Santander,PCA);
 	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/personal-current-accounts,Ulster_Bank,PCA);
@@ -548,7 +548,7 @@ Run;
 	Run;
 */
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OpenData.NoDUP_CMA9_&API NoDupKey;
+		Out = OBData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -616,7 +616,7 @@ Run;
 	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/business-current-accounts,First_Trust_Bank,BCA);
 	%Main(https://api.hsbc.com/open-banking/v1.2/personal-current-accounts,HSBC,BCA);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/business-current-accounts,Lloyds_Bank,BCA);
-	%Main(https://openapi.natwest.com/open-banking/v1.2/business-current-accounts,Natwest,BCA);
+	%Main(https://openapi.natwest.com/open-banking/v1.3/business-current-accounts,Natwest,BCA);
 	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/business-current-accounts,RBS,BCA);
 	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/business-current-accounts,Santander,BCA);
 	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/business-current-accounts,Ulster_Bank,BCA);
@@ -752,7 +752,7 @@ Run;
 	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/unsecured-sme-loans,First_Trust_Bank,SME);
 	%Main(https://api.hsbc.com/open-banking/v1.2/unsecured-sme-loans,HSBC,SME);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/unsecured-sme-loans,Lloyds_Bank,SME);
-	%Main(https://openapi.natwest.com/open-banking/v1.2/unsecured-sme-loans,Natwest,SME);
+	%Main(https://openapi.natwest.com/open-banking/v1.3/unsecured-sme-loans,Natwest,SME);
 	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/unsecured-sme-loans,RBS,SME);
 	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/unsecured-sme-loans,Santander,SME);
 	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/unsecured-sme-loans,Ulster_Bank,SME);
@@ -871,7 +871,7 @@ Run;
 	%Main(https://atlas.api.barclays/open-banking/v1.3/commercial-credit-cards,Barclays,CCC);
 	%Main(https://api.hsbc.com/open-banking/v1.2/commercial-credit-cards,HSBC,CCC);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/commercial-credit-cards,Lloyds_Bank,CCC);
-	%Main(https://openapi.natwest.com/open-banking/v1.2/commercial-credit-cards,Natwest,CCC);
+	%Main(https://openapi.natwest.com/open-banking/v1.3/commercial-credit-cards,Natwest,CCC);
 	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/commercial-credit-cards,RBS,CCC);
 	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/commercial-credit-cards,Santander,CCC);
 %End;
@@ -1252,7 +1252,7 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 Run;
 
 /*
-PROC EXPORT DATA = OPENDATA.CMA9_&API(Drop=Bank_API P Count RowCnt) 
+PROC EXPORT DATA = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) 
             OUTFILE= "H:\STV\Open Banking\SAS\Temp\CMA9_&API..csv" 
             DBMS=CSV REPLACE;
      PUTNAMES=YES;
@@ -1264,14 +1264,14 @@ RUN;
 
 /*
 ODS CSV File="&Path\CMA9_&API..csv";
-Proc Print Data=OpenData.CMA9_&API(Drop=Bank_API P Count RowCnt);
+Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
 Run;
 ODS CSV Close;
 
 ODS HTML File="&Path\CMA9_&API..xls";
-Proc Print Data=OpenData.CMA9_&API(Drop=Bank_API P Count RowCnt);
+Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
 Run;
@@ -1342,31 +1342,31 @@ RUN;
 
 
 *--- Print BRANCHES Report ---;
-Proc Print Data = OpenData.CMA9_BRANCHES;
+Proc Print Data = OBData.CMA9_BRANCHES;
 Title1 "Open Banking - BRANCHES";
 Title2 "CMA9 Raw Data Comparison &fdate";
 Run;
 
 *--- Print PCA Report ---;
-Proc Print Data = OpenData.CMA9_PCA;
+Proc Print Data = OBData.CMA9_PCA;
 Title1 "Open Banking - PCA";
 Title2 "CMA9 Raw Data Comparison &fdate";
 Run;
 
 *--- Print BCA Report ---;
-Proc Print Data = OpenData.CMA9_BCA;
+Proc Print Data = OBData.CMA9_BCA;
 Title1 "Open Banking - BCA";
 Title2 "CMA9 Raw Data Comparison &fdate";
 Run;
 
 *--- Print SME Report ---;
-Proc Print Data = OpenData.CMA9_SME;
+Proc Print Data = OBData.CMA9_SME;
 Title1 "Open Banking - SME";
 Title2 "CMA9 Raw Data Comparison &fdate";
 Run;
 
 *--- Print CCC Report ---;
-Proc Print Data = OpenData.CMA9_CCC;
+Proc Print Data = OBData.CMA9_CCC;
 Title1 "Open Banking - CCC";
 Title2 "CMA9 Raw Data Comparison &fdate";
 Run;
