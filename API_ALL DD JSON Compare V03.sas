@@ -37,7 +37,7 @@ Options MPrint MLogic Source Source2 Symbolgen;
         informat Length $5. ;
         informat MinLength $25. ;
         informat MaxLength $25. ;
-        informat Pattern $25. ;
+        informat Pattern $250. ;
         informat CodeName $1000. ;
         informat CodeDescription $1000. ;
         informat EnhancedDefinition $1000. ;
@@ -51,7 +51,7 @@ Options MPrint MLogic Source Source2 Symbolgen;
         format Length $5. ;
         format MinLength $25. ;
         format MaxLength $25. ;
-        format Pattern $25. ;
+        format Pattern $250. ;
         format CodeName $1000. ;
         format CodeDescription $1000. ;
         format EnhancedDefinition $1000. ;
@@ -82,7 +82,7 @@ Options MPrint MLogic Source Source2 Symbolgen;
      run;
 
 
-Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/ OBData.X;
+Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/;
 	Length Pattern Hierarchy $ 1000 &DSN._Lev1 $ 1000;
 	Set OBData.&Dsn;
 
@@ -157,12 +157,9 @@ Quit;
 %End;
 
 *--- Create the Bank Schema dataset ---;
-Data Work.&JSON;
+Data Work.&JSON OBData.X;
 	Set LibAPIs.Alldata(Where=(V NE 0));
 Run;
-
-
-
 
 *--- Sort the Bank Schema file ---;
 Proc Sort Data = Work.&JSON
@@ -606,11 +603,11 @@ Run;
 %Mend VarVal;
 %VarVal();
 
-
+/*
 Proc JSON Out = "C:\inetpub\wwwroot\sasweb\data\results\Compare_&API_DSN..json";
 	Export OBData.Compare_&API_DSN;
 Run;
-
+*/
 
 
 Data OBData.Compare_&API_DSN(Keep = Hierarchy 
@@ -992,15 +989,14 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 	Swag_MaxLength
 	&API_DSN._MaxLength
 	MaxLength_Flag
-/*
+
 	Swagger_Pattern
 	&API_DSN._Pattern
 	Pattern_Flag
-*/
 	;
 
 
-*--- Define columns in the report output ---;
+*--- Define columns in the report and associated parameters for output ---;
 	Define CountRows / display 'Row Count' left style(column)=[width=5%];
 	Define Hierarchy / display 'Hierarchy' left style(column)=[width=15%];
 	Define Swagger_&API_DSN._Lev1 / display "Swagger &API_DSN Data Structure" left;
@@ -1008,7 +1004,7 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 	Define Mandatory_Flag / display "Mandatory Flag" left;
 
 	Define Swagger_Desc / display 'Swagger Description' left;
-	Define EnhancedDefinition / display "&API_DSN Description" left;
+	Define EnhancedDefinition / display "&API_DSN DD Description" left;
 	Define Desc_Flag / display 'Description Flag' left;
 
 /*	Define Code / display 'Swagger Code' left;*/
@@ -1020,18 +1016,19 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 /*	Define CodeNameDesc_Flag / display 'Code Name Desc Flag' left;*/
 
 	Define Swag_MinLength / display 'Swagger Min Length' left;
-	Define &API_DSN._MinLength / display "&API_DSN Min Length" left;
+	Define &API_DSN._MinLength / display "&API_DSN DD Min Length" left;
 	Define MinLength_Flag / display 'Min Length Flag' left;
 
 	Define Swag_MaxLength / display 'Swagger Max Length' left;
-	Define &API_DSN._MaxLength / display "&API_DSN Max Length" left;
+	Define &API_DSN._MaxLength / display "&API_DSN DD Max Length" left;
 	Define MaxLength_Flag / display 'Max Length Flag' left;
 
-/*	Define Swagger_Pattern / display 'Swagger Pattern' left;*/
-/*	Define &API_DSN._Pattern / display "&API_DSN Pattern" left;*/
-/*	Define Pattern_Flag / display 'Pattern Flag' left;*/
+	Define Swagger_Pattern / display 'Swagger Pattern' left;
+	Define &API_DSN._Pattern / display "&API_DSN DD Pattern" left;
+	Define Pattern_Flag / display 'Pattern Flag' left;
 
-	Compute Desc_Flag;
+*--- Based on the values of Desc_Flag variable change the style/colour parameters within the report ---;
+Compute Desc_Flag;
 	If Desc_Flag = 'Mismatch' then 
 	Do;
 		Call Define(_col_,'style',"style=[foreground=red background=pink font_weight=bold]");
@@ -1065,7 +1062,7 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 /*	Endcomp;*/
 
 
-
+*--- Based on the values of MinLength_Flag variable change the style/colour parameters within the report ---;
 	Compute MinLength_Flag;
 	If MinLength_Flag = 'Mismatch' then 
 	Do;
@@ -1077,6 +1074,7 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 	End;
 	Endcomp;
 
+*--- Based on the values of MaxLength_Flag variable change the style/colour parameters within the report ---;
 	Compute MaxLength_Flag;
 	If MaxLength_Flag = 'Mismatch' then 
 	Do;
@@ -1087,7 +1085,8 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 		Call Define(_col_,'style',"style=[foreground=blue background=lightcyan font_weight=bold]");
 	End;
 	Endcomp;
-/*
+
+*--- Based on the values of Pattern_Flag variable change the style/colour parameters within the report ---;
 	Compute Pattern_Flag;
 	If Pattern_Flag = 'Mismatch' then 
 	Do;
@@ -1098,7 +1097,7 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 		Call Define(_col_,'style',"style=[foreground=blue background=lightcyan font_weight=bold]");
 	End;
 	Endcomp;
-*/
+
 Run;
 
 Proc Export Data = OBData.Compare_&API_DSN

@@ -192,7 +192,7 @@ Data Work.&Bank._&API
 	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P7 Value 
 	Rename=(Var3 = Data_Element Var2 = Hierarchy Value = &Bank));
 
-	Length Bank_API $ 8 Var2 Value1 Value2 $ 500 Var3 $ 100 P1 - P7 Value $ 500;
+	Length Bank_API $ 8 Var2 Value1 Value2 $ 250 Var3 $ 100 P1 - P7 Value $ 300;
 
 	RowCnt = _N_;
 
@@ -245,7 +245,6 @@ Proc Sort Data = Work.&Bank._&API;
 %Mend Main;
 
 %Macro RunAPI();
-
 *------------------------------------------------------------------------------------------------------
 											ATMS
 -------------------------------------------------------------------------------------------------------;
@@ -620,8 +619,8 @@ Run;
 	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/business-current-accounts,RBS,BCA);
 	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/business-current-accounts,Santander,BCA);
 	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/business-current-accounts,Ulster_Bank,BCA);
-	%Main(https://openapi.coutts.co.uk/open-banking/v1.3/business-current-accounts,Coutts,BCA);
-	%Main(https://openapi.adambank.co.uk/open-banking/v1.3/business-current-accounts,Adam_Bank,BCA);
+	%Main(https://openapi.coutts.com/open-banking/v1.3/business-current-accounts,Coutts,BCA);
+	%Main(https://openapi.adambank.com/open-banking/v1.3/business-current-accounts,Adam_Bank,BCA);
 
 %End;
 *--- Get unique Hierarchy values for BCA ---;
@@ -1132,7 +1131,7 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 
 		Columns Hierarchy 
 		Data_Element
-		Bank_of_Ireland
+/*		Bank_of_Ireland*/
 		Barclays
 		HSBC
 		Lloyds_Bank
@@ -1142,7 +1141,7 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 
 		Define Hierarchy  / display 'Hierarchy' left;
 		Define Data_Element / display 'Data Element' left;
-		Define Bank_of_Ireland / display 'Bank of Ireland' left;
+/*		Define Bank_of_Ireland / display 'Bank of Ireland' left;*/
 		Define Barclays / display 'Barclays Bank' left;
 		Define HSBC / display 'HSBC' left;
 		Define Lloyds_Bank / display 'Lloyds Bank' left;

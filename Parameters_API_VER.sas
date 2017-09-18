@@ -205,6 +205,7 @@ Put '<p></p>';
 	Put '<OPTION VALUE="V1_3"> Version 1.3 </option>';
 	Put '<OPTION VALUE="V2_0"> Version 2.0 </option>';
 	Put '<OPTION VALUE="V2_1"> Version 2.1 </option>';
+	Put '<OPTION VALUE="V2_2"> Version 2.2 </option>';
 	Put '</SELECT>';
 	Put '</div>';
 	Put '</td>';

@@ -26,10 +26,12 @@ Run;
 %Global Version_C;
 %Global Sch_Version;
 %Global FDate;
+%Global _WebUser;
 
 %Global _Host;
 %Global _Path;
 
+%Let _WebUser = &_WebUser;
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
 
@@ -2209,6 +2211,17 @@ Proc Export Data = Work.No_Obs
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
+
+
+FILENAME Mailbox EMAIL "&_WebUser"
+Subject='Test Mail message' ATTACH="&Path";
+DATA _NULL_;
+FILE Mailbox;
+PUT "Hello";
+PUT "Please find Report as an attachment";
+PUT "Thank you";
+RUN;
+
 %Mend ExportXL;
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&Bank._&APIName._No_Obs.csv);
 
@@ -2223,7 +2236,7 @@ Run;
 %Mend API;
 %API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 *=====================================================================================================================================================
---- The values are passed from the Mmain macro to resolve in the macro below which allows execution of the API data extract ---
+--- The values are passed from the Main macro to resolve in the macro below which allows execution of the API data extract ---
 ======================================================================================================================================================;
 %Mend Schema;
 %Schema(&GitHub_Path/%Sysfunc(Tranwrd(&Github_API..json,'-','_')),&Bank_Name,&API_SCH);

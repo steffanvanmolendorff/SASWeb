@@ -39,11 +39,6 @@ Options Source Source2 Symbolgen MLogic MPrint;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
 %End;
 
-%If "&_action" EQ "CMA9 COMPARISON ALL" %Then
-%Do;
-/*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_PCA.sas";*/
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
-%End;
 
 /*
 %If "&_action" EQ "API TEST APP" %Then

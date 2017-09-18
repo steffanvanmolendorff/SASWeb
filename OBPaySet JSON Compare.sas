@@ -1,6 +1,6 @@
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
 
-/*Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";*/
+Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 
 
 %Macro Import(Filename,Dsn);
@@ -53,6 +53,10 @@ Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
                FractionDigits $
    ;
    if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+
+   *--- This line will identify any line or carriage returns within the description field ---;
+      		EnhancedDefinition = Compress(EnhancedDefinition,'0D0A'x);
+
    run;
 
 
@@ -84,10 +88,10 @@ Proc Sort Data = OBData.&Dsn;
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\OBPaySet.csv,OBPaySet);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\OBPaySetResponse.csv,OBPaySetResponse);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\OBPaySub.csv,OBPaySub);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\OBPaySubResponse.csv,OBPaySubResponse);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\OBPaySet.csv,OBPaySet);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\OBPaySetResponse.csv,OBPaySetResponse);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\OBPaySub.csv,OBPaySub);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\OBPaySubResponse.csv,OBPaySubResponse);
 
 
 /*
@@ -451,6 +455,36 @@ Run;
 
 		Hierarchy1 = Trim(Left(Substr(Hierarchy, index(Hierarchy, '-D') + 1)));
 		Table  = 'Swagger_Sch';
+
+ *--- This line will identify any line or carriage returns within the description field ---;
+ 		Definition = Compress(Definition,'0D0A'x);
+
+
+		If Find(Hierarchy,'-Risk') > 0 Then
+		Do;
+
+			If Substr(Hierarchy1,1,Find(Hierarchy1,'-Risk')) = 'paths-/payments-post-parameters-schema-' Then
+			Do;
+				Hierarchy1 = Compress('OBPaymentSetup1'||Substr(Hierarchy1,Find(Hierarchy1,'-Risk')));
+			End;
+
+			If Substr(Hierarchy1,1,Find(Hierarchy1,'-Risk')) = 'paths-/payments-post-responses-201-schema-' Then
+			Do;
+				Hierarchy1 = Compress('OBPaymentSetupResponse1'||Substr(Hierarchy1,Find(Hierarchy1,'-Risk')));
+			End;
+
+			If Substr(Hierarchy1,1,Find(Hierarchy1,'-Risk')) = 'paths-/payment-submissions-post-parameters-schema-' Then
+			Do;
+				Hierarchy1 = Compress('OBPaymentSubmission1'||Substr(Hierarchy1,Find(Hierarchy1,'-Risk')));
+			End;
+
+			If Substr(Hierarchy1,1,Find(Hierarchy1,'-Risk')) = 'paths-/payments/{PaymentId}-get-responses-200-schema-' Then
+			Do;
+				Hierarchy1 = Compress('OBPaymentSubmissionResponse1'||Substr(Hierarchy1,Find(Hierarchy1,'-Risk')));
+			End;
+
+		End;
+
 	Run;
 
 
@@ -509,7 +543,7 @@ Run;
 
 
 %Mend Schema;
-%Schema(http://localhost/sasweb/data/temp/payment_initiation_swagger.json,Test,Swagger_SCH);
+%Schema(http://localhost/sasweb/data/temp/V1_1_1/payment_initiation_swagger.json,Test,Swagger_SCH);
 
 Data OBData.Compare(Keep = Hierarchy Table MinLength MaxLength type Class
 	OBPaySet_Lev1
@@ -553,7 +587,7 @@ Data OBData.Compare(Keep = Hierarchy Table MinLength MaxLength type Class
 */
 
 *--- Find mismatches between EhancedDefinition and Description variables ---;
-If Trim(Left(EnhancedDefinition)) NE Trim(Left(Description)) then 
+If Strip(Trim(Left(EnhancedDefinition))) NE Strip(Trim(Left(Description))) then 
 	Do;
 		Desc_Flag = 'Mismatch';
 	End;
@@ -561,7 +595,7 @@ If Trim(Left(EnhancedDefinition)) NE Trim(Left(Description)) then
 		Desc_Flag = 'Match';
 	End;
 
-*--- Compare the length values of the Class and MinLength/MacLength variablesv ---;
+*--- Compare the length values of the Class and MinLength/MacLength variables ---;
 If Substr(Class,1,3) in ('Min','Max') Then
 Do;
 
@@ -736,8 +770,8 @@ Proc Report Data = OBData.Compare nowd
 			Define Hierarchy / display 'Data Hierarchy' left;
 			Define OBPaySet_Lev1 / display 'OB Payset Data Level' left;
 			Define OBPaySetResponse_Lev1 / display 'OB Payset Response Data Level' left;
-			Define OBPaySub_Lev1 / display 'OB Payset Sub Level' left;
-			Define OBPaySubResponse_Lev1 / display 'OB Payset Response Level' left;
+			Define OBPaySub_Lev1 / display 'OB Pay Sub Level' left;
+			Define OBPaySubResponse_Lev1 / display 'OB Pay Sub Response Level' left;
 			Define Description / display 'Description' left;
 			Define EnhancedDefinition / display 'Enhanced Definition' left;
 			Define Desc_Flag / display 'Description Flag' left;
@@ -775,6 +809,19 @@ Proc Report Data = OBData.Compare nowd
 Run;
 
 %ReturnButton;
+
+*=====================================================================================================================================================
+						EXPORT REPORT RESULTS TO RESULTS FOLDER
+=====================================================================================================================================================;
+%Macro ExportXL(Path);
+Proc Export Data = OBData.Compare
+ 	Outfile = "&Path"
+	DBMS = CSV REPLACE;
+	PUTNAMES=YES;
+Run;
+%Mend ExportXL;
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\OBPAYSET_SUB_RESPONSE.csv);
+
 
 /*
 ODS HTML Close;
