@@ -81,6 +81,13 @@ Options Source Source2 Symbolgen MLogic MPrint;
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\OBPaySet JSON Compare.sas";
 %End;
+
+%If "&_action" EQ "Account Information SWAGGER COMPARE" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Read RW ACCINFO Files V0.2.sas";
+%End;
+
+
 /*
 %If "&_action" EQ "ATM BRA PCA DD JSON COMPARE" %Then
 %Do;

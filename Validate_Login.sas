@@ -149,6 +149,8 @@
 /*		Put '<p><br></p>';*/
 		Put '<INPUT TYPE=submit NAME=_action VALUE="OBPaySet JSON COMPARE">';
 		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="Account Information SWAGGER COMPARE">';
+		Put '<p><br></p>';
 
 
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
