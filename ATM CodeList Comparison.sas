@@ -178,7 +178,7 @@ Run;
 
 Data WORK.ATM_CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_1\UML\ATM_CodeList_Fees.csv' 
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\ATM_CodeList_Fees.csv' 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
@@ -343,7 +343,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V2_1\UML\ATMl_001_001_01DD.csv,ATM);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\ATMl_001_001_01DD.csv,ATM);
 
 Proc Sort Data = OBData.API_ATM
 	Out = Work.API_ATM(Keep = Hierarchy DataType CodeName CodeDescription
@@ -943,4 +943,4 @@ ods tagsets.tableeditor close;
 ods listing; 
 
 %Mend CodeList;
-%CodeList(V2_0);
+%CodeList(V2_2);

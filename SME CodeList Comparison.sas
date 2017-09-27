@@ -178,10 +178,11 @@ Run;
 
 Data WORK.SME_CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_1\UML\SME_CodeList_Fees.csv' 
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\SME_CodeList_Fees.csv' 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
+	   informat CodeCategory $25.;
        informat Code_Mnemonic $4. ;
        informat Description $1000. ;
        informat Include_in_v2_0_ $1. ;
@@ -189,6 +190,7 @@ Data WORK.SME_CODELIST_FEES;
        informat Notes $89. ;
        format CodelistName $50. ;
        format CodeName $50. ;
+	   format CodeCategory $25.;
        format Code_Mnemonic $4. ;
        format Description $1000. ;
        format Include_in_v2_0_ $1. ;
@@ -205,6 +207,7 @@ Data WORK.SME_CODELIST_FEES;
 		input
                 CodelistName $
                 CodeName $
+				CodeCategory $
                 Code_Mnemonic $
                 Description $
                 Include_in_v2_0_ $
@@ -343,7 +346,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V2_1\UML\SMEl_001_001_01DD.csv,SME);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\SMEl_001_001_01DD.csv,SME);
 
 Proc Sort Data = OBData.API_SME
 	Out = Work.API_SME(Keep = Hierarchy DataType CodeName CodeDescription

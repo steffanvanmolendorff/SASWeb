@@ -1,5 +1,5 @@
 %Global _APINamme;
-/*%Let _APIName = SME;*/
+/*%Let _APIName = BCA;*/
 
 %Global _Host;
 %Global _Path;
@@ -112,6 +112,21 @@ Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy
 	EnhancedDefinition = Tranwrd(EnhancedDefinition,'"','');
 
 Run;
+
+*--- Include this step to change the \\ to \ to match the data in the Swagger File ---;
+	Data OBData.&Dsn(Drop = Pattern Rename=(Pattern1 = Pattern));
+		Set OBData.&Dsn;
+	
+		If Trim(Left(Pattern)) NE '' Then
+		Do;
+			Pattern1 = Tranwrd(Trim(Left(Pattern)),"\\","\");
+		End;
+		Else Do;
+			Pattern1 = Pattern;
+		End;
+		
+	Run;
+
 
 Proc Sort Data = OBData.&Dsn
 	Out = OBData.API_&Dsn.;
@@ -568,26 +583,19 @@ Run;
 		Drop Hierarchy;
 		Rename Hier = Hierarchy;
 
-/*		Swagger_&API_DSN._Lev1 = Hierarchy;*/
-
 	Run;
 
-
 /*
-	Data Work.X10;
-		Set Work.X9;
-
-		Hier = Substr(Hierarchy,find(Hierarchy,'Brand'));
-
-		If Reverse(Substr(Reverse(Trim(Left(Hier))),1,11)) = '-items-type' then
+	Data Work.Schema_Columns(Drop = Pattern Rename=(Pattern1 = Pattern));
+		Set Work.Schema_Columns;
+	
+		If Trim(Left(Pattern)) NE '' Then
 		Do;
-			Hier = Reverse(Substr(Reverse(Trim(Left(Hier))),12));
+			Pattern1 = Tranwrd(Trim(Left(Pattern)),"\\","\");
 		End;
-
-		If Hier NE '';
-		Drop Hierarchy;
-		Rename Hier = Hierarchy;
-
+		Else Do;
+			Pattern1 = Pattern;
+		End;
 	Run;
 */
 %End;
@@ -628,6 +636,7 @@ Data OBData.Compare_&API_DSN(Keep = Hierarchy
 	MaxLength_Flag
 	Swagger_Pattern
 	&API_DSN._Pattern
+	Items_Pattern
 	Pattern_Flag
 	Flag
 	CountRows
@@ -730,7 +739,13 @@ If Trim(Left(Name)) NE Trim(Left(CodeDescription)) then
 End;
 
 
-
+*--- If Swagger_Pattern is missing and Items_Pattern is not missing set Swagger_Pattern = Items_Pattern ---
+*--- This is to ensure that there are no missing Swagger_Pattern values in the output report when
+	creating the comparison between Pattern values of the SWAGGER and API datasets ---;
+If Trim(Left(Items_Pattern)) NE '' and Swagger_Pattern EQ '' Then 
+Do;
+	Swagger_Pattern = Items_Pattern;
+End;
 
 *--- Find mismatches between Swagger_Pattern and API_Pattern variables ---;
 If Trim(Left(Swagger_Pattern)) NE '' or Trim(Left(&API_DSN._Pattern)) NE '' Then 
@@ -743,6 +758,7 @@ Do;
 		Pattern_Flag = 'Match';
 	End;
 End;
+
 
 *--- Set Swagger MaxLenngth value equal to Items_maxLength if Items_MaxLength is not missing in order to use only 1 variable in Proc Report ---;
 	If Items_MaxLength NE '' then Swag_MaxLength = Trim(Left(Items_MaxLength));
@@ -924,7 +940,7 @@ Proc Print Data = OBData.Compare_&API_DSN	;
 Run;
 
 %ReturnButton;
-*/
+
 
 ODS HTML File="C:\inetpub\wwwroot\sasweb\data\Results\&API_DSN._JSON_COMPARE_&FDate..xls";
 
@@ -937,6 +953,7 @@ ODS HTML Close;
 ODS Listing;
 
 ODS _ALL_ Close;
+*/
 
 /*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
@@ -1117,7 +1134,11 @@ Proc Export Data = OBData.Compare_&API_DSN
 
 	Swag_MaxLength
 	&API_DSN._MaxLength
-	MaxLength_Flag)
+	MaxLength_Flag
+
+	Swagger_Pattern
+	&API_DSN._Pattern
+	Pattern_Flag)
 
 /* 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&_APIName._DD_SWAGGER_Comparison_Final.csv"*/
 	 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&File._DD_Comparison_Final.csv"

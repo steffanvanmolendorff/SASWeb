@@ -940,7 +940,9 @@ RUN;
 	Emailpw="@Octa7700";
 
 FILENAME Thunder EMAIL To=("&_WebUser")
-	From=("steffan@vanmolendorff.com")
+	CC="steffan@vanmolendorff.com"
+	Sender="steffan van Molendorff"
+	EmailID="steffan@vanmolendorff.com"
  	Subject = "An automatic email sent from SAS"
 	ATTACH="C:\inetpub\wwwroot\sasweb\data\Results\ACC_INFO_DD_SWAGGER_COMPARISON_&FDate..xls"; 
 
@@ -960,14 +962,6 @@ run;
 
 %Mend SendMail;
 %SendMail();
-
-
-
-
-
-
-
-
 
 %ReturnButton;
 

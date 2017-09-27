@@ -178,7 +178,7 @@ Run;
 
 Data WORK.BCH_CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_1\UML\BCH_CodeList_Fees.csv' 
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\BCH_CodeList_Fees.csv' 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
@@ -343,7 +343,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V2_1\UML\BCHl_001_001_01DD.csv,BCH);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\BCHl_001_001_01DD.csv,BCH);
 
 Proc Sort Data = OBData.API_BCH
 	Out = Work.API_BCH(Keep = Hierarchy DataType CodeName CodeDescription

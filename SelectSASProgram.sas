@@ -72,10 +72,18 @@ Options Source Source2 Symbolgen MLogic MPrint;
 %End;
 */
 
+*====================================================================================================
+		RETURN TO MAIN MENU
+=====================================================================================================;
+
 %If "&_action" EQ "RETURN" %Then
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Validate_Login.sas";
 %End;
+
+*====================================================================================================
+		READ / WRITE SECTION
+=====================================================================================================;
 
 %If "&_action" EQ "OBPaySet JSON COMPARE" %Then
 %Do;
@@ -85,6 +93,14 @@ Options Source Source2 Symbolgen MLogic MPrint;
 %If "&_action" EQ "Account Information SWAGGER COMPARE" %Then
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Read RW ACCINFO Files V0.2.sas";
+%End;
+
+*====================================================================================================
+		OPEN DATA _ QUERY TOOL
+=====================================================================================================;
+%If "&_action" EQ "Select Query Parameters" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\API Columns V0.1.sas";
 %End;
 
 

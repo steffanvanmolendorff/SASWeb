@@ -151,7 +151,14 @@
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit NAME=_action VALUE="Account Information SWAGGER COMPARE">';
 		Put '<p><br></p>';
+		Put '<p><br></p>';
 
+		Put '<H1>Ad-hoc Query Tool</H1>';
+		Put '<p><br></p>';
+		Put '<H2>Open Data - API Data Query</H2>';
+/*		Put '<p><br></p>';*/
+		Put '<INPUT TYPE=submit NAME=_action VALUE="Select Query Parameters">';
+		Put '<p><br></p>';
 
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
 
