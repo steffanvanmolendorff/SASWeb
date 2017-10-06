@@ -2,7 +2,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 /*Options MPrint MLogic Symbolgen Source Source2;*/
 
 %Global _Host;
-%Let _Host = Localhost;
+%Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
 
 
@@ -799,7 +799,7 @@ Run;
 
 ODS _All_ Close;
 
-ODS HTML File="C:\inetpub\wwwroot\sasweb\data\Results\ACC_INFO_DD_SWAGGER_COMPARISON_&FDate..xls";
+/*ODS HTML File="C:\inetpub\wwwroot\sasweb\data\Results\ACC_INFO_DD_SWAGGER_COMPARISON_&FDate..xls";*/
 
 Proc Print Data=Work.AccInfo_DD_SWAGGER1;
 	Title1 "Open Banking - Account Information API";
@@ -972,5 +972,3 @@ ods listing;
 %Mend Main;
 %Main();
 
-
-proc options group=email; run;

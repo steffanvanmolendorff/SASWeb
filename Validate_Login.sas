@@ -82,87 +82,81 @@
 		Put '<p><br></p>';
 		Put '<H2>OPEN DATA CMA9 COMPARISON REPORTS</H2>';
 /*		Put '<p><br></p>';*/
-		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON ATMS">';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON BRANCHES">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON PCA">';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON BCA">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON SME">';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="CMA9 COMPARISON CCC">';
-		Put '<p><br></p>';
+
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<SELECT NAME="_action" size="6" onchange="this.form.submit()"</option>';
+		Put '<OPTION VALUE="CMA9 COMPARISON ATMS"> 1. CMA9 COMPARISON ATMS </option>';
+		Put '<OPTION VALUE="CMA9 COMPARISON BRANCHES"> 2. CMA9 COMPARISON BRANCHES </option>';
+		Put '<OPTION VALUE="CMA9 COMPARISON PCA"> 3. CMA9 COMPARISON PCA </option>';
+		Put '<OPTION VALUE="CMA9 COMPARISON BCA"> 4. CMA9 COMPARISON BCA </option>';
+		Put '<OPTION VALUE="CMA9 COMPARISON SME"> 5. CMA9 COMPARISON SME </option>';
+		Put '<OPTION VALUE="CMA9 COMPARISON CCC"> 6. CMA9 COMPARISON CCC </option>';
+		Put '</SELECT>';
+		Put '</div>';
+
 
 		Put '<H2>OPEN DATA V2 CODELIST VALIDATION</H2>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="ATM CODELIST COMPARISON">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="BCH CODELIST COMPARISON">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="PCA CODELIST COMPARISON">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="BCA CODELIST COMPARISON">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="CCC CODELIST COMPARISON">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="SME CODELIST COMPARISON">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL CODELIST COMPARISON">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD JSON COMPARE">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD SWAGGER COMPARE">';
-		Put '<p><br></p>';
-/*		Put '<INPUT TYPE=submit NAME=_action VALUE="API_ALL DD JSON COMPARE WITH CODENAMES">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="MASTER SWAGGER API JSON COMPARE">';
-		Put '<p><br></p>';
-*/
-/*
-		Put '<INPUT TYPE=submit NAME=_action VALUE="ATM BRA PCA DD JSON COMPARE">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="BCA DD JSON COMPARE">';
-		Put '<p><br></p>';
-*/
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<SELECT NAME="_action" size="8" onchange="this.form.submit()"</option>';
+		Put '<OPTION VALUE="ATM CODELIST COMPARISON"> 1. ATM CODELIST COMPARISON </option>';
+		Put '<OPTION VALUE="BCH CODELIST COMPARISON"> 2. BCH CODELIST COMPARISON </option>';
+		Put '<OPTION VALUE="PCA CODELIST COMPARISON"> 3. PCA CODELIST COMPARISON </option>';
+		Put '<OPTION VALUE="BCA CODELIST COMPARISON"> 4. BCA CODELIST COMPARISON </option>';
+		Put '<OPTION VALUE="CCC CODELIST COMPARISON"> 5. CCC CODELIST COMPARISON </option>';
+		Put '<OPTION VALUE="SME CODELIST COMPARISON"> 6. SME CODELIST COMPARISON </option>';
+		Put '<OPTION VALUE="API_ALL DD JSON COMPARE"> 7. API_ALL DD JSON COMPARE </option>';
+		Put '<OPTION VALUE="API_ALL DD SWAGGER COMPARE"> 8. API_ALL DD SWAGGER COMPARE </option>';
+		Put '</SELECT>';
+		Put '</div>';
 
-/*		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';*/
-/*		Put '<p><br></p>';*/
 		Put '<H2>OPEN DATA V1 SCHEMA - API VALIDATION</H2>';
-/*		Put '<p><br></p>';*/
-		Put '<INPUT TYPE=submit NAME=_action VALUE="SELECT API PARAMETERS">';
-/*		Put '<p><br></p>';*/
-		Put '<INPUT TYPE=submit NAME=_action VALUE="STATISTICS REPORT">';
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
+		Put '<OPTION VALUE="SELECT API PARAMETERS"> 1. SELECT API PARAMETERS </option>';
+		Put '<OPTION VALUE="STATISTICS REPORT"> 2. STATISTICS REPORT </option>';
+		Put '</SELECT>';
+		Put '</div>';
 		Put '<p><br></p>';
 
-/*		Put '<p><br></p>';*/
+/*
 		Put '<H2>OPEN DATA V2 SWAGGER VALIDATION</H2>';
-/*		Put '<p><br></p>';*/
-		Put '<INPUT TYPE=submit NAME=_action VALUE="VALIDATE PCA V2 SWAGGER">';
-/*		Put '<p><br></p>';*/
-		Put '<INPUT TYPE=submit NAME=_action VALUE="VALIDATE BCA V2 SWAGGER">';
-		Put '<p><br></p>';
-
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
+		Put '<OPTION VALUE="VALIDATE PCA V2 SWAGGER"> 1. VALIDATE PCA V2 SWAGGER </option>';
+		Put '<OPTION VALUE="VALIDATE BCA V2 SWAGGER"> 2. VALIDATE BCA V2 SWAGGER </option>';
+		Put '</SELECT>';
+		Put '</div>';
+*/
 
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
 		Put '<p><br></p>';
+		Put '<p><br><br></p>';
+		Put '<p><br><br></p>';
+		Put '<H2>AD-HOC REPORT - SELECT API PRODUCT</H2>';
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<SELECT NAME="_action" size="6" onchange="this.form.submit()"</option>';
+		Put '<OPTION VALUE="ATM"> 1. ATM </option>';
+		Put '<OPTION VALUE="BRANCH"> 2. BRANCH </option>';
+		Put '<OPTION VALUE="PERSONAL CURRENT ACCOUNT"> 3. PERSONAL CURRENT ACCOUNT </option>';
+		Put '<OPTION VALUE="BUSINESS CURRENT ACCOUNT"> 4. BUSINESS CURRENT ACCOUNT </option>';
+		Put '<OPTION VALUE="COMMERCIAL CREDIT CARD"> 5. COMMERCIAL CREDIT CARD </option>';
+		Put '<OPTION VALUE="SME LOAN"> 6. SME LOAN </option>';
+		Put '</SELECT>';
+		Put '</div>';
+
+		Put '<p><br></p>';
+		Put '********************************************************';
 		Put '<H1>READ / WRITE</H1>';
 		Put '<p><br></p>';
-		Put '<H2>OB PAYSET VALIDATION</H2>';
-/*		Put '<p><br></p>';*/
-		Put '<INPUT TYPE=submit NAME=_action VALUE="OBPaySet JSON COMPARE">';
-		Put '<p><br></p>';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="Account Information SWAGGER COMPARE">';
-		Put '<p><br></p>';
-		Put '<p><br></p>';
-
-		Put '<H1>Ad-hoc Query Tool</H1>';
-		Put '<p><br></p>';
-		Put '<H2>Open Data - API Data Query</H2>';
-/*		Put '<p><br></p>';*/
-		Put '<INPUT TYPE=submit NAME=_action VALUE="Select Query Parameters">';
-		Put '<p><br></p>';
+		Put '<H2>PAYMENT / ACC-INFO VALIDATION</H2>';
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
+		Put '<OPTION VALUE="OBPaySet JSON COMPARE"> 1. OBPAYSET JSON COMPARE </option>';
+		Put '<OPTION VALUE="Account Information SWAGGER COMPARE"> 2. ACCOUNT INFO SWAGGER COMPARE </option>';
+		Put '</SELECT>';
+		Put '</div>';
 
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
-
-
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
 			'>';

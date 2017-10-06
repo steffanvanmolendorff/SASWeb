@@ -250,10 +250,10 @@ Proc Sort Data = Work.&Bank._&API;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
 %Do;
-	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/atms)) %Then 
-	%Do;
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/atms)) %Then */
+/*	%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v1.2/atms,Bank_of_Ireland,ATM);
-	%End;
+/*	%End;*/
 	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/atms,Bank_of_Scotland,ATM);
 	%Main(https://atlas.api.barclays/open-banking/v1.3/atms,Barclays,ATM);
 	%Main(https://obp-api.danskebank.com/open-banking/v1.2/atms,Danske_Bank,ATM);
@@ -365,10 +365,10 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
 %Do;
-	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/branches)) %Then 
-	%Do;
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/branches)) %Then */
+/*	%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v1.2/branches,Bank_of_Ireland,BCH);
-	%End;
+/*	%End;*/
 	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/branches,Bank_of_Scotland,BCH);
 	%Main(https://atlas.api.barclays/open-banking/v1.3/branches,Barclays,BCH);
 	%Main(https://obp-api.danskebank.com/open-banking/v1.2/branches,Danske_Bank,BCH);
@@ -481,10 +481,10 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
 %Do;
-	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/personal-current-accounts)) %Then 
-	%Do;
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/personal-current-accounts)) %Then */
+/*	%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v1.2/personal-current-accounts,Bank_of_Ireland,PCA);
-	%End;
+/*	%End;*/
 	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/personal-current-accounts,Bank_of_Scotland,PCA);
 	%Main(https://atlas.api.barclays/open-banking/v1.3/personal-current-accounts,Barclays,PCA);
 	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/personal-current-accounts,First_Trust_Bank,PCA);
@@ -515,7 +515,9 @@ Run;
 	%TestDsn(Bank_of_Ireland_&API);
 	%TestDsn(Bank_of_Scotland_&API);
 	%TestDsn(Barclays_&API);
+	%TestDsn(First_Trust_Bank_&API);
 	%TestDsn(Halifax_&API);
+	%TestDsn(HSBC_&API);
 	%TestDsn(Lloyds_Bank_&API);
 	%TestDsn(Nationwide_&API);
 	%TestDsn(Natwest_&API);
@@ -604,11 +606,11 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON BCA" %Then
 %Do;
-%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/business-current-accounts)) %Then 
-%Do;
-	%Main(https://api.aibgb.co.uk/open-banking/v1.2/business-current-accounts,AIB_Group,BCA);
-%End;
+/*%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/business-current-accounts)) %Then */
+/*%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v1.2/business-current-accounts,Bank_of_Ireland,BCA);
+/*%End;*/
+	%Main(https://api.aibgb.co.uk/open-banking/v1.2/business-current-accounts,AIB_Group,BCA);
 	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/business-current-accounts,Bank_of_Scotland,BCA);
 	%Main(https://atlas.api.barclays/open-banking/v1.3/business-current-accounts,Barclays,BCA);
 	%Main(https://obp-api.danskebank.com/open-banking/v1.2/business-current-accounts,Danske_Bank,BCA);
@@ -740,11 +742,11 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON SME" %Then
 %Do;
-	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/unsecured-sme-loans)) %Then 
-	%Do;
-	%Main(https://api.aibgb.co.uk/open-banking/v1.2/unsecured-sme-loans,AIB_Group, SME);
-	%End;
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/unsecured-sme-loans)) %Then */
+/*	%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v1.2/unsecured-sme-loans,Bank_of_Ireland,SME);
+/*	%End;*/
+	%Main(https://api.aibgb.co.uk/open-banking/v1.2/unsecured-sme-loans,AIB_Group, SME);
 	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/unsecured-sme-loans,Bank_of_Scotland,SME);
 	%Main(https://atlas.api.barclays/open-banking/v1.3/unsecured-sme-loans,Barclays,SME);
 	%Main(https://obp-api.danskebank.com/open-banking/v1.2/unsecured-sme-loans,Danske_Bank,SME);
@@ -863,10 +865,10 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON CCC" %Then
 %Do;
-	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/commercial-credit-cards)) %Then 
-	%Do;
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v1.2/commercial-credit-cards)) %Then */
+/*	%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v1.2/commercial-credit-cards,Bank_of_Ireland,CCC);
-	%End;
+/*	%End;*/
 	%Main(https://atlas.api.barclays/open-banking/v1.3/commercial-credit-cards,Barclays,CCC);
 	%Main(https://api.hsbc.com/open-banking/v1.2/commercial-credit-cards,HSBC,CCC);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/commercial-credit-cards,Lloyds_Bank,CCC);
@@ -1126,127 +1128,129 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 			style(header)=[background=lightskyblue foreground=black] 
 			style(column)=[background=lightcyan foreground=black];
 
-%If "&_action" EQ "CMA9 COMPARISON CCC" %Then
-%Do;
+	%If "&_action" EQ "CMA9 COMPARISON CCC" %Then
+	%Do;
 
-		Columns Hierarchy 
-		Data_Element
-/*		Bank_of_Ireland*/
-		Barclays
-		HSBC
-		Lloyds_Bank
-		Natwest
-		RBS
-		Santander;
+			Columns Hierarchy 
+			Data_Element
+			Bank_of_Ireland
+			Barclays
+			HSBC
+			Lloyds_Bank
+			Natwest
+			RBS
+			Santander;
 
-		Define Hierarchy  / display 'Hierarchy' left;
-		Define Data_Element / display 'Data Element' left;
-/*		Define Bank_of_Ireland / display 'Bank of Ireland' left;*/
-		Define Barclays / display 'Barclays Bank' left;
-		Define HSBC / display 'HSBC' left;
-		Define Lloyds_Bank / display 'Lloyds Bank' left;
-		Define Natwest / display 'Natwest' left;
-		Define RBS / display 'RBS' left;
-		Define Santander / display 'Santander' left;
-%End;
+			Define Hierarchy  / display 'Hierarchy' left;
+			Define Data_Element / display 'Data Element' left;
+			Define Bank_of_Ireland / display 'Bank of Ireland' left;
+			Define Barclays / display 'Barclays Bank' left;
+			Define HSBC / display 'HSBC' left;
+			Define Lloyds_Bank / display 'Lloyds Bank' left;
+			Define Natwest / display 'Natwest' left;
+			Define RBS / display 'RBS' left;
+			Define Santander / display 'Santander' left;
+	%End;
 
-%If "&_action" EQ "CMA9 COMPARISON SME" %Then
-%Do;
-		Columns Hierarchy 
-		Data_Element
-		Bank_of_Ireland
-		Bank_of_Scotland
-		Barclays
-		First_Trust_Bank
-		HSBC
-		Lloyds_Bank
-		Natwest
-		RBS
-		Santander
-		Ulster_Bank;
-
-
-		Define Hierarchy  / display 'Hierarchy' left;
-		Define Data_Element / display 'Data Element' left;
-		Define Bank_of_Ireland / display 'Bank of Ireland' left;
-		Define Bank_of_Scotland / display 'Bank of Scotland' left;
-		Define Barclays / display 'Barclays Bank' left;
-		Define First_Trust_Bank / display 'First Trust Bank' left;
-		Define HSBC / display 'HSBC' left;
-		Define Lloyds_Bank / display 'Lloyds Bank' left;
-		Define Natwest / display 'Natwest' left;
-		Define RBS / display 'RBS' left;
-		Define Santander / display 'Santander' left;
-		Define Ulster_Bank / display 'Ulster Bank' left;
-%End;
-
-%If "&_action" EQ "CMA9 COMPARISON BCA" %Then
-%Do;
-		Columns Hierarchy 
-		Data_Element
-		Bank_of_Ireland
-		Bank_of_Scotland
-		Barclays
-		First_Trust_Bank
-		HSBC
-		Lloyds_Bank
-		Natwest
-		RBS
-		Santander
-		Ulster_Bank
-		Coutts
-		Adam_Bank
-		;
+	%If "&_action" EQ "CMA9 COMPARISON SME" %Then
+	%Do;
+			Columns Hierarchy 
+			Data_Element
+			Bank_of_Ireland
+			AIB_Group		
+			Bank_of_Scotland
+			Barclays
+			First_Trust_Bank
+			HSBC
+			Lloyds_Bank
+			Natwest
+			RBS
+			Santander
+			Ulster_Bank;
 
 
-		Define Hierarchy  / display 'Hierarchy' left;
-		Define Data_Element / display 'Data Element' left;
-		Define Bank_of_Ireland / display 'Bank of Ireland' left;
-		Define Bank_of_Scotland / display 'Bank of Scotland' left;
-		Define Barclays / display 'Barclays Bank' left;
-		Define First_Trust_Bank / display 'First Trust Bank' left;
-		Define HSBC / display 'HSBC' left;
-		Define Lloyds_Bank / display 'Lloyds Bank' left;
-		Define Natwest / display 'Natwest' left;
-		Define RBS / display 'RBS' left;
-		Define Santander / display 'Santander' left;
-		Define Ulster_Bank / display 'Ulster Bank' left;
-		Define Coutts / display 'Coutts' left;
-		Define Adam_Bank / display 'Adam Bank' left;
+			Define Hierarchy  / display 'Hierarchy' left;
+			Define Data_Element / display 'Data Element' left;
+			Define Bank_of_Ireland / display 'Bank of Ireland' left;
+			Drfine AIB_Group / display 'Allied Irish Bank' left;
+			Define Bank_of_Scotland / display 'Bank of Scotland' left;
+			Define Barclays / display 'Barclays Bank' left;
+			Define First_Trust_Bank / display 'First Trust Bank' left;
+			Define HSBC / display 'HSBC' left;
+			Define Lloyds_Bank / display 'Lloyds Bank' left;
+			Define Natwest / display 'Natwest' left;
+			Define RBS / display 'RBS' left;
+			Define Santander / display 'Santander' left;
+			Define Ulster_Bank / display 'Ulster Bank' left;
+	%End;
 
-%End;
-
-%If "&_action" EQ "CMA9 COMPARISON PCA" %Then
-%Do;
-		Columns Hierarchy 
-		Data_Element
-		Bank_of_Ireland
-		Bank_of_Scotland
-		Barclays
-		First_Trust_Bank
-		HSBC
-		Lloyds_Bank
-		Natwest
-		RBS
-		Santander
-		Ulster_Bank;
-
-
-		Define Hierarchy  / display 'Hierarchy' left;
-		Define Data_Element / display 'Data Element' left;
-		Define Bank_of_Ireland / display 'Bank of Ireland' left;
-		Define Bank_of_Scotland / display 'Bank of Scotland' left;
-		Define Barclays / display 'Barclays Bank' left;
-		Define First_Trust_Bank / display 'First Trust Bank' left;
-		Define HSBC / display 'HSBC' left;
-		Define Lloyds_Bank / display 'Lloyds Bank' left;
-		Define Natwest / display 'Natwest' left;
-		Define RBS / display 'RBS' left;
-		Define Santander / display 'Santander' left;
-		Define Ulster_Bank / display 'Ulster Bank' left;
-%End;
+	%If "&_action" EQ "CMA9 COMPARISON BCA" %Then
+	%Do;
+			Columns Hierarchy 
+			Data_Element
+			AIB_Group
+			Bank_of_Ireland
+			Bank_of_Scotland
+			Barclays
+			First_Trust_Bank
+			HSBC
+			Lloyds_Bank
+			Natwest
+			RBS
+			Santander
+			Ulster_Bank
+			Coutts
+			Adam_Bank
+			;
 
 
+			Define Hierarchy  / display 'Hierarchy' left;
+			Define Data_Element / display 'Data Element' left;
+			Define AIB_Group / display 'Allied Irish Bank' left;
+			Define Bank_of_Ireland / display 'Bank of Ireland' left;
+			Define Bank_of_Scotland / display 'Bank of Scotland' left;
+			Define Barclays / display 'Barclays Bank' left;
+			Define First_Trust_Bank / display 'First Trust Bank' left;
+			Define HSBC / display 'HSBC' left;
+			Define Lloyds_Bank / display 'Lloyds Bank' left;
+			Define Natwest / display 'Natwest' left;
+			Define RBS / display 'RBS' left;
+			Define Santander / display 'Santander' left;
+			Define Ulster_Bank / display 'Ulster Bank' left;
+			Define Coutts / display 'Coutts' left;
+			Define Adam_Bank / display 'Adam Bank' left;
+
+	%End;
+
+	%If "&_action" EQ "CMA9 COMPARISON PCA" %Then
+	%Do;
+			Columns Hierarchy 
+			Data_Element
+			Bank_of_Ireland
+			Bank_of_Scotland
+			Barclays
+			First_Trust_Bank
+			HSBC
+			Lloyds_Bank
+			Natwest
+			RBS
+			Santander
+			Ulster_Bank;
+
+
+			Define Hierarchy  / display 'Hierarchy' left;
+			Define Data_Element / display 'Data Element' left;
+			Define Bank_of_Ireland / display 'Bank of Ireland' left;
+			Define Bank_of_Scotland / display 'Bank of Scotland' left;
+			Define Barclays / display 'Barclays Bank' left;
+			Define First_Trust_Bank / display 'First Trust Bank' left;
+			Define HSBC / display 'HSBC' left;
+			Define Lloyds_Bank / display 'Lloyds Bank' left;
+			Define Natwest / display 'Natwest' left;
+			Define RBS / display 'RBS' left;
+			Define Santander / display 'Santander' left;
+			Define Ulster_Bank / display 'Ulster Bank' left;
+	%End;
 
 Run;
 

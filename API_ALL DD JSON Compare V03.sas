@@ -744,12 +744,22 @@ End;
 	creating the comparison between Pattern values of the SWAGGER and API datasets ---;
 If Trim(Left(Items_Pattern)) NE '' and Swagger_Pattern EQ '' Then 
 Do;
+	*--- This line will ensure that there are no decimal points in the Swagger_Pattern value in the report
+		id the Items_Pattern value is missing. ---;
+	If Trim(Left(Items_Pattern)) = '.' then Items_Pattern = '';
+
 	Swagger_Pattern = Items_Pattern;
+
+	*--- This line will ensure that there are no decimal points in the Swagger_Pattern value in the report
+		id the Items_Pattern value is missing. ---;
+	If Trim(Left(Swagger_Pattern)) = '.' then Swagger_Pattern = '';
 End;
 
 *--- Find mismatches between Swagger_Pattern and API_Pattern variables ---;
 If Trim(Left(Swagger_Pattern)) NE '' or Trim(Left(&API_DSN._Pattern)) NE '' Then 
 Do;
+	If Trim(Left(Swagger_Pattern)) = '.' then Swagger_Pattern = '';
+
 	If Trim(Left(Swagger_Pattern)) NE Trim(Left(&API_DSN._Pattern)) then 
 	Do;
 		Pattern_Flag = 'Mismatch';

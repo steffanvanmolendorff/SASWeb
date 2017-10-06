@@ -98,11 +98,35 @@ Options Source Source2 Symbolgen MLogic MPrint;
 *====================================================================================================
 		OPEN DATA _ QUERY TOOL
 =====================================================================================================;
-%If "&_action" EQ "Select Query Parameters" %Then
+%If "&_action" EQ "ATM" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\API Columns V0.1.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\API Columns V0.2.sas";
 %End;
 
+%If "&_action" EQ "BRANCH" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\API Columns V0.2.sas";
+%End;
+
+%If "&_action" EQ "PERSONAL CURRENT ACCOUNT" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\API Columns V0.2.sas";
+%End;
+
+%If "&_action" EQ "BUSINESS CURRENT ACCOUNT" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\API Columns V0.2.sas";
+%End;
+
+%If "&_action" EQ "COMMERCIAL CREDIT CARD" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\API Columns V0.2.sas";
+%End;
+
+%If "&_action" EQ "SME LOAN" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\API Columns V0.2.sas";
+%End;
 
 /*
 %If "&_action" EQ "ATM BRA PCA DD JSON COMPARE" %Then
