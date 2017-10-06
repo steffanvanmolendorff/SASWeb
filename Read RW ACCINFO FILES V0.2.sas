@@ -922,6 +922,13 @@ Proc Export Data = Work.AccInfo_DD_SWAGGER1
 	PUTNAMES=YES;
 Run;
 
+ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\AccInfo_SW_DD_Comparison_Final.csv";
+Proc Print Data=Work.AccInfo_DD_SWAGGER1;
+	Title1 "OPEN BANKING - &API";
+	Title2 "ACCOUNT INFORMATION DATA STRUCTURE REPORT - &Fdate";
+Run;
+ODS CSV Close;
+
 /*
 FILENAME Mailbox EMAIL "&_WebUser" emailid = "Microsoft Outlook"
 Subject='Test Mail message' ATTACH="C:\inetpub\wwwroot\sasweb\Data\Results\AccInfo_SW_DD_Comparison_Final.csv";

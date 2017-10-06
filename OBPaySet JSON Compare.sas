@@ -822,6 +822,12 @@ Run;
 %Mend ExportXL;
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\OBPAYSET_SUB_RESPONSE.csv);
 
+ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\OBPAYSET_SUB_RESPONSE.csv";
+Proc Print Data=OBData.Compare;
+	Title1 "OPEN BANKING - &API";
+	Title2 "OBPAYSET DATA STRUCTURE REPORT - &Fdate";
+Run;
+ODS CSV Close;
 
 /*
 ODS HTML Close;

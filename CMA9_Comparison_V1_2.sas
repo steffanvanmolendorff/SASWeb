@@ -1265,15 +1265,15 @@ RUN;
 *--- Close Output Delivery Parameters  ---;
 /*ODS HTML Close;*/
 
-/*
-ODS CSV File="&Path\CMA9_&API..csv";
+
+ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\CMA9_&API..csv";
 Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
 Run;
 ODS CSV Close;
-
-ODS HTML File="&Path\CMA9_&API..xls";
+/*
+ODS HTML File="&Path\Data\Results\CMA9_&API..xls";
 Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
