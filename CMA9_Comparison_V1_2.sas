@@ -286,6 +286,7 @@ Proc Sort Data = Work.&Bank._&API;
 	%TestDsn(Bank_of_Scotland_&API);
 	%TestDsn(Barclays_&API);
 	%TestDsn(Danske_Bank_&API);
+	%TestDsn(First_Trust_Bank_&API);
 	%TestDsn(Halifax_&API);
 	%TestDsn(HSBC_&API);
 	%TestDsn(Lloyds_Bank_&API);
@@ -377,7 +378,7 @@ Run;
 	%Main(https://api.hsbc.com/open-banking/v1.2/branches,HSBC,BCH);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/branches,Lloyds_Bank,BCH);
 	%Main(https://openapi.nationwide.co.uk/open-banking/v1.2/branches,Nationwide,BCH);
-	%Main(https://openapi.natwest.com/open-banking/v1.2/branches,Natwest,BCH);
+	%Main(https://openapi.natwest.com/open-banking/v1.3/branches,Natwest,BCH);
 	%Main(https://openapi.rbs.co.uk/open-banking/v1.3/branches,RBS,BCH);
 	%Main(https://api.santander.co.uk/retail/open-banking/v1.2/branches,Santander,BCH);
 	%Main(https://openapi.ulsterbank.co.uk/open-banking/v1.3/branches,Ulster_Bank,BCH);
@@ -487,6 +488,7 @@ Run;
 /*	%End;*/
 	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/personal-current-accounts,Bank_of_Scotland,PCA);
 	%Main(https://atlas.api.barclays/open-banking/v1.3/personal-current-accounts,Barclays,PCA);
+	%Main(https://obp-api.danskebank.com/open-banking/v1.2/personal-current-accounts,Danske_Bank,PCA);
 	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/personal-current-accounts,First_Trust_Bank,PCA);
 	%Main(https://api.halifax.co.uk/open-banking/v1.2/personal-current-accounts,Halifax,PCA);
 	%Main(https://api.hsbc.com/open-banking/v1.2/personal-current-accounts,HSBC,PCA);
@@ -515,6 +517,7 @@ Run;
 	%TestDsn(Bank_of_Ireland_&API);
 	%TestDsn(Bank_of_Scotland_&API);
 	%TestDsn(Barclays_&API);
+	%TestDsn(Danske_Bank_&API);
 	%TestDsn(First_Trust_Bank_&API);
 	%TestDsn(Halifax_&API);
 	%TestDsn(HSBC_&API);
@@ -750,6 +753,7 @@ Run;
 	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/unsecured-sme-loans,Bank_of_Scotland,SME);
 	%Main(https://atlas.api.barclays/open-banking/v1.3/unsecured-sme-loans,Barclays,SME);
 	%Main(https://obp-api.danskebank.com/open-banking/v1.2/unsecured-sme-loans,Danske_Bank,SME);
+	%Main(https://openapi.esmeloans.com/open-banking/v1.3/unsecured-sme-loans,ESME,SME);
 	%Main(https://api.firsttrustbank.co.uk/open-banking/v1.2/unsecured-sme-loans,First_Trust_Bank,SME);
 	%Main(https://api.hsbc.com/open-banking/v1.2/unsecured-sme-loans,HSBC,SME);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/unsecured-sme-loans,Lloyds_Bank,SME);
@@ -777,6 +781,7 @@ Run;
 	%TestDsn(Bank_of_Scotland_&API);
 	%TestDsn(Barclays_&API);
 	%TestDsn(Danske_Bank_&API);
+	%TestDsn(ESME_&API);
 	%TestDsn(First_Trust_Bank_&API);
 	%TestDsn(HSBC_&API);
 	%TestDsn(Lloyds_Bank_&API);
@@ -869,6 +874,7 @@ Run;
 /*	%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v1.2/commercial-credit-cards,Bank_of_Ireland,CCC);
 /*	%End;*/
+	%Main(https://api.bankofscotland.co.uk/open-banking/v1.2/commercial-credit-cards,Bank_of_Scotland,CCC);
 	%Main(https://atlas.api.barclays/open-banking/v1.3/commercial-credit-cards,Barclays,CCC);
 	%Main(https://api.hsbc.com/open-banking/v1.2/commercial-credit-cards,HSBC,CCC);
 	%Main(https://api.lloydsbank.com/open-banking/v1.2/commercial-credit-cards,Lloyds_Bank,CCC);
@@ -891,6 +897,7 @@ Run;
 		%End;
 	%Mend TestDsn;
 	%TestDsn(Bank_of_Ireland_&API);
+	%TestDsn(Bank_of_Scotland_&API);
 	%TestDsn(Barclays_&API);
 	%TestDsn(HSBC_&API);
 	%TestDsn(Lloyds_Bank_&API);
@@ -1134,6 +1141,7 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 			Columns Hierarchy 
 			Data_Element
 			Bank_of_Ireland
+			Bank_of_Scotland
 			Barclays
 			HSBC
 			Lloyds_Bank
@@ -1144,6 +1152,7 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 			Define Hierarchy  / display 'Hierarchy' left;
 			Define Data_Element / display 'Data Element' left;
 			Define Bank_of_Ireland / display 'Bank of Ireland' left;
+			Define Bank_of_Scotland / display 'Bank of Scotland' left;
 			Define Barclays / display 'Barclays Bank' left;
 			Define HSBC / display 'HSBC' left;
 			Define Lloyds_Bank / display 'Lloyds Bank' left;
@@ -1160,6 +1169,7 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 			AIB_Group		
 			Bank_of_Scotland
 			Barclays
+			ESME
 			First_Trust_Bank
 			HSBC
 			Lloyds_Bank
@@ -1168,13 +1178,13 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 			Santander
 			Ulster_Bank;
 
-
 			Define Hierarchy  / display 'Hierarchy' left;
 			Define Data_Element / display 'Data Element' left;
 			Define Bank_of_Ireland / display 'Bank of Ireland' left;
 			Drfine AIB_Group / display 'Allied Irish Bank' left;
 			Define Bank_of_Scotland / display 'Bank of Scotland' left;
 			Define Barclays / display 'Barclays Bank' left;
+			Define ESME / display 'ESME Bank' left;
 			Define First_Trust_Bank / display 'First Trust Bank' left;
 			Define HSBC / display 'HSBC' left;
 			Define Lloyds_Bank / display 'Lloyds Bank' left;
@@ -1192,6 +1202,7 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 			Bank_of_Ireland
 			Bank_of_Scotland
 			Barclays
+			Danske_Bank
 			First_Trust_Bank
 			HSBC
 			Lloyds_Bank
@@ -1203,13 +1214,13 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 			Adam_Bank
 			;
 
-
 			Define Hierarchy  / display 'Hierarchy' left;
 			Define Data_Element / display 'Data Element' left;
 			Define AIB_Group / display 'Allied Irish Bank' left;
 			Define Bank_of_Ireland / display 'Bank of Ireland' left;
 			Define Bank_of_Scotland / display 'Bank of Scotland' left;
 			Define Barclays / display 'Barclays Bank' left;
+			Define Danske_Bank / display 'Danske Bank' left;
 			Define First_Trust_Bank / display 'First Trust Bank' left;
 			Define HSBC / display 'HSBC' left;
 			Define Lloyds_Bank / display 'Lloyds Bank' left;
@@ -1229,23 +1240,28 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
 			Bank_of_Ireland
 			Bank_of_Scotland
 			Barclays
+			Danske_Bank
 			First_Trust_Bank
+			Halifax
 			HSBC
 			Lloyds_Bank
+			Nationwide
 			Natwest
 			RBS
 			Santander
 			Ulster_Bank;
-
 
 			Define Hierarchy  / display 'Hierarchy' left;
 			Define Data_Element / display 'Data Element' left;
 			Define Bank_of_Ireland / display 'Bank of Ireland' left;
 			Define Bank_of_Scotland / display 'Bank of Scotland' left;
 			Define Barclays / display 'Barclays Bank' left;
+			Define Danske_Bank / display 'Danske Bank' left;
 			Define First_Trust_Bank / display 'First Trust Bank' left;
+			Define Halifax / display 'Halifax Bank' left;
 			Define HSBC / display 'HSBC' left;
 			Define Lloyds_Bank / display 'Lloyds Bank' left;
+			Define Nationwide / display 'Nationwide' left;
 			Define Natwest / display 'Natwest' left;
 			Define RBS / display 'RBS' left;
 			Define Santander / display 'Santander' left;
