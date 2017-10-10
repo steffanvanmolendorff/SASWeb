@@ -155,6 +155,14 @@
 		Put '<OPTION VALUE="Account Information SWAGGER COMPARE"> 2. ACCOUNT INFO SWAGGER COMPARE </option>';
 		Put '</SELECT>';
 		Put '</div>';
+		Put '<p><br></p>';
+
+		Put '<H2>TEST</H2>';
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
+		Put '<OPTION VALUE="Test Other Script"> 1. Test Other Script </option>';
+		Put '</SELECT>';
+		Put '</div>';
 
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /

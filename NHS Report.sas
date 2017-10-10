@@ -1,5 +1,5 @@
 %Macro Main();
-Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
+Libname NHSData "C:\inetpub\wwwroot\sasweb\data\NHS";
 Options MPrint MLogic Symbolgen Source Source2;
 
 %Global _Host;
@@ -14,7 +14,7 @@ Options MPrint MLogic Symbolgen Source Source2;
 %Global _Multiple;
 
 *--- This section will determine which report to run based on a single or multiple columns selection that ---;
-%If "&_API_Field0" GT "0" %Then
+%If "&_NHS_Selected0" GT "0" %Then
 %Do;
 	%Let _Multiple = Yes;
 	%Put _Multiple = "&_Multiple";
@@ -143,15 +143,15 @@ Run;
 %Mend Template;
 %Template;
 
-%Macro API_Report();
+%Macro NHS_Report();
 %If "&_Multiple" EQ "Yes" %Then
 %Do;
 
 *--- Concatenate columns to create subset of columns in the report ---;
 %Let Columns =;
 /*%Macro Concat(Dsn);*/
-	%Do i = 1 %to &_API_Field0;
-			%Let ColX = &&_API_Field&i;
+	%Do i = 1 %to &_NHS_Selected0;
+			%Let ColX = &&_NHS_Selected&i;
 			%Put ColX = &ColX;
 
 			%Let Columns = &Columns &ColX;
@@ -159,11 +159,6 @@ Run;
 	%End;
 /*%Mend Concat;*/
 /*%Concat(OBACCOUNT);*/
-
-
-
-
-
 
 	Data _NULL_;
 	File _Webout;
@@ -182,7 +177,7 @@ Run;
 		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
 			
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		Put '<title>OBIE</title>';
+		Put '<title>QLICK2 NHS</title>';
 
 		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
@@ -204,6 +199,123 @@ Run;
 	*--- Space below image ---;
 		Put '<p><br></p>';
 
+
+	*--- Space below image ---;
+	Put '<p><br></p>';
+	Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
+
+
+		Put '<table align="center" style="width: 75%; height: 15%" border="1">';
+		Put '<td>';
+		Put '<tr>';
+
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<H1>TEST</H1>';
+		Put '<p><br></p>';
+		Put '<H2>SELECT FORESCAST %</H2>';
+		Put '<SELECT NAME="_forecast" size="10" "</option>';/*onchange="this.form.submit()*/
+		Put '<OPTION VALUE="0"> </option>';
+		Put '<OPTION VALUE="05"> 0.5 % </option>';
+		Put '<OPTION VALUE="1"> 1 % </option>';
+		Put '<OPTION VALUE="5"> 5 % </option>';
+		Put '<OPTION VALUE="10"> 10 % </option>';
+		Put '<OPTION VALUE="15"> 15 % </option>';
+		Put '<OPTION VALUE="20"> 20 % </option>';
+		Put '<OPTION VALUE="25"> 25 % </option>';
+		Put '<OPTION VALUE="50"> 50 % </option>';
+		Put '<OPTION VALUE="75"> 75 % </option>';
+		Put '<OPTION VALUE="100"> 100 % </option>';
+		Put '</SELECT>';
+		Put '</div>';
+		Put '<p><br></p>';
+
+		Put '</td>';
+
+
+
+
+	*--- Table 2 - Drop Down Table ---;
+	Put '<table align = "center" style="width: 60%; height: 5%" border="1">';
+	Put '<tr>';
+
+
+	Put '<td valign="top" style="background-color: white; color: black" border="1">';
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<b>SELECT BANK NAME</b>';
+		Put '<p></p>';
+
+
+	*--- Read Dataset UniqueNames ---;
+		 	%Let Dsn = %Sysfunc(Open(NHSData.NHS_1));
+	*--- Count Observations ---;
+		    %Let Count = %Eval(%Sysfunc(Attrn(&Dsn,Nobs))+1);
+
+			Put	'<select name="_NHS_Selected" size="15" multiple>' /;
+	*--- Populate Drop Down Box on HTML Page ---;
+			%Do I = 1 %To &Count;
+		        %Let Rc = %Sysfunc(fetch(&Dsn,&i));
+				%Let Start=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,Name))));
+				%Let Label=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,Name))));
+					%If "&Start" ne " " %Then
+					%Do;
+						%If &I=1 %Then 
+						%Do;
+							Put '<option value='
+								"&Start"
+								'>' /
+								"&Label"
+								'</option>' /;
+						%End;
+						%Else
+						%Do;
+				            Put '<option value='
+								"&Start"
+								'>' /
+								"&Label"
+								'</option>' /;
+						%End;
+					%End;
+						%Else %Let I = &Count;
+					%End;
+
+					%Let Rc = %Sysfunc(Close(&Dsn));
+
+		Put '</div>';
+	Put '</td>';
+	Put '</tr>';
+	Put '</table>';
+
+
+	Put '<p><br></p>';
+
+	*--- Table 3 - Submit button ---;
+	Put '<table style="width: 100%; height: 5%" border="0">';
+	Put '<td valign="center" align="center" border="1" style="background-color: lightblue; color: Black">';
+	Put '<INPUT TYPE=submit VALUE="Submit Details" valign="center">';
+
+	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.NHS Report Percentage.sas">';
+	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+		"&_service"
+		'>';
+
+	Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+		"&_debug"
+		'>';
+	Put '<INPUT TYPE=hidden NAME=_API_Val VALUE=' /
+		"&_API_Val"
+		'>';
+	Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+		"&_WebUser"
+		'>';
+	Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+		"&_WebPass"
+		'>';
+
+	Put '</FORM>';
+	Put '</td>';
+	Put '</tr>';
+	Put '</table>';
+
 		ODS _ALL_ Close;
 
 		/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
@@ -219,27 +331,13 @@ Run;
 		            frozen_headers="0" 
 		            frozen_rowheaders="0" 
 		            ) ; 
-/*
-				Data Work.Bank_API;
-					Set OBData.&_API_Val._geographic(Keep = Bank &Columns);
-					API_Bank_Name = Upcase(Tranwrd(Trim(Left(Bank)),' ','_'));
+
+				Data Work.NHS;
+					Set NHSData.NHS(Keep = &Columns);
 				Run;
-				Proc Print Data=Work.Bank_API(Drop = Bank
-					Where=(API_Bank_Name EQ "&_Bank_Selected"));
-					Title1 "Open Banking - &_API_VAL Ad-hoc Report";
-					Title2 "&_API_Val Columns - %Sysfunc(UPCASE(&Fdate))";
-				Run;
-*/
-				Proc Summary Data = OBData.&_API_Val._geographic
-				(Keep = Bank Count &Columns
-				Where=(Upcase(Tranwrd(Trim(Left(Bank)),' ','_')) EQ "&_Bank_Selected")) Nway Missing;
-					Class Bank &Columns;
-					Var Count;
-					Output Out = Work.Summ_Bank_API(Drop = _Freq_ _Type_) Sum=;
-				Run;
-				Proc Print Data=Work.Summ_Bank_API;
-					Title1 "Open Banking - &_API_VAL Ad-hoc Summary Report";
-					Title2 "&_API_Val Columns - %Sysfunc(UPCASE(&Fdate))";
+				Proc Print Data=Work.NHS;
+					Title1 "Test Ad-hoc Report";
+					Title2 "%Sysfunc(UPCASE(&Fdate))";
 				Run;
 
 		%ReturnButton;
@@ -307,10 +405,9 @@ Run;
 		            frozen_rowheaders="0" 
 		            ) ; 
 
-				Proc Print Data=OBData.&_API_Val._geographic
-				(Keep = Bank Data_Element &_API_Val._Count);
-					Title1 "Open Banking - &_API_VAL Ad-hoc Report";
-					Title2 "&_API_Val Columns - %Sysfunc(UPCASE(&Fdate))";
+				Proc Print Data=NHSData.NHS;
+					Title1 "Test - Ad-hoc Report";
+					Title2 "%Sysfunc(UPCASE(&Fdate))";
 				Run;
 
 		%ReturnButton;
@@ -322,8 +419,8 @@ Run;
 %End;
 
 
-%Mend API_Report;
-%API_Report();
+%Mend NHS_Report;
+%NHS_Report();
 
 %Mend Main;
 %Main();

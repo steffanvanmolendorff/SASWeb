@@ -207,6 +207,17 @@ Options Source Source2 Symbolgen MLogic MPrint;
 *====================================================================================================
 		SWAGGER V2 VS. JSON COMPARISON - EARLY VERSIONS
 =====================================================================================================;
+
+%If "&_action" EQ "Test Other Script" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\NHS Data.sas";
+%End;
+
+
+
+*====================================================================================================
+		SWAGGER V2 VS. JSON COMPARISON - EARLY VERSIONS
+=====================================================================================================;
 %If "&_action" EQ "VALIDATE PCA V2 SWAGGER" %Then
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\General\Extract PCA V2 JSON Data.sas";

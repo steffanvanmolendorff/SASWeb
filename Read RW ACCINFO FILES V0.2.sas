@@ -25,7 +25,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
       Informat Name $250. ;
       Informat Occurrence $100. ;
       Informat XPath $515. ;
-      Informat EnhancedDefinition $500. ;
+      Informat EnhancedDefinition $1000. ;
       Informat Class $100. ;
       Informat Codes $25. ;
       Informat Pattern $50. ;
@@ -34,7 +34,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
       Format Name $250. ;
       Format Occurrence $100. ;
       Format XPath $515. ;
-      Format EnhancedDefinition $500. ;
+      Format EnhancedDefinition $1000. ;
       Format Class $100. ;
       Format Codes $25. ;
       Format Pattern $50. ;
@@ -499,7 +499,7 @@ Run;
 	%Put i = &i;
 
 	Data Work.Unique_Columns&i;
-		Length Hierarchy $515.  Description $500. Items_MaxLength Items_MinLength $25.;
+		Length Hierarchy $515.  Description $1000. Items_MaxLength Items_MinLength $25.;
 		Set Work.&JSON._2(Where=(HierCnt = &i));
 		By HierCnt Counter;
 
@@ -517,7 +517,7 @@ Run;
 					Length &&Variable_Name_&i._&j  $250.;
 				%End;
 				%Else %Do;
-					Length &&Variable_Name_&i._&j  $500.;
+					Length &&Variable_Name_&i._&j  $1000.;
 				%End;
 /*				%Let Varname = %Sysfunc(Translate(&&Variable_Name_&i._&j.,' ','_'));*/
 				%Let Varname = &&Variable_Name_&i._&j.;
