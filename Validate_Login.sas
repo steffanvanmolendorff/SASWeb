@@ -160,7 +160,7 @@
 		Put '<H2>TEST</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
-		Put '<OPTION VALUE="Test Other Script"> 1. Test Other Script </option>';
+		Put '<OPTION VALUE="Test Other Script"> 1. TEST OTHER SCRIPT </option>';
 		Put '</SELECT>';
 		Put '</div>';
 

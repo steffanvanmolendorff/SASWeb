@@ -24,6 +24,61 @@ Options MPrint MLogic Symbolgen Source Source2;
 	%Put _Multiple = "&_Multiple";
 %End;
 
+
+
+
+
+*--- Set Title Date in Proc Print ---;
+%Macro Fdate(Fmt,Fmt2);
+   %Global Fdate FdateTime;
+   Data _Null_;
+      Call Symput("Fdate",Left(Put("&Sysdate"d,&Fmt)));
+      Call Symput("FdateTime",Left(Put("&Sysdate"d,&Fmt2)));
+  Run;
+%Mend Fdate;
+%Fdate(worddate12., datetime.);
+
+%Macro Template;
+Proc Template;
+ define style styles.OBStyle;
+ parent = styles.BarrettsBlue;
+ notes "My Simple Style";
+
+ class body /
+ backgroundcolor = white
+ color = black
+ fontfamily = "Palatino"
+ ;
+ class systemtitle /
+ fontfamily = "Verdana, Arial"
+ fontsize = 16pt
+ fontweight = bold
+ ;
+ class table /
+ backgroundcolor = #f0f0f0
+ bordercolor = black
+ borderstyle = solid
+ borderwidth = 1pt
+ cellpadding = 5pt
+ cellspacing = 1pt
+ frame = void
+ rules = groups
+ fontfamily = "Verdana"
+;
+ class header, footer /
+ backgroundcolor = #c0c0c0
+ fontfamily = "Verdana, Arial"
+ fontweight = bold
+ ;
+ class data /
+ fontfamily = "Palatino"
+ ;
+ end; 
+
+Run;
+%Mend Template;
+%Template;
+
 %Macro ReturnButton();
 Data _Null_;
 		File _Webout;
@@ -58,9 +113,9 @@ Data _Null_;
 		Put '<HR>';
 		Put '<p></p>';
 
-		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
+		Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
+		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
 		Put '<p><br></p>';
@@ -82,7 +137,7 @@ Data _Null_;
 		Put '</tr>';
 		Put '</Table>';
 
-		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
+		Put '<Table align="center" style="width: 100%; height: 5%" border="0">';
 		Put '<td valign="top" style="background-color: White; color: black">';
 		Put '<H3>All Rights Reserved</H3>';
 		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
@@ -95,53 +150,7 @@ Data _Null_;
 Run;
 %Mend ReturnButton;
 
-*--- Set Title Date in Proc Print ---;
-%Macro Fdate(Fmt,Fmt2);
-   %Global Fdate FdateTime;
-   Data _Null_;
-      Call Symput("Fdate",Left(Put("&Sysdate"d,&Fmt)));
-      Call Symput("FdateTime",Left(Put("&Sysdate"d,&Fmt2)));
-  Run;
-%Mend Fdate;
-%Fdate(worddate12., datetime.);
 
-%Macro Template;
-
-Proc Template;
-	Define style style.OBStyle;
- 	notes "My Simple Style";
- 	class body /
- 	backgroundcolor = white
- 	color = black
- 	fontfamily = "Palatino";
-
- 	Class systemtitle /
- 	fontfamily = "Verdana, Arial"
- 	fontsize = 16pt
- 	fontweight = bold;
-
- 	Class table /
- 	backgroundcolor = #f0f0f0
- 	bordercolor = red
- 	borderstyle = solid
- 	borderwidth = 1pt
- 	cellpadding = 5pt
- 	cellspacing = 0pt
- 	frame = void
- 	rules = groups;
-
- 	Class header, footer /
- 	backgroundcolor = #c0c0c0
- 	fontfamily = "Verdana, Arial"
- 	fontweight = bold;
-
-	Class data /
- 	fontfamily = "Palatino";
- 	End; 
-Run;
-
-%Mend Template;
-%Template;
 
 %Macro API_Report();
 %If "&_Multiple" EQ "Yes" %Then
@@ -159,10 +168,6 @@ Run;
 	%End;
 /*%Mend Concat;*/
 /*%Concat(OBACCOUNT);*/
-
-
-
-
 
 
 	Data _NULL_;
@@ -208,17 +213,19 @@ Run;
 
 		/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
+		%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+		title "Listing of Product Sales"; 
 		ods listing close; 
 		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
-		ods tagsets.tableeditor file=_Webout 
-		    style=styles./*meadow*/OBStyle 
+		ods tagsets.tableeditor file=_Webout
+		    style=styles.OBStyle 
 		    options(autofilter="YES" 
 		 	    autofilter_table="1" 
-		            autofilter_width="10em" 
+		            autofilter_width="9em" 
 		 	    autofilter_endcol= "50" 
 		            frozen_headers="0" 
 		            frozen_rowheaders="0" 
-		            ) ; 
+		            ); 
 /*
 				Data Work.Bank_API;
 					Set OBData.&_API_Val._geographic(Keep = Bank &Columns);
@@ -241,6 +248,7 @@ Run;
 					Title1 "Open Banking - &_API_VAL Ad-hoc Summary Report";
 					Title2 "&_API_Val Columns - %Sysfunc(UPCASE(&Fdate))";
 				Run;
+
 
 		%ReturnButton;
 
@@ -295,17 +303,19 @@ Run;
 
 		/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
+		%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+		title "Listing of Product Sales"; 
 		ods listing close; 
 		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
-		ods tagsets.tableeditor file=_Webout 
-		    style=styles./*meadow*/OBStyle 
+		ods tagsets.tableeditor file=_Webout
+		    style=styles.OBStyle 
 		    options(autofilter="YES" 
 		 	    autofilter_table="1" 
-		            autofilter_width="10em" 
+		            autofilter_width="9em" 
 		 	    autofilter_endcol= "50" 
 		            frozen_headers="0" 
 		            frozen_rowheaders="0" 
-		            ) ; 
+		            ); 
 
 				Proc Print Data=OBData.&_API_Val._geographic
 				(Keep = Bank Data_Element &_API_Val._Count);

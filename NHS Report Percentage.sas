@@ -108,40 +108,43 @@ Run;
 %Fdate(worddate12., datetime.);
 
 %Macro Template;
-
 Proc Template;
-	Define style Style.OBStyle;
- 	notes "My Simple Style";
- 	class body /
- 	backgroundcolor = white
- 	color = black
- 	fontfamily = "Palatino";
+ define style styles.OBStyle;
+ parent = styles.BarrettsBlue;
+ notes "My Simple Style";
 
- 	Class systemtitle /
- 	fontfamily = "Verdana, Arial"
- 	fontsize = 16pt
- 	fontweight = bold;
+ class body /
+ backgroundcolor = white
+ color = black
+ fontfamily = "Palatino"
+ ;
+ class systemtitle /
+ fontfamily = "Verdana, Arial"
+ fontsize = 16pt
+ fontweight = bold
+ ;
+ class table /
+ backgroundcolor = #f0f0f0
+ bordercolor = black
+ borderstyle = solid
+ borderwidth = 1pt
+ cellpadding = 5pt
+ cellspacing = 1pt
+ frame = void
+ rules = groups
+ fontfamily = "Verdana"
+;
+ class header, footer /
+ backgroundcolor = #c0c0c0
+ fontfamily = "Verdana, Arial"
+ fontweight = bold
+ ;
+ class data /
+ fontfamily = "Palatino"
+ ;
+ end; 
 
- 	Class table /
- 	backgroundcolor = #f0f0f0
- 	bordercolor = red
- 	borderstyle = solid
- 	borderwidth = 1pt
- 	cellpadding = 5pt
- 	cellspacing = 0pt
- 	frame = void
- 	rules = groups;
-
- 	Class header, footer /
- 	backgroundcolor = #c0c0c0
- 	fontfamily = "Verdana, Arial"
- 	fontweight = bold;
-
-	Class data /
- 	fontfamily = "Palatino";
- 	End; 
 Run;
-
 %Mend Template;
 %Template;
 
@@ -265,19 +268,19 @@ Run;
 
 		/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
+		%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+		title "Listing of Product Sales"; 
 		ods listing close; 
 		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
-		ods tagsets.tableeditor file=_Webout 
+		ods tagsets.tableeditor file=_Webout
 		    style=styles.OBStyle 
 		    options(autofilter="YES" 
 		 	    autofilter_table="1" 
-		            autofilter_width="10em" 
+		            autofilter_width="9em" 
 		 	    autofilter_endcol= "50" 
 		            frozen_headers="0" 
 		            frozen_rowheaders="0" 
-		            ) ; 
-
-
+		            ); 
 
 
 				Data Work.NHS_Percentage;
@@ -344,25 +347,67 @@ Run;
 
 					%Let Perc_FactCols = &Perc_FactCols _&_Forecast._&ColX;
 					%Put Perc_FactCols = &Perc_FactCols;
+
+				%If i = 1 %Then
+				%Do;
+					%Let PlotBubble = Year*Total_Non_elect_Admis;
+				%End;
 			%End;
 
 				Data Work.NHS_Percentage_1;
 					Set Work.NHS_Percentage(Keep = &DimCols &FactCols &Perc_FactCols);
+					RowCnt = 1;
 				Run;
 
 
+				Proc Summary Data = Work.NHS_Percentage_1 Nway Missing;
+					Class &DimCols;
+					Var &FactCols &Perc_FactCols;
+					Output Out = Work.NHS_Percentage_1_Sum(Drop = _Freq_ _Type_) Sum=;
+				Run;
+
+				Proc Print Data=Work.NHS_Percentage_1_Sum;
+					Title1 "Test Ad-hoc &_forecast Summary Report";
+					Title2 "%Sysfunc(UPCASE(&Fdate))";
+				Run;
 
 				Proc Print Data=Work.NHS_Percentage_1;
 					Title1 "Test Ad-hoc &_forecast Report";
 					Title2 "%Sysfunc(UPCASE(&Fdate))";
 				Run;
 
+				goptions reset=all border;
+
+				title1 "Member Profile";
+				title2 "Salaries and Number of Member Engineers";
+				footnote j=r "GPLBUBL1";
+
+				axis1 offset=(5,5);
+
+/*				ods _all_ close;*/
+				ods html file =_webout (no_top_matter no_bottom_matter)
+				  path=&_TMPCAT (url=&_REPLAY);
+				goptions device=png;
+				proc gplot data=Work.NHS_Percentage_1;
+				   Plot Year * Total_Non_elect_Admis=RowCnt / haxis=axis1;
+				   Plot Year * _&_Forecast._Total_Non_elect_Admis=RowCnt / haxis=axis1;
+				run;
+				quit;
+
+				ods html file =_webout (no_top_matter no_bottom_matter)
+				  path=&_TMPCAT (url=&_REPLAY);
+				proc gchart data=Work.NHS_Percentage_1;                                                                                                                
+   				vbar region_code / discrete sumvar=Total_Non_elect_Admis group=year                                                                                    
+				raxis=axis1; 
+/*				ods html close;*/
+	
+
 		%ReturnButton;
 
 		ods tagsets.tableeditor close; 
 		ods listing; 
 
-	Run;
+
 
 %End;
 %Else %If "&_Multiple" EQ "No" %Then
@@ -410,17 +455,19 @@ Run;
 
 		/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
+		%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+		title "Listing of Product Sales"; 
 		ods listing close; 
 		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
-		ods tagsets.tableeditor file=_Webout 
-		    style=Style.OBStyle 
+		ods tagsets.tableeditor file=_Webout
+		    style=styles.OBStyle 
 		    options(autofilter="YES" 
 		 	    autofilter_table="1" 
-		            autofilter_width="10em" 
+		            autofilter_width="9em" 
 		 	    autofilter_endcol= "50" 
 		            frozen_headers="0" 
 		            frozen_rowheaders="0" 
-		            ) ; 
+		            ); 
 
 				Data Work.NHS_Percentage;
 				Length
