@@ -14,6 +14,7 @@
 ==================================================================================================;
 /*
 %Macro Columns(Dsn);
+Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 Proc Contents Data=OBData.&Dsn 
 	Out=Work.&Dsn (Keep=Name); 
 Run; 

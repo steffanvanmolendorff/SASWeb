@@ -51,8 +51,8 @@ Libname NHSData "C:\inetpub\wwwroot\sasweb\Data\NHS";
         format Elect_Plan_Total_Admis best12. ;
         format Elect_Admis_NHS_TreatCentre best12. ;
         format Total_Non_elect_Admis best12. ;
-        format GPRefer_All_special best12. ;
-        format GPRefer_Seen_special best12. ;
+        format GPRefer_All_Special best12. ;
+        format GPRefer_Seen_Special best12. ;
         format GPRefer_Made_GA best12. ;
         format GP_Refer_Seen_GA best12. ;
         format Other_Refer_Made_GA best12. ;
@@ -72,8 +72,8 @@ Libname NHSData "C:\inetpub\wwwroot\sasweb\Data\NHS";
                  Elect_Plan_Total_Admis
                  Elect_Admis_NHS_TreatCentre
                  Total_Non_elect_Admis
-                 GPRefer_All_special
-                 GPRefer_Seen_special
+                 GPRefer_All_Special
+                 GPRefer_Seen_Special
                  GPRefer_Made_GA
                  GP_Refer_Seen_GA
                  Other_Refer_Made_GA

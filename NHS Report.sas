@@ -2,14 +2,21 @@
 Libname NHSData "C:\inetpub\wwwroot\sasweb\data\NHS";
 Options MPrint MLogic Symbolgen Source Source2;
 
+*--- Assign Global macro variables to use in all macro sections below ---;
 %Global _Host;
 %Global _Path;
+%Global _CountVal;
+%Global _ValueDim;
+%Global _ValueFact;
 
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
 
 %Let _Path = http://&_Host/sasweb;
 %Put _Path = &_Path;
+
+*--- Create a local macro variable from the HTML parameter _NHS_Selected0 to use in Do loops ---;
+%Let _CountVal = &_NHS_Selected0;
 
 %Global _Multiple;
 
@@ -206,12 +213,13 @@ Run;
 
 
 		Put '<table align="center" style="width: 75%; height: 15%" border="1">';
-		Put '<td>';
 		Put '<tr>';
+		Put '<td>';
 
+	*--- Table 1 - Drop Down Table for Percentage values ---;
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
-		Put '<H1>TEST</H1>';
-		Put '<p><br></p>';
+/*		Put '<H1>TEST</H1>';*/
+/*		Put '<p><br></p>';*/
 		Put '<H2>SELECT FORESCAST %</H2>';
 		Put '<SELECT NAME="_forecast" size="10" "</option>';/*onchange="this.form.submit()*/
 		Put '<OPTION VALUE="0"> </option>';
@@ -227,63 +235,79 @@ Run;
 		Put '<OPTION VALUE="100"> 100 % </option>';
 		Put '</SELECT>';
 		Put '</div>';
+		Put '</td>';
+
+	*--- Table 2 - Drop Down Table for Dimension columns---;
+		Put '<td>';
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+/*		Put '<H1>TEST</H1>';*/
+/*		Put '<p><br></p>';*/
+		Put '<H2>SELECT DIMENSIONS</H2>';
+		Put '<SELECT NAME="_Dimension" size="7" Multiple </option>';/*onchange="this.form.submit()*/
+
+		%Do i = 1 %To &_CountVal;
+			Options Minoperator MLogic;
+			%Macro Dimension(_ValueDim) / Mindelimiter=',';
+
+			%If "&_ValueDim" in ("Year","Org_Name","Org_Code","Region_Name","Period","Region_Code","Region") %Then 
+				Put '<option value='
+					"&_ValueDim"
+					'>' /
+					"&_ValueDim"
+					'</option>' /;
+			%Else %Put &_ValueDim not in list.;
+
+			%Mend;
+			%Dimension(&&_NHS_Selected&i);
+		%End;
+
+		Put '</SELECT>';
+		Put '</div>';
+		Put '</td>';
+
+	*--- Table 3 - Drop Down Table for Fact columns---;
+		Put '<td>';
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+/*		Put '<H1>TEST</H1>';*/
+/*		Put '<p><br></p>';*/
+		Put '<H2>SELECT FACTS</H2>';
+		Put '<SELECT NAME="_Fact" size="15" Multiple </option>';/*onchange="this.form.submit()*/
+		%Do i = 1 %To &_CountVal;
+			Options Minoperator MLogic;
+			%Macro Fact(_ValueFact) / Mindelimiter=',';
+
+			%If "&_ValueFact" in ("Elect_Ordinary_Admis",
+			                 "Elect_Daycase_Admis",
+			                 "Elect_Total_Admis",
+			                 "Elect_Plan_Ordinary_Admis",
+			                 "Elect_Plan_Daycase_Admis",
+			                 "Elect_Plan_Total_Admis",
+			                 "Elect_Admis_NHS_TreatCentre",
+			                 "Total_Non_elect_Admis",
+			                 "GPRefer_All_Special",
+			                 "GPRefer_Seen_Special",
+			                 "GPRefer_Made_GA",
+			                 "GPRefer_Seen_GA",
+			                 "Other_Refer_Made_GA",
+			                 "All_1st_Outpat_Att_GA") %Then 
+
+				Put '<option value='
+					"&_ValueFact"
+					'>' /
+					"&_ValueFact"
+					'</option>' /;
+
+			%Else %Put Value not in list.;
+
+			%Mend;
+			%Fact(&&_NHS_Selected&i);
+		%End;
+		Put '</SELECT>';
+		Put '</div>';
 		Put '<p><br></p>';
 
 		Put '</td>';
-
-
-
-
-	*--- Table 2 - Drop Down Table ---;
-	Put '<table align = "center" style="width: 60%; height: 5%" border="1">';
-	Put '<tr>';
-
-
-	Put '<td valign="top" style="background-color: white; color: black" border="1">';
-		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
-		Put '<b>SELECT BANK NAME</b>';
-		Put '<p></p>';
-
-
-	*--- Read Dataset UniqueNames ---;
-		 	%Let Dsn = %Sysfunc(Open(NHSData.NHS_1));
-	*--- Count Observations ---;
-		    %Let Count = %Eval(%Sysfunc(Attrn(&Dsn,Nobs))+1);
-
-			Put	'<select name="_NHS_Selected" size="15" multiple>' /;
-	*--- Populate Drop Down Box on HTML Page ---;
-			%Do I = 1 %To &Count;
-		        %Let Rc = %Sysfunc(fetch(&Dsn,&i));
-				%Let Start=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,Name))));
-				%Let Label=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,Name))));
-					%If "&Start" ne " " %Then
-					%Do;
-						%If &I=1 %Then 
-						%Do;
-							Put '<option value='
-								"&Start"
-								'>' /
-								"&Label"
-								'</option>' /;
-						%End;
-						%Else
-						%Do;
-				            Put '<option value='
-								"&Start"
-								'>' /
-								"&Label"
-								'</option>' /;
-						%End;
-					%End;
-						%Else %Let I = &Count;
-					%End;
-
-					%Let Rc = %Sysfunc(Close(&Dsn));
-
-		Put '</div>';
-	Put '</td>';
-	Put '</tr>';
-	Put '</table>';
+		Put '</tr>';
 
 
 	Put '<p><br></p>';

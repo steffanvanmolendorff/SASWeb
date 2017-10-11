@@ -16,7 +16,7 @@ Options MPrint MLogic Symbolgen Source Source2;
 %Let _Forecast = &_Forecast;
 
 *--- This section will determine which report to run based on a single or multiple columns selection that ---;
-%If "&_NHS_Selected0" GT "0" %Then
+%If "&_Dimension0" GT "0" or "&_Fact0" GT "0" %Then
 %Do;
 	%Let _Multiple = Yes;
 	%Put _Multiple = "&_Multiple";
@@ -65,7 +65,7 @@ Data _Null_;
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
-		Put '<p><br></p>';
+/*		Put '<p><br></p>';*/
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
@@ -149,16 +149,25 @@ Run;
 %If "&_Multiple" EQ "Yes" %Then
 %Do;
 
-*--- Concatenate columns to create subset of columns in the report ---;
-%Let Columns =;
-	%Do i = 1 %to &_NHS_Selected0;
-			%Let ColX = &&_NHS_Selected&i;
+*--- Concatenate columns to create subset of Dimension columns in the report ---;
+%Let DimCols =;
+	%Do i = 1 %to &_Dimension0;
+			%Let ColX = &&_Dimension&i;
 			%Put ColX = &ColX;
 
-			%Let Columns = &Columns &ColX;
-			%Put Columns = &Columns;
+			%Let DimCols = &DimCols &ColX;
+			%Put DimCols = &DimCols;
 	%End;
 
+*--- Concatenate columns to create subset of Dimension columns in the report ---;
+%Let FactCols =;
+	%Do i = 1 %to &_Fact0;
+			%Let ColX = &&_Fact&i;
+			%Put ColX = &ColX;
+
+			%Let FactCols = &FactCols &ColX;
+			%Put FactCols = &FactCols;
+	%End;
 
 	Data _NULL_;
 	File _Webout;
@@ -187,6 +196,8 @@ Run;
 		Put '</HEAD>';
 
 		Put '<BODY>';
+
+
 		*--- Table 1 - Image ---;
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
@@ -203,7 +214,7 @@ Run;
 	*--- Space below image ---;
 	Put '<p><br></p>';
 	Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
-
+/*
 
 		Put '<table align="center" style="width: 75%; height: 15%" border="1">';
 		Put '<td>';
@@ -222,7 +233,7 @@ Run;
 		Put '<p><br></p>';
 
 		Put '</td>';
-
+/*
 
 		Put '<td valign="center" align="center" border="1" style="background-color: lightblue; color: Black">';
 		Put '<INPUT TYPE=submit VALUE="Submit Details" valign="center">';
@@ -249,7 +260,7 @@ Run;
 		Put '</td>';
 		Put '</tr>';
 		Put '</table>';
-
+*/
 		ODS _ALL_ Close;
 
 		/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
@@ -287,14 +298,14 @@ Run;
 				Elect_Admis_NHS_TreatCentre	
 				_&_forecast._Total_Non_elect_Admis
 				Total_Non_elect_Admis
-				_&_forecast._GPRefer_All_special
-				GPRefer_All_specialties 	
-				_&_forecast._GPRefer_Seen_special
-				GPRefer_Seen_All_special	
+				_&_forecast._GPRefer_All_Special
+				GPRefer_All_Special 	
+				_&_forecast._GPRefer_Seen_Special
+				GPRefer_Seen_Special	
 				_&_forecast._GPRefer_Made_GA
 				GPRefer_Made_GA
-				_&_forecast._GP_Refer_Seen_GA
-				GP_Refer_Seen_GA	
+				_&_forecast._GPRefer_Seen_GA
+				GPRefer_Seen_GA	
 				_&_forecast._Other_Refer_Made_GA
 				Other_Refer_Made_GA	
 				_&_forecast._All_1st_Outpat_Att_GA
@@ -310,11 +321,11 @@ Run;
 				_&_forecast._Elect_Plan_Daycase_Admis = (Elect_Plan_Daycase_Admis * (&_forecast/100));
 				_&_forecast._Elect_Plan_Total_Admis = (Elect_Plan_Total_Admis * (&_forecast/100));	
 				_&_forecast._Elect_Admis_NHS_TreatCentre = (Elect_Admis_NHS_TreatCentre * (&_forecast/100));	
-				_&_forecast._Total_Non_elective_Admis = (Total_Non_elect_Admis * (&_forecast/100));
-				_&_forecast._GPRefer_special = (GPRefer_special * (&_forecast/100)); 	
-				_&_forecast._GPRefer_Seen_special = (GPRefer_Seen_special * (&_forecast/100));
+				_&_forecast._Total_Non_elect_Admis = (Total_Non_elect_Admis * (&_forecast/100));
+				_&_forecast._GPRefer_Special = (GPRefer_Special * (&_forecast/100)); 	
+				_&_forecast._GPRefer_Seen_Special = (GPRefer_Seen_Special * (&_forecast/100));
 				_&_forecast._GPRefer_Made_GA = (GPRefer_Made_GA * (&_forecast/100));
-				_&_forecast._GPRefer_Seen_GA = (GP_Refer_Seen_GA * (&_forecast/100));
+				_&_forecast._GPRefer_Seen_GA = (GPRefer_Seen_GA * (&_forecast/100));
 				_&_forecast._Other_Refer_Made_GA = (Other_Refer_Made_GA * (&_forecast/100));
 				_&_forecast._All_1st_Outpat_Att_GA = (All_1st_Outpat_Att_GA * (&_forecast/100));
 
@@ -326,9 +337,17 @@ Run;
 				
 				Run;
 
-			
+			%Let Perc_FactCols =;
+			%Do i = 1 %to &_Fact0;
+					%Let ColX = &&_Fact&i;
+					%Put ColX = &ColX;
+
+					%Let Perc_FactCols = &Perc_FactCols _&_Forecast._&ColX;
+					%Put Perc_FactCols = &Perc_FactCols;
+			%End;
+
 				Data Work.NHS_Percentage_1;
-					Set Work.NHS_Percentage(Keep = &Columns);
+					Set Work.NHS_Percentage(Keep = &DimCols &FactCols &Perc_FactCols);
 				Run;
 
 
