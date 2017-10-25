@@ -1,12 +1,13 @@
 *=====================================================================================================================================================
 --- Set system options to track comments in the log file ---
 ======================================================================================================================================================;
-/*
+
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN SPOOL;
 OPTIONS NOSYNTAXCHECK;
-
+/*
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 */
+/*
 Data Work._Null_;
 _BankName = "&_BankName";
 _APIName = "&_APIName";
@@ -16,6 +17,7 @@ Call Symput('_BankName',_BankName);
 Call Symput('_APIName',_APIName);
 Call Symput('_VersionNo',_VersionNo);
 Run;
+*/
 
 %Global SCH_Name;
 %Global SCH_Link;
@@ -39,10 +41,12 @@ Run;
 %Put _Path = &_Path;
 
 /*
-%Let _BankName = Barclays;
-%Let _APIName = BCA;
-%Let _VersionNo = v1.3;
+%Let _BankName = BOI;
+%Let _APIName = ATM;
+%Let _VersionNo = v2.1;
 */
+
+
 *=====================================================================================================================================================
 --- Macro Imports read the API_Config CSV sheet and saves the values in macro variables to use in program below ---
 ======================================================================================================================================================;
@@ -73,18 +77,18 @@ Data Work.API_CONFIG    ;
        informat API_Abb $3. ;
        informat API_Link $60. ;
        informat API_Name $25. ;
-       informat SCH_Link $81. ;
+       informat SCH_Link $100. ;
        informat SCH_Name $24. ;
        informat Perm_SCH_Table $10. ;
-       informat Version $4. ;
+       informat Version $6. ;
        format Bank_Name $20. ;
        format API_Abb $3. ;
        format API_Link $60. ;
        format API_Name $25. ;
-       format SCH_Link $81. ;
+       format SCH_Link $100. ;
        format SCH_Name $24. ;
        format Perm_SCH_Table $10. ;
-       format Version $4. ;
+       format Version $6. ;
     input
                 Bank_Name $
                 API_Abb $
@@ -98,7 +102,7 @@ Data Work.API_CONFIG    ;
     if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
 Run;
 
-Data OBData._Null_;
+Data OBDATA.API_Config;
 	Set Work.API_Config(Where=(Trim(Left(Bank_Name)) EQ "&_BankName" and Trim(Left(API_Abb)) EQ "&_APIName" and Trim(Left(Version)) EQ "&_VersionNo"));
 	Call Symput('BankName_C',Bank_Name);
 	Call Symput('API_Link',API_Link);
@@ -400,7 +404,7 @@ Run;
 Data Work.&JSON
 	(Rename=(Var3 = Data_Element Var2 = Hierarchy));
 
-	Length Bank_API $ 8 Var2 $ 250 Var3 $ 250 P1 - P&H_Num $ 250 ;
+	Length Bank_API $ 8 Var2 $ 300 Var3 $ 300 P1 - P&H_Num $ 300;
 
 	RowCnt = _N_;
 
@@ -454,6 +458,8 @@ Run;
 Data Work.&JSON;
 	Set Work.&JSON;
 
+	Length New_Data_Element New_Data_Element1 New_Data_Element2 $ 250;
+
 	If Reverse(Scan(Reverse(Trim(Left(Data_Element))),1,'-')) = 'required' then Flag = 'Mandatory';
 	Else Flag = 'Optional';
 
@@ -484,7 +490,7 @@ Data Work.&JSON(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy));
 	Set Work.&JSON;
 	By Hierarchy;
 
-	Length Data_Element_1 $ 250;
+	Length Data_Element_1 Attribute Hierarchy_1 $ 250;
 
 	If First.Hierarchy then
 	Do;
@@ -814,7 +820,7 @@ Data Work.&Bank._API
 	Rename=(Var3 = Data_Element Var2 = Hierarchy Value = &Bank));
 
 	Set Work.&Bank._API;
-
+/*
 *=====================================================================================================================================================
 --- For ATMS do the following amendments to the Hierarchy values ---
 ======================================================================================================================================================;
@@ -867,6 +873,7 @@ Data Work.&Bank._API
 			Var2 = 'CustomerSegment';
 		End;
 	End;
+	*/
 *=====================================================================================================================================================
 --- For BUSINESS-CURRENT-ACCOUNTS do the following amendments to the Hierarchy values ---
 ======================================================================================================================================================;
@@ -906,9 +913,19 @@ Run;
 *=====================================================================================================================================================
 --- Remove the value data- from the Hierarchy value ---
 ======================================================================================================================================================;
-Data Work.&Bank._API;
+Data Work.&Bank._API(Drop = Hierarchy_X Find);
 	Set Work.&Bank._API;
 	Hierarchy = Trim(Left(Tranwrd(Hierarchy,'data-','')));
+
+*--- This step is required to remove the values 1,2,3,etc from the Hierarchy field added by the 
+	SAS JSON Libname Engine during ETL. This is to ensure that the Hierarchy value matches with the
+	Hierarchy value in the JSON specification file ---;
+	If Substr(Reverse(Trim(Left(Hierarchy))),1,1) in ('1','2','3','4','5','6','7','8','9','0') Then
+	Do;
+		Hierarchy_X = Reverse(Trim(Left(Hierarchy)));
+		Find = Find(Hierarchy_X,'-');
+		Hierarchy = Trim(Left(Reverse(Substr(Hierarchy_X,Find+1))));
+	End;
 Run;
 *=====================================================================================================================================================
 --- Sort data by Data_Element ---
@@ -921,7 +938,8 @@ Run;
 ======================================================================================================================================================;
 Data Work.&Bank._API
 		Work._A_&Bank._API
-		Work._S_&Bank._API   OBData.X;
+		Work._S_&Bank._API
+		OBDATA._&BANK._API_SCH;
 
 	Length Hierarchy $ 250
 	Table $ 32;
@@ -941,10 +959,11 @@ Data Work.&Bank._API
 		Table = 'Schema';
 		Output Work._S_&Bank._API;
 	End;
-	If a and b then 
+	If a and b Then 
 	Do;
 		Table = 'Both'; 
 		Output Work.&Bank._API;
+		Output OBDATA._&BANK._API_SCH;
 	End;
 Run;
 *=====================================================================================================================================================
@@ -1006,11 +1025,11 @@ Run;
 %Test_VarLength(&Bank, &API);
 
 *=====================================================================================================================================================
---- Test for the URI Format of the Bank URI data value ---
+--- Test for the URI & Date-Time & Date Format if the Bank value = http / date-time or date ---
 ======================================================================================================================================================;
 %Macro Test_Format(Bank, API);
 
-Data Work.&Bank._API;
+Data Work.&Bank._API OBDATA.X;
 	Set Work.&Bank._API;
 
 	Length Test_Format_Value_Desc $ 100
@@ -1018,36 +1037,79 @@ Data Work.&Bank._API;
 	
 	If Format NE '' Then
 	Do;
-		Format_Value = Scan(&Bank._Value,1,'//');
-		If Format_Value in ('http:','https:') then 
+
+*--- Test URI Format ---;
+		If Scan(&Bank._Value,1,'//') in ('http:','https:') then 
 		Do;
-			Test_Format_Value = 'Pass';
-		End;
-		Else If Format_Value EQ '' then
-		Do;
-			Test_Format_Value = 'Failed';
-			Test_Format_Value_Desc = "&Bank Value is blank";
-		End;
-		Else If Format_Value not in ('http:','https:') and Substr(&Bank._Value,11,1) NE 'T' then
-		Do;
-			Test_Format_Value = 'Failed';
-			Test_Format_Value_Desc = 'Value does not represent a Date-Time value or an uri address - i.e. https://';
+			Format_Value = Scan(&Bank._Value,1,'//');
+
+			If Format_Value in ('http:','https:') then 
+			Do;
+				Test_Format_Value = 'Pass';
+			End;
+			Else If Format_Value EQ '' then
+			Do;
+				Test_Format_Value = 'Failed';
+				Test_Format_Value_Desc = "&Bank Value is blank";
+			End;
+			Else If Format_Value not in ('http:','https:') and Substr(&Bank._Value,11,1) NE 'T' then
+			Do;
+				Test_Format_Value = 'Failed';
+				Test_Format_Value_Desc = 'Value does not represent a Date-Time value or an uri address - i.e. https://';
+			End;
 		End;
 
-		If Format_Value in ('date-time') and Substr(&Bank._Value,11,1) EQ 'T' then 
+*--- Test Date-Time Format ---;
+		If Format EQ 'date-time' Then
 		Do;
-			Test_Format_Value = 'Pass';
+			Format_Value = Substr(&Bank._Value,1);
+
+			If Format_Value in ('date-time') and Substr(&Bank._Value,11,1) EQ 'T' then 
+			Do;
+				Test_Format_Value = 'Pass';
+			End;
+			If Format_Value in ('date-time') and Substr(&Bank._Value,11,1) NE 'T' then 
+			Do;
+				Test_Format_Value = 'Failed';
+				Test_Format_Value_Desc = "&Bank Value doe not have the correct date-time format";
+			End;
+			Else If Format_Value in ('date-time') and &Bank._Value EQ '' then
+			Do;
+				Test_Format_Value = 'Failed';
+				Test_Format_Value_Desc = "&Bank Value is blank";
+			End;
 		End;
-		If Format_Value in ('date-time') and Substr(&Bank._Value,11,1) NE 'T' then 
+
+*--- Test Date-Time Format ---;
+		If Format EQ 'date' Then
 		Do;
-			Test_Format_Value = 'Failed';
-			Test_Format_Value_Desc = "&Bank Value doe not have the correct date-time format";
+
+			Format_Value = Substr(&Bank._Value,1);
+
+			If Format_Value EQ ('date') and Substr(&Bank._Value,1,4) in ('1','2','3','4','5','6','7','8','9','0')
+				and Substr(&Bank._Value,5,1) in ('-')
+				and Substr(&Bank._Value,6,2) in ('1','2','3','4','5','6','7','8','9','0') 
+				and Substr(&Bank._Value,8,1) in ('-') 
+				and Substr(&Bank._Value,9,2) in ('1','2','3','4','5','6','7','8','9','0') then 
+			Do;
+				Test_Format_Value = 'Pass';
+			End;
+			If Format_Value in ('date') and &Bank._Value EQ '' then
+			Do;
+				Test_Format_Value = 'Failed';
+				Test_Format_Value_Desc = "&Bank Value is blank";
+			End;
+			If Format_Value EQ ('date') and Substr(&Bank._Value,1,4) Notin ('1','2','3','4','5','6','7','8','9','0')
+				and Substr(&Bank._Value,5,1) Notin ('-')
+				and Substr(&Bank._Value,6,2) Notin ('1','2','3','4','5','6','7','8','9','0') 
+				and Substr(&Bank._Value,8,1) Notin ('-') 
+				and Substr(&Bank._Value,9,2) Notin ('1','2','3','4','5','6','7','8','9','0') then
+			Do; 
+				Test_Format_Value = 'Failed';
+				Test_Format_Value_Desc = "&Bank Value may be in the wrong date format";
+			End;
 		End;
-		Else If Format_Value in ('date-time') and &Bank._Value EQ '' then
-		Do;
-			Test_Format_Value = 'Failed';
-			Test_Format_Value_Desc = "&Bank Value is blank";
-		End;
+
 	End;
 
 Run;
@@ -1605,7 +1667,6 @@ Run;
 %Let NOBS_SCH = %sysfunc(attrn(&dsid,nobs)); 
 %Let rc = %sysfunc(close(&dsid)); 
 %Put NOBS_SCH = &NOBS_SCH;
-
 *=====================================================================================================================================================
 --- Create a temporary dataset to store the details of the current request being executed ---
 ======================================================================================================================================================;
@@ -1918,7 +1979,7 @@ Run;
 %End;
 
 
-%Else %If &ErrorCode = 0 and &NOBS_API > 0 %Then 
+/*%Else*/ %If &ErrorCode = 0 and &NOBS_API > 0 %Then 
 %Do;
 *=====================================================================================================================================================
 						LIST OF DATA RECORDS ONLY IN BANK API TABLE REPORT
@@ -1956,10 +2017,10 @@ ods tagsets.tableeditor file=_Webout
 
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
-		Title3 "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
+		Title3 "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) API OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
 		Title4 "";
-		Title5 "&API_Link";
-		Title6 "&SCH_Link";
+		Title5 "API LOCATION: &API_Link";
+		Title6 "SCHEMA LOCATION: &SCH_Link";
 
 		Proc Report Data =  Work._a_&Bank._API nowd
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
@@ -2012,7 +2073,7 @@ Run;
 
 %End;
 
-%Else %If &ErrorCode = 0 and &NOBS_SCH > 0 %Then 
+/*%Else*/ %If &ErrorCode = 0 and &NOBS_SCH > 0 %Then 
 %Do;
 *=====================================================================================================================================================
 						LIST OF DATA RECORDS ONLY IN BANK API TABLE REPORT
@@ -2050,10 +2111,10 @@ ods tagsets.tableeditor file=_Webout
 
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
-		Title3 "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
+		Title3 "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) OB SCHEMA OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
 		Title4 "";
-		Title5 "&API_Link";
-		Title6 "&SCH_Link";
+		Title5 "API LOCATION: &API_Link";
+		Title6 "SCHEMA LOCATION: &SCH_Link";
 
 		Proc Report Data =  Work._s_&Bank._API nowd
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
@@ -2096,7 +2157,7 @@ ods listing;
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
 %Macro ExportXL(Path);
-Proc Export Data = Work._s_&Bank.&_API
+Proc Export Data = Work._s_&Bank._API
  	Outfile = "&Path"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
@@ -2232,7 +2293,23 @@ RUN;
 --- The values are passed from the Main macro to resolve in the macro below which allows execution of the API data extract ---
 ======================================================================================================================================================;
 %Mend API;
-%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%If "&_VersionNo" EQ "v1.2" or "&_VersionNo" = "v1.3" %Then
+%Do;
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v2.1" or "&_VersionNo" = "v2.1.1" and
+	%Sysfunc(Find(&API_Path,'localhost')) GT 0 %Then
+%Do;
+/*	%API(&API_Path/OD/&Version/&Main_API,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Main_API..json,&Bank_Name,&Main_API);
+%End;
+/*
+%If "&_VersionNo" EQ "v2.1" or "&_VersionNo" = "v2.1.1" and
+	%Sysfunc(Find(&API_Path,'localhost')) EQ 0 %Then
+%Do;
+	%API(&API_Path/&Main_API,&Bank_Name,&Main_API);
+%End;
+*/
 *=====================================================================================================================================================
 --- The values are passed from the Main macro to resolve in the macro below which allows execution of the API data extract ---
 ======================================================================================================================================================;

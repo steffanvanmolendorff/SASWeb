@@ -1042,19 +1042,110 @@ Data _Null_;
 		Put '</script>';
 
 		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
+*--- CSS and JS ---;
+		Put '<link rel="stylesheet" type="text/css" href="&_Path/css/loading-bar.css"/>';
+		Put '<script type="text/javascript" src="&_Path/js/loading-bar.js"></script>';		
 
 		Put '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>';
 
-		Put '</HEAD>';
+
+		Put '<SCRIPT language="javascript">' /
+		'function MySubmit()' /
+		'{document.OBIE.submit();} ' /
+		'</SCRIPT>' /;
+
+		*--- Create styles for HTML links on page ---;
+		Put '<style>' /
+		'td{font-size:"25";color:"green"}' /
+
+		'a' /
+		'{' /
+			'font-family:arial;' /
+			'font-size:10px;' /
+			'color:black;' /
+			'font-weight:normal;' /
+			'font-style:normal;' /
+			'text-decoration:none;' /
+		'}' /
+		'a:hover' /
+		'{' /
+			'font-family:arial;' /
+			'font-size:10px;' /
+			'color:blue;' /
+			'text-decoration:none;' /
+		'}' /
+		'.nav' /
+		'{' /
+			'font-family:arial;' /
+			'font-size:10px;' /
+			'color:#ffffff;' /
+			'font-weight:normal;' /
+			'font-style:normal;' /
+			'text-decoration:none;' /
+			'border:inset 0px #ececec;' /
+			'cursor:hand;' /
+		'}' /
+		'</style>' /
+		'</HEAD>';
+
 		Put '<BODY>';
 
-		Put '<p></p>';
-		Put '<HR>';
-		Put '<p></p>';
+		*--- Include horizontal line under image ---;
+/*		Put '<hr size="2" color="blue">'  /;*/
 
-		Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
+		*--- Create Progress Bar ---;
+		Put '<table align="center"><tr><td>' /
+			'<div style="font-size:8pt;padding:2px;border:solid black 0px">' /
+			'<span id="progress1"> &nbsp; &nbsp;</span>' /
+			'<span id="progress2"> &nbsp; &nbsp;</span>' /
+			'<span id="progress3"> &nbsp; &nbsp;</span>' /
+			'<span id="progress4"> &nbsp; &nbsp;</span>' /
+			'<span id="progress5"> &nbsp; &nbsp;</span>' /
+			'<span id="progress6"> &nbsp; &nbsp;</span>' /
+			'<span id="progress7"> &nbsp; &nbsp;</span>' /
+			'<span id="progress8"> &nbsp; &nbsp;</span>' /
+			'<span id="progress9"> &nbsp; &nbsp;</span>'
+			'</div>' /
+			'</td></tr></table>';
+
+		Put '<script language="javascript">' /
+		'var progressEnd = 9;' /		
+		'var progressColor = "blue";' /	
+		'var progressInterval = 1000;' /	
+		'var progressAt = progressEnd;' /
+		'var progressTimer;' /
+
+		'function progress_clear() {' /
+		'	for (var i = 1; i <= progressEnd; i++) ' /
+		"	document.getElementById('progress'+i).style.backgroundColor = 'transparent';" /
+		'	progressAt = 0;' /
+		'}' /
+
+		'function progress_update() {' /
+		'	progressAt++;' /
+		'	if (progressAt > progressEnd) progress_clear();' /
+		"	else document.getElementById('progress'+progressAt).style.backgroundColor = progressColor;" /
+		"	progressTimer = setTimeout('progress_update()',progressInterval);" /
+		'}' /
+
+		'function progress_stop() {' /
+		'	clearTimeout(progressTimer);' /
+		'	progress_clear();' /
+		'}' /
+
+		'progress_update();' /		
+		'</script>' /
+		'<p>' /;
+
+/*		Put '<p></p>';*/
+/*		Put '<HR>';*/
+/*		Put '<p></p>';*/
+
+		Put '<Table align="center" style="width: 100%; height: 8%" border="0">';
+
+
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-		Put '<FORM NAME=check METHOD=get ACTION="http://localhost/scripts/broker.exe">';
+		Put '<FORM ID=OBIE NAME=OBIE METHOD=get ACTION="http://localhost/scripts/broker.exe">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
 		Put '<p><br></p>';
@@ -1082,6 +1173,14 @@ Data _Null_;
 		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
 		Put '</td>';
 		Put '</Table>';
+	Run;
+
+	*--- Stop Progress Bar and close HTML page ---;
+		Data _Null_;
+		File _Webout;
+		Put '<SCRIPT language="javascript">' /
+			'progress_stop();' /
+			'</SCRIPT>';
 
 		Put '</BODY>';
 		Put '<HTML>';
@@ -1283,11 +1382,14 @@ RUN;
 
 
 ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\CMA9_&API..csv";
+
 Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
 Run;
+
 ODS CSV Close;
+
 /*
 ODS HTML File="&Path\Data\Results\CMA9_&API..xls";
 Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
@@ -1296,6 +1398,7 @@ Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 Run;
 ODS HTML Close;
 */
+
 
 %ReturnButton;
 

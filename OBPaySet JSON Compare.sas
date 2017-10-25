@@ -17,7 +17,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
    infile "&Filename" Delimiter = ',' MISSOVER DSD Lrecl=32767 Firstobs=2 Termstr=CRLF;
       informat Name $262. ;
       informat Occurrence $4. ;
-      informat XPath $58. ;
+      informat XPath $100. ;
       informat EnhancedDefinition $1024. ;
       informat Class $49. ;
       informat Codes $6. ;
@@ -26,7 +26,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
       informat FractionDigits $1. ;
       format Name $262. ;
       format Occurrence $4. ;
-      format XPath $58. ;
+      format XPath $100. ;
       format EnhancedDefinition $1024. ;
       format Class $49. ;
       format Codes $6. ;
@@ -59,12 +59,12 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 
    run;
 
-
-Data OBData.&Dsn(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy));
+Data OBData.&Dsn(Drop = Hierarchy Position Rename=(Hierarchy1 = Hierarchy));
 	Length Table $ 16 Pattern Hierarchy Hierarchy1 &Dsn._Lev1 Position Want $ 250;
 	Set Work.&Dsn;
 	If XPath NE '';
 	Table = "&Dsn";
+
 	NewPath = Compress('D'||Scan(XPath,2,'/D'));
 	Hierarchy = Trim(Left(Tranwrd(Trim(Left(Substr(XPath, index(XPath, '/D') + 1))),'/','-'))); 
 
@@ -81,7 +81,22 @@ Data OBData.&Dsn(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))
 	End;
 
 	&Dsn._Lev1 = Hierarchy1;
-Run;
+
+*--- This line ensures that where the &Dsn._lev1 = Data it is concatented with the variable Name 
+	to ensure that it matches with the Swagger_Sch file ---;
+
+	If Trim(Left(Hierarchy1)) = 'Data' Then
+	Do;
+	Hierarchy1 = Compress(Hierarchy1||'-'||Name);
+	End; 
+
+*--- Added this line to normalise data because the Swagger file listed only DeliveryAddress ---;
+	If Hierarchy1 = 'DeliveryAddress-DeliveryAddress' Then
+	Do;
+		Hierarchy1 = 'DeliveryAddress';
+	End;
+
+	Run;
 
 Proc Sort Data = OBData.&Dsn;
 	By Hierarchy;
@@ -564,7 +579,8 @@ Data OBData.Compare(Keep = Hierarchy Table MinLength MaxLength type Class
 	Desc_Flag $ 8
 	XPath $ 100 
 	Codes $ 30 
-	NewPath $ 70;
+	NewPath $ 70
+	UML_MaxLength UML_MinLength $ 49;
 
 	Merge OBData.Swagger_Sch(In=a)
 	OBData.OBPaySet(In=b)

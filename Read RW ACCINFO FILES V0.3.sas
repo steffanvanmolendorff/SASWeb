@@ -1,10 +1,11 @@
 /*
 Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
+
 Options MPrint MLogic Symbolgen Source Source2;
 */
 
 %Global _Host;
-%Let _Host = &_SRVNAME/*localhost*/;
+%Let _Host = &_SRVNAME /*localhost*/;
 %Put _Host = &_Host;
 
 
@@ -24,19 +25,19 @@ Options MPrint MLogic Symbolgen Source Source2;
    Data Work.&Dsn;
    %let _EFIERR_ = 0;
    Infile "&Path.\&Dsn..csv" delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 Termstr=CRLF;
-      Informat Name $100. ;
+      Informat Name $1000. ;
       Informat Occurrence $100. ;
-      Informat XPath $250. ;
-      Informat EnhancedDefinition $600. ;
+      Informat XPath $1000. ;
+      Informat EnhancedDefinition $1000. ;
       Informat Class $100. ;
       Informat Codes $25. ;
       Informat Pattern $50. ;
       Informat TotalDigits $10. ;
       Informat FractionDigits $10. ;
-      Format Name $100. ;
+      Format Name $1000. ;
       Format Occurrence $100. ;
-      Format XPath $250. ;
-      Format EnhancedDefinition $600. ;
+      Format XPath $1000. ;
+      Format EnhancedDefinition $1000. ;
       Format Class $100. ;
       Format Codes $25. ;
       Format Pattern $50. ;
@@ -60,7 +61,7 @@ Options MPrint MLogic Symbolgen Source Source2;
 		;
 	If _ERROR_ then call symputx('_EFIERR_',1);
 
-	Length Filename $25.;
+	Length Filename $ 25;
 	Filename = "&Dsn";
 Run;
 
@@ -70,7 +71,6 @@ Run;
 %AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBBENEFICIARY);
 %AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBDIRECTDEBIT);
 %AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBPRODUCT);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBDIRECTDEBIT);
 %AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBREQUEST);
 %AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBRESPONSE);
 %AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBSTANDINGORDER);
@@ -94,7 +94,6 @@ Run;
 %Concat(OBACCOUNT);
 %Concat(OBBALANCE);
 %Concat(OBBENEFICIARY);
-%Concat(OBDIRECTDEBIT);
 %Concat(OBPRODUCT);
 %Concat(OBDIRECTDEBIT);
 %Concat(OBREQUEST);
@@ -104,7 +103,7 @@ Run;
 
 *--- Create the OBData.ATM dataset ---;
 Data OBData.AccInfo_DD;
-	Length Hierarchy $250.;
+	Length Hierarchy $ 1000;
 	Set &Datasets;
 	Hierarchy = XPath;
 	If Hierarchy NE '';
@@ -156,7 +155,7 @@ Quit;
 %End;
 
 *--- Create the Bank Schema dataset ---;
-Data Work.&JSON;
+Data Work.&JSON Work.X0;
 	Set LibAPIs.Alldata(Where=(V NE 0));
 Run;
 
@@ -177,7 +176,7 @@ Run;
 Data Work.&JSON
 	(Rename=(Var3 = Data_Element Var2 = Hierarchy)) Work.X1;
 
-	Length Bank_API $ 8 Var2 $ 250 Var3 $ 250 P1 - P&H_Num $ 10 Value $ 600;
+	Length Bank_API $ 8 Var2 $ 1000 Var3 $ 1000 P1 - P&H_Num $ 50 Value $ 1000;
 
 	RowCnt = _N_;
 
@@ -224,7 +223,7 @@ Run;
 Data Work.&JSON Work.X2;
 	Set Work.&JSON;
 
-	Length New_Data_Element1 $250.;
+	Length New_Data_Element1 $ 1000;
 
 	If Reverse(Scan(Reverse(Trim(Left(Data_Element))),1,'-')) = 'required' then Flag = 'Mandatory';
 	Else Flag = 'Optional';
@@ -252,10 +251,42 @@ Data Work.&JSON Work.X2;
 Run;
 
 
-Data Work.&JSON Work.X3(Drop = Word New_Word1 New_Word2 New_Data_Element3 New_Data_Element4 New_Data_Element6);
+Data Work.&JSON Work.X3(Drop = Word New_Word1 New_Word2 New_Data_Element3 New_Data_Element4 
+	New_Data_Element6 FindData Data1 Data2 ReadPost ReadGet);
 	Set Work.&JSON;
 
-	Length New_Data_Element1 New_Data_Element2 New_Data_Element3 New_Data_Element4 New_Data_Element6 $250.;
+	Length Hierarchy_GetPost New_Data_Element1 New_Data_Element2 New_Data_Element3
+	New_Data_Element4 New_Data_Element6 $ 1000;
+
+*===============================================================================================================
+			THIS SECTION WILL CREATE THE RESPONSE & REQUEST HIERARCHIES FOR THE SWAGGER FILE.
+			THE RESPONSE & CREATE HIERARCHIES ARE NOT SPECIFICALY LISTED IN THE SWAGGER BUT
+			APPEARS AS OBJECTS WITHIN THE OTHER HIERARCHIES I.E. BALANCES OR BENEFICIARIES
+================================================================================================================;
+
+	FindData = Find(Data_Element,'Data');
+	If FindData > 0 Then 
+	Do;
+		Data1 = Substr(Data_Element,FindData);
+		Data2 = Reverse(Scan(Reverse(Data1),2,'-'));
+	End;
+
+	ReadPost = Find(Data_Element,'post');
+	ReadGet  = Find(Data_Element,'get');
+
+	If Data2 = 'Data' Then
+	Do;
+		If ReadPost > 0 Then 
+		Do;
+			Hierarchy_GetPost = Compress('OBReadRequest1-'||Data1);
+		End;
+
+		If ReadGet > 0 Then 
+		Do;
+			Hierarchy_GetPost = Compress('OBReadResponse1-'||Data1);
+		End;
+	End;
+*--- END ---;
 
 	New_Data_Element2 = Reverse(Reverse(Trim(Left(New_Data_Element1))));
 	New_Data_Element3 = Reverse(Scan(Reverse(Trim(Left(New_Data_Element1))),2,'-'));
@@ -269,7 +300,7 @@ Data Work.&JSON Work.X3(Drop = Word New_Word1 New_Word2 New_Data_Element3 New_Da
 	Do;
 /*		New_Data_Element5 = Scan(Trim(Left(Reverse(New_Data_Element2))),1,'-');*/
 		NWords = CountW(New_Data_Element2,'-');
-		Length New_Word1 New_Word2 $250.;
+		Length New_Word1 New_Word2 $ 1000;
 		Do i = 1 to NWords-2;
 			If i = 1 Then
 			Do;
@@ -306,7 +337,7 @@ Data Work.&JSON/*(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy))*/ Work.X4;
 	Set Work.&JSON;
 	By Hierarchy;
 
-	Length Data_Element_1 $250.;
+	Length Attribute Data_Element_1 $ 1000;
 
 	If First.Hierarchy then
 	Do;
@@ -366,13 +397,12 @@ Data Work.&JSON Work.X5;
 
 	By Hierarchy;
 
-	Length Columns Columns1 $ 32 Value $ 600;
+	Length Columns Columns1 $ 50 Value $ 1000;
 
 
 *--- This step search for the first word (value) to build the Culumns variable value ---;
 	If Reverse(Scan(Reverse(Trim(Left(New_Data_Element))),1,'-')) in 
-		('type','description','minLength','maxLength','notes','format','additionalProperties',
-		'title','uniqueItems','pattern','minItems','mandatory',
+		('type','description','minLength','maxLength','notes','format','additionalProperties','title','uniqueItems','pattern','minItems','mandatory',
 		'enum1','enum2','enum3','enum4','enum5','enum6','enum7','enum8','enum9','enum10',
 		'enum11','enum12','enum13','enum14','enum15','enum16','enum17','enum18','enum19','enum20',
 		'enum21','enum22','enum23','enum24','enum25','enum26','enum27','enum28','enum29','enum30',
@@ -390,8 +420,7 @@ Data Work.&JSON Work.X5;
 
 *--- This step search for the first word only for Hirarchy values which have -items- after the Notes i.e. Notes-items-minLength (value)to build the Culumns variable value ---;
 		If Reverse(Scan(Reverse(Trim(Left(Hierarchy))),1,'-')) in 
-		('type','description','minLength','maxLength','notes','format','additionalProperties',
-		'title','uniqueItems','pattern','minItems','mandatory',
+		('type','description','minLength','maxLength','notes','format','additionalProperties','title','uniqueItems','pattern','minItems','mandatory',
 		'enum1','enum2','enum3','enum4','enum5','enum6','enum7','enum8','enum9','enum10',
 		'enum11','enum12','enum13','enum14','enum15','enum16','enum17','enum18','enum19','enum20',
 		'enum21','enum22','enum23','enum24','enum25','enum26','enum27','enum28','enum29','enum30',
@@ -495,7 +524,7 @@ Run;
 %Put _ALL_;
 
 	Data Work.Schema_Columns;
-		Length Hierarchy $250.;
+		Length Hierarchy $ 1000;
 	Run;
 
 %Do i = 1 %To %Eval(&HierCnt);
@@ -503,7 +532,7 @@ Run;
 	%Put i = &i;
 
 	Data Work.Unique_Columns&i;
-		Length Hierarchy $250.  Description $600. Items_MaxLength Items_MinLength $25.;
+		Length Hierarchy $ 1000  Description $ 1000 Items_MaxLength Items_MinLength $ 25;
 		Set Work.&JSON._2(Where=(HierCnt = &i));
 		By HierCnt Counter;
 
@@ -515,13 +544,13 @@ Run;
 			%Do j = 1 %To &Cnt;
 				%Put j = &j;
 
-/**--- Set the length of the description variable to $600, all other $600 else a runtime error is emcounterred ---;*/
+/**--- Set the length of the description variable to $1000, all other $1000 else a runtime error is emcounterred ---;*/
 				%If %Sysfunc(Trim(%Sysfunc(Left(&&Variable_Name_&i._&j)))) NE 'description' %Then
 				%Do;
-					Length &&Variable_Name_&i._&j $ 600;
+					Length &&Variable_Name_&i._&j  $ 250;
 				%End;
 				%Else %Do;
-					Length &&Variable_Name_&i._&j  $ 250;
+					Length &&Variable_Name_&i._&j  $ 1000;
 				%End;
 /*				%Let Varname = %Sysfunc(Translate(&&Variable_Name_&i._&j.,' ','_'));*/
 				%Let Varname = &&Variable_Name_&i._&j.;
@@ -548,11 +577,11 @@ Run;
 		enum1 - enum33
 		Hierarchy1
 		Table)*/ Work.X9;
-		Length Table $16. Hierarchy $250.;
+		Length Table $ 16 Hierarchy $ 1000;
 		Set Work.Schema_Columns
 			Work.Unique_Columns&i;
 
-		If Hierarchy EQ '' then Delete;
+/*		If Hierarchy EQ '' then Delete;*/
 		Table  = "&API_SCH";
 
 /*		Hierarchy1 = Trim(Left(Substr(Hierarchy, index(Hierarchy, '-D') + 1)));*/
@@ -581,6 +610,11 @@ Data Work.Schema_Columns1(Drop = Hierarchy Rename = (Hierarchy1 = Hierarchy));
 	%Element(paths-/transactions-,OBReadTransaction1);
 
 	Hierarchy_Merge = Hierarchy1;
+
+	If Hierarchy_GetPost NE '' Then
+	Do;
+		Hierarchy_Merge = Hierarchy_GetPost;
+	End;
 Run;
 
 %End;
@@ -601,7 +635,7 @@ Run;
 
 
 Data Work.AccInfo_DD_SWAGGER;
-	Length Hierarchy_Merge $250.;
+	Length Hierarchy_Merge $ 1000;
 
 	Merge OBData.Swagger_AccInfo(Keep = Hierarchy
 	Hierarchy_Merge
@@ -636,9 +670,13 @@ Run;
 Data Work.AccInfo_DD_SWAGGER1;
 	Set Work.AccInfo_DD_SWAGGER;
 
+*--- Exclude all Hoerarchy_Merge values which only has 1 level because the Data Dictionary
+	only contains multiple Hierarchical levels ---;
+	If Find(Hierarchy_Merge,'-') > 0;
+
 *--- Select only the records from the Account file and where records merge i.e. Both ---;
 *--- Beacuse the Swagger File contains all of the Code which are not in the Account File ---;
-	If InFile in ('Account','Both');
+/*	If InFile in ('Account','Both');*/
 
 *--- Validate if the Descriptions values in both files match or not ---;
 	If Description NE '' or EnhancedDefinition NE '' Then
@@ -651,6 +689,7 @@ Data Work.AccInfo_DD_SWAGGER1;
 			Desc_Flag = 'Match';
 		End;
 	End;
+
 
 *--- Validate if the Pattern values in both files match or not ---;
 	If Pattern_DD NE '' or Pattern_SW NE '' Then
@@ -801,26 +840,25 @@ Run;
 %Mend Template;
 %Template;
 
+/*
 ODS _All_ Close;
-
-/*ODS HTML File="C:\inetpub\wwwroot\sasweb\data\Results\ACC_INFO_DD_SWAGGER_COMPARISON_&FDate..xls";*/
 
 Proc Print Data=Work.AccInfo_DD_SWAGGER1;
 	Title1 "Open Banking - Account Information API";
-/*	Title2 "SWAGGER vs. DATA DICTIONARY Comparison Report - %Sysfunc(UPCASE(&Fdate))";*/
+	Title2 "SWAGGER vs. DATA DICTIONARY Comparison Report - %Sysfunc(UPCASE(&Fdate))";
 Run;
 
 ODS HTML Close;
 ODS Listing;
-
+*/
 ODS _ALL_ Close;
+ODS Listing close; 
 
 /*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
-ods listing close; 
-/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
+/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html";*/
 ods tagsets.tableeditor file=_Webout 
-    style=styles./*meadow*/OBStyle 
+    style=styles.OBStyle 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="10em" 
@@ -837,7 +875,7 @@ Proc Report Data = Work.AccInfo_DD_SWAGGER1 nowd
 	style(column)=[background=lightcyan foreground=black];
 
 	Title1 "Open Banking - Account Information API";
-/*	Title2 "SWAGGER vs. DATA DICTIONARY Comparison Report - %Sysfunc(UPCASE(&Fdate))";*/
+	Title2 "SWAGGER vs. DATA DICTIONARY Comparison Report - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Hierarchy_Merge
 	Hierarchy_DD
@@ -878,6 +916,10 @@ Proc Report Data = Work.AccInfo_DD_SWAGGER1 nowd
 	Do;
 		Call Define(_col_,'style',"style=[foreground=blue background=lightcyan font_weight=bold]");
 	End;
+	If XPath_Flag = 'Only in Swagger File' then 
+	Do;
+		Call Define(_col_,'style',"style=[foreground=yellow background=pink font_weight=bold]");
+	End;
 	Endcomp;
 
 *--- Based on the values of Desc_Flag variable change the style/colour parameters within the report ---;
@@ -905,7 +947,7 @@ Proc Report Data = Work.AccInfo_DD_SWAGGER1 nowd
 	Endcomp;
 
 Run;
-
+/*
 *--- Export file to Directory - CSV ---;
 Proc Export Data = Work.AccInfo_DD_SWAGGER1
 	(Keep = Hierarchy_Merge
@@ -925,13 +967,14 @@ Proc Export Data = Work.AccInfo_DD_SWAGGER1
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
-
+*/
 ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\AccInfo_SW_DD_Comparison_Final.csv";
 Proc Print Data=Work.AccInfo_DD_SWAGGER1;
 	Title1 "OPEN BANKING - &API";
 	Title2 "ACCOUNT INFORMATION DATA STRUCTURE REPORT - &Fdate";
 Run;
 ODS CSV Close;
+
 
 /*
 FILENAME Mailbox EMAIL "&_WebUser" emailid = "Microsoft Outlook"
@@ -944,6 +987,8 @@ PUT "Thank you";
 RUN;
 */
 
+
+/*
 %Macro SendMail();
 
 *Options Emailhost="smtp.123-reg.co.uk" 
@@ -973,7 +1018,7 @@ run;
 
 %Mend SendMail;
 %SendMail();
-
+*/
 %ReturnButton;
 
 ods tagsets.tableeditor close; 
@@ -982,4 +1027,3 @@ ods listing;
 
 %Mend Main;
 %Main();
-

@@ -226,7 +226,7 @@ Run;
 		Put '<OPTION VALUE="05"> 0.5 % </option>';
 		Put '<OPTION VALUE="1"> 1 % </option>';
 		Put '<OPTION VALUE="5"> 5 % </option>';
-		Put '<OPTION VALUE="10"> 10 % </option>';
+		Put '<OPTION VALUE="10" SELECTED> 10 % </option>';
 		Put '<OPTION VALUE="15"> 15 % </option>';
 		Put '<OPTION VALUE="20"> 20 % </option>';
 		Put '<OPTION VALUE="25"> 25 % </option>';
@@ -249,12 +249,15 @@ Run;
 			Options Minoperator MLogic;
 			%Macro Dimension(_ValueDim) / Mindelimiter=',';
 
-			%If "&_ValueDim" in ("Year","Org_Name","Org_Code","Region_Name","Period","Region_Code","Region") %Then 
+			%If "&_ValueDim" in ("Year","Org_Name","Org_Code","Region_Name","Region_Name_Code",
+									"Period","Region_Code","Region") %Then 
+			%Do;
 				Put '<option value='
 					"&_ValueDim"
 					'>' /
 					"&_ValueDim"
 					'</option>' /;
+			%End;
 			%Else %Put &_ValueDim not in list.;
 
 			%Mend;
@@ -313,11 +316,13 @@ Run;
 	Put '<p><br></p>';
 
 	*--- Table 3 - Submit button ---;
-	Put '<table style="width: 100%; height: 5%" border="0">';
+	Put '<table style="width: 100%; height: 10%" border="0">';
 	Put '<td valign="center" align="center" border="1" style="background-color: lightblue; color: Black">';
+	Put '<p><br></p>';
+
 	Put '<INPUT TYPE=submit VALUE="Submit Details" valign="center">';
 
-	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.NHS Report Percentage.sas">';
+	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.NHSReport2.sas">';
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"
 		'>';

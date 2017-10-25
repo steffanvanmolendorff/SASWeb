@@ -47,9 +47,103 @@
 
 		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
-		Put '</HEAD>';
+				Put '<SCRIPT language="javascript">' /
+		'function MySubmit()' /
+		'{document.NHS.submit();} ' /
+		'</SCRIPT>' /;
+
+		*--- Create styles for HTML links on page ---;
+		Put '<style>' /
+		'td{font-size:"25";color:"green"}' /
+
+		'a' /
+		'{' /
+			'font-family:arial;' /
+			'font-size:10px;' /
+			'color:black;' /
+			'font-weight:normal;' /
+			'font-style:normal;' /
+			'text-decoration:none;' /
+		'}' /
+		'a:hover' /
+		'{' /
+			'font-family:arial;' /
+			'font-size:10px;' /
+			'color:blue;' /
+			'text-decoration:none;' /
+		'}' /
+		'.nav' /
+		'{' /
+			'font-family:arial;' /
+			'font-size:10px;' /
+			'color:#ffffff;' /
+			'font-weight:normal;' /
+			'font-style:normal;' /
+			'text-decoration:none;' /
+			'border:inset 0px #ececec;' /
+			'cursor:hand;' /
+		'}' /
+		'</style>' /
+		'</HEAD>';
 
 		Put '<BODY>';
+
+				*--- Include horizontal line under image ---;
+		Put '<hr size="2" color="blue">'  /;
+
+		*--- Create Progress Bar ---;
+		Put '<table align="center"><tr><td>' /
+			'<div style="font-size:8pt;padding:2px;border:solid black 0px">' /
+			'<span id="progress1"> &nbsp; &nbsp;</span>' /
+			'<span id="progress2"> &nbsp; &nbsp;</span>' /
+			'<span id="progress3"> &nbsp; &nbsp;</span>' /
+			'<span id="progress4"> &nbsp; &nbsp;</span>' /
+			'<span id="progress5"> &nbsp; &nbsp;</span>' /
+			'<span id="progress6"> &nbsp; &nbsp;</span>' /
+			'<span id="progress7"> &nbsp; &nbsp;</span>' /
+			'<span id="progress8"> &nbsp; &nbsp;</span>' /
+			'<span id="progress9"> &nbsp; &nbsp;</span>'
+			'</div>' /
+			'</td></tr></table>';
+
+		Put '<script language="javascript">' /
+		'var progressEnd = 9;' /		
+		'var progressColor = "blue";' /	
+		'var progressInterval = 1000;' /	
+		'var progressAt = progressEnd;' /
+		'var progressTimer;' /
+
+		'function progress_clear() {' /
+		'	for (var i = 1; i <= progressEnd; i++) ' /
+		"	document.getElementById('progress'+i).style.backgroundColor = 'transparent';" /
+		'	progressAt = 0;' /
+		'}' /
+
+		'function progress_update() {' /
+		'	progressAt++;' /
+		'	if (progressAt > progressEnd) progress_clear();' /
+		"	else document.getElementById('progress'+progressAt).style.backgroundColor = progressColor;" /
+		"	progressTimer = setTimeout('progress_update()',progressInterval);" /
+		'}' /
+
+		'function progress_stop() {' /
+		'	clearTimeout(progressTimer);' /
+		'	progress_clear();' /
+		'}' /
+
+		'progress_update();' /		
+		'</script>' /
+		'<p>' /;
+
+		Put '<p></p>';
+		Put '<HR>';
+		Put '<p></p>';
+
+		*--- Load Progress Bar ---;
+		Put '<div class="ldBar" data-value="50"></div>';
+
+		Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
+
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
 		Put '<td valign="top" style="background-color: lightblue; color: orange">';
@@ -160,9 +254,11 @@
 		Put '<H2>TEST</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
+		Put '<OPTION VALUE="Null"> Select option below </option>';
 		Put '<OPTION VALUE="Test Other Script"> 1. TEST OTHER SCRIPT </option>';
 		Put '</SELECT>';
 		Put '</div>';
+		Put '<p><br></p>';
 
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
@@ -183,6 +279,11 @@
 		Put '</tr>';
 		Put '</table>';
 
+		*--- Stop Progress Bar and close HTML page ---;
+		Put '<SCRIPT language="javascript">' /
+			'progress_stop();' /
+			'</SCRIPT>';
+
 		Put '<table style="width: 100%; height: 5%" border="1">';
 		Put '<tr>';
 		Put '<td valign="top" style="background-color: White; color: black">';
@@ -193,7 +294,8 @@
 		Put '</table>';
 
 		Put '</BODY>';
-		Put '<HTML>';
+		Put '</HTML>';
+	Run;
 %Mend Valid;
 
 
@@ -270,7 +372,8 @@
 		Put '</table>';
 
 		Put '</BODY>';
-		Put '<HTML>';
+		Put '</HTML>';
+	Run;
 %Mend NewUser;
 
 %Macro InValid();
@@ -348,7 +451,8 @@
 		Put '</table>';
 
 		Put '</BODY>';
-		Put '<HTML>';
+		Put '</HTML>';
+	Run;
 %Mend InValid;
 
 

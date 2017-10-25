@@ -1,13 +1,14 @@
 Options MPrint MLogic Source Source2 Symbolgen;
 
 %Macro Import(Filename);
+/*
 PROC IMPORT DATAFILE="&Filename"
  	OUT=OBData.Bank_API_List
  	DBMS=csv
  	REPLACE;
  	GETNAMES=Yes;
 RUN;
-
+*/
 
  /**********************************************************************
  *   PRODUCT:   SAS
@@ -21,17 +22,17 @@ RUN;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
     infile "&Filename" delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
        informat Bank_Name $10. ;
-       informat Bank_Description $27. ;
+       informat Bank_Description $30. ;
        informat API_Name $3. ;
        informat API_Desc $25. ;
-       informat Version_No $4. ;
-       informat Version_No_Desc $16. ;
+       informat Version_No $6. ;
+       informat Version_No_Desc $20. ;
        format Bank_Name $10. ;
-       format Bank_Description $27. ;
+       format Bank_Description $30. ;
        format API_Name $3. ;
        format API_Desc $25. ;
-       format Version_No $4. ;
-       format Version_No_Desc $16. ;
+       format Version_No $6. ;
+       format Version_No_Desc $20. ;
     input
                 Bank_Name $
                 Bank_Description $
@@ -50,6 +51,7 @@ RUN;
 /*	API_Name $ 8*/
 /*	API_Desc $ 25;*/
 /*Run;*/
+
 
 Proc Sort Data = Work.Bank_API_List;
 	By Bank_Name;
@@ -418,14 +420,14 @@ Put '<p></p>';
 					            "&Label"
 					            '</option>' /;
 							%End;
-							%Else %If &I = &Count+1 %Then
+/*							%Else %If &I = &Count+1 %Then
 							%Do;
 					            Put '<option Selected value='
 					            "&Start"
 					            '>' /
 					            "&Label"
 					            '</option>' /;
-							%End;
+							%End;*/
 
 				        %End;
 				        %Else %Let I = &Count;
