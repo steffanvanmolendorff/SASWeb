@@ -336,19 +336,27 @@ Run;
 					Set Work.NHS_Percentage_1_Sum;
 
 					%Do j = 1 %To &_Fact0;
-						_&_forecast._Month_&j._1 = 0;
+						_&_forecast._Month_&j = 0;
+						_Val_&j = 0;
+					%End;
+
+					%Do j = 1 %To &_Fact0;
+/*						_&_forecast._Month_&j = 0;*/
+/*						_Val_&j = 0;*/
 						%Do i = 1 %To 12;
 							%If &i = 1 %Then
 							%Do;
-								_&_forecast._Month_&j._&i = &&_Fact&i;
-								_Val = _&_forecast._Month_&j._&i;
-								Retain _Val;
-/*								Output;*/
+/*								_&_forecast._Month_&j._&i = &&_Fact&i;*/
+								_&_forecast._Month_&j = &&_Fact&i;
+								_Val_&j = _&_forecast._Month_&j;
+								Retain _Val_&j;
+								Output;
 							%End;
 							%Else %Do;
-								_&_forecast._Month_&j._&i = _Val * (&_Forecast/100);
-								_Val = _Val + _&_forecast._Month_&j._&i;
-/*								Output;*/
+/*								_&_forecast._Month_&j._&i = _Val * (&_Forecast/100);*/
+								_&_forecast._Month_&j = _Val_&j * (&_Forecast/100);
+								_Val_&j = _Val_&j + _&_forecast._Month_&j;
+								Output;
 							%End;
 						%End;
 					%End;

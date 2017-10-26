@@ -4,9 +4,9 @@
 
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN SPOOL;
 OPTIONS NOSYNTAXCHECK;
-/*
+
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
-*/
+
 /*
 Data Work._Null_;
 _BankName = "&_BankName";
@@ -23,6 +23,7 @@ Run;
 %Global SCH_Link;
 %Global API_Link;
 %Global API_Name;
+%Global API_JSON;
 %Global Perm_Sch_Table;
 %Global BankName_C;
 %Global Version_C;
@@ -42,7 +43,7 @@ Run;
 
 /*
 %Let _BankName = BOI;
-%Let _APIName = ATM;
+%Let _APIName = PCA;
 %Let _VersionNo = v2.1;
 */
 
@@ -75,20 +76,22 @@ Data Work.API_CONFIG    ;
 	DSD lrecl=32767 firstobs=2 ;
        informat Bank_Name $20. ;
        informat API_Abb $3. ;
-       informat API_Link $60. ;
+       informat API_Link $100. ;
        informat API_Name $25. ;
        informat SCH_Link $100. ;
        informat SCH_Name $24. ;
        informat Perm_SCH_Table $10. ;
        informat Version $6. ;
+	   informat API_JSON $30.;
        format Bank_Name $20. ;
        format API_Abb $3. ;
-       format API_Link $60. ;
+       format API_Link $100. ;
        format API_Name $25. ;
        format SCH_Link $100. ;
        format SCH_Name $24. ;
        format Perm_SCH_Table $10. ;
        format Version $6. ;
+	   format API_JSON $30.;
     input
                 Bank_Name $
                 API_Abb $
@@ -98,6 +101,8 @@ Data Work.API_CONFIG    ;
                 SCH_Name $
                 Perm_SCH_Table $
                 Version $
+				API_JSON $
+
     ;
     if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
 Run;
@@ -112,6 +117,7 @@ Data OBDATA.API_Config;
 	Call Symput('Perm_Sch_Table',Perm_Sch_Table);
 	Call Symput('Version_C',Version);
 	Call Symput('Sch_Version',Tranwrd(Version,'.','_'));
+	Call Symput('API_JSON',API_JSON);
 Run;
 
 %Mend Import;
@@ -455,10 +461,15 @@ Data Work.&JSON
 	Var3 = Left(Trim(Var2));
 Run;
 
-Data Work.&JSON;
+Data Work.&JSON(Drop = Value1 Value2);
 	Set Work.&JSON;
 
-	Length New_Data_Element New_Data_Element1 New_Data_Element2 $ 250;
+	Length New_Data_Element New_Data_Element1 New_Data_Element2 $ 250 Value $ 1000;
+
+	Value1 = Compbl(Trim(Left(Tranwrd(Value,"'"," "))));
+	Value2 = Compbl(Trim(Left(Tranwrd(Value1,'"'," "))));
+	Value = Value2;
+	
 
 	If Reverse(Scan(Reverse(Trim(Left(Data_Element))),1,'-')) = 'required' then Flag = 'Mandatory';
 	Else Flag = 'Optional';
@@ -477,7 +488,8 @@ Data Work.&JSON;
 
 	End;
 
-	Data_Element = Compress(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Hierarchy,'data-',''),'properties-',''),'-enum',''),'-items',''),'-required',''),'items-',''));
+/*	Data_Element = Compress(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Hierarchy,'data-',''),'properties-',''),'-enum',''),'-items',''),'-required',''),'items-',''));*/
+	Data_Element = Compress(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Hierarchy,'properties-',''),'-enum',''),'-items',''),'-required',''),'items-',''));
 
 Run;
 
@@ -631,6 +643,7 @@ Data Work.&JSON._2;
 		Call Symput('HierCnt',Trim(Left(Put(HierCnt,6.))));
 		Call Symput(Compress('Test'||'_'||Put(HierCnt,8.)),Trim(Left(Put(Counter,8.))));
 	End;
+
 Run;
 
 %Put HierCnt = &HierCnt;
@@ -641,7 +654,7 @@ Run;
 %Put _ALL_;
 
 	Data Work.Schema_Columns;
-		Length Hierarchy $ 250;
+		Length Hierarchy $ 300;
 	Run;
 
 %Do i = 1 %To %Eval(&HierCnt);
@@ -654,12 +667,17 @@ Run;
 
 		If Last.HierCnt and Last.Counter;
 
-			%Do j = 1 %To %Eval(&&Test_&i);
+			%Do j = 1 %To &&Test_&i;
 				%Put j = &j;
-				Length &&Variable_Name_&i._&j  $ 250;
-
+				%If "&&Variable_Name_&i._&j" = "description" %Then
+				%Do;
+					Length &&Variable_Name_&i._&j  $ 1000;
+				%End;
+				%Else %Do;
+					Length &&Variable_Name_&i._&j  $ 300;
+				%End;
 				%Let Varname = &&Variable_Name_&i._&j.;
-				&Varname = "&&Variable_Value_&i._&j.";
+				&Varname = %UNQUOTE(%STR(%')"&&Variable_Value_&i._&j."%STR(%'));
 			%End;
 	Run;
 
@@ -820,94 +838,6 @@ Data Work.&Bank._API
 	Rename=(Var3 = Data_Element Var2 = Hierarchy Value = &Bank));
 
 	Set Work.&Bank._API;
-/*
-*=====================================================================================================================================================
---- For ATMS do the following amendments to the Hierarchy values ---
-======================================================================================================================================================;
-	If Trim(Left(Bank_API)) = 'atms' then
-	Do;
-
-		If Trim(Left(Var2)) = 'data-ATMServices-ATMServic' then 
-		Do;
-			Var2 = 'data-ATMServices';
-		End;
-
-		If Trim(Left(Var2)) = 'data-AccessibilityTypes-Accessibi' then 
-		Do;
-			Var2 = 'data-AccessibilityTypes';
-		End;
-
-		If Trim(Left(Var2)) = 'data-Currency-Currency1' then 
-		Do;
-			Var2 = 'data-Currency';
-		End;
-
-		If Trim(Left(Var2)) = 'data-SupportedLanguages-Supported' then 
-		Do;
-			Var2 = 'data-SupportedLanguages';
-		End;
-	End;
-*=====================================================================================================================================================
---- For BRANCHES do the following amendments to the Hierarchy values ---
-======================================================================================================================================================;
-	If Trim(Left(Bank_API)) = 'branches' then
-	Do;
-
-		If Trim(Left(Var2)) = 'data-BranchFacilitiesName-BranchFacil' then 
-		Do;
-			Var2 = 'BranchFacilitiesName';
-		End;
-
-		If Trim(Left(Var2)) = 'data-BranchMediatedServiceName-BranchMedia' then 
-		Do;
-			Var2 = 'BranchMediatedServiceName';
-		End;
-
-		If Trim(Left(Var2)) = 'data-BranchSelfServeServiceName-BranchSelfS' then 
-		Do;
-			Var2 = 'BranchSelfServeServiceName';
-		End;
-
-		If Trim(Left(Var2)) in ('data-CustomerSegment-CustomerSeg','data-CustomerSegment-Custome') then 
-		Do;
-			Var2 = 'CustomerSegment';
-		End;
-	End;
-	*/
-*=====================================================================================================================================================
---- For BUSINESS-CURRENT-ACCOUNTS do the following amendments to the Hierarchy values ---
-======================================================================================================================================================;
-/*	If Trim(Left(Bank_API)) = 'business-current-accounts' then*/
-/*	Do;*/
-/*		If Trim(Left(Var2)) in ('data-AccessChannels-Acces','AccessChannels-Acce') then */
-/*		Do;*/
-/*			Var2 = 'AccessChannels';*/
-/*		End;*/
-/*		If Trim(Left(Var2)) in ('data-CardType-CardT','CardType-Card') then */
-/*		Do;*/
-/*			Var2 = 'CardType';*/
-/*		End;*/
-/*		If Trim(Left(Var2)) in ('data-Currency-Curre','Currency-Curr') then */
-/*		Do;*/
-/*			Var2 = 'Currency';*/
-/*		End;*/
-/*		If Trim(Left(Var2)) in ('data-MobileWallet-Mobil','MobileWallet-','MobileWallet-MobileWallet1PayM') then */
-/*		Do;*/
-/*			Var2 = 'MobileWallet';*/
-/*		End;*/
-/*		If Trim(Left(Var2)) in ('data-ProductSegment-Produ','ProductSegment-Prod') then */
-/*		Do;*/
-/*			Var2 = 'ProductSegment';*/
-/*		End;*/
-/*		If Trim(Left(Var2)) in ('data-ProductURL-Produ','ProductURL-ProductURL1http:/') then */
-/*		Do;*/
-/*			Var2 = 'ProductURL';*/
-/*		End;*/
-/*		If Trim(Left(Var2)) in ('data-TsandCs-Tsand','TsandCs-TsandCs1http://www') then */
-/*		Do;*/
-/*			Var2 = 'TsandCs';*/
-/*		End;*/
-/*	End;*/
 
 Run;
 *=====================================================================================================================================================
@@ -915,6 +845,8 @@ Run;
 ======================================================================================================================================================;
 Data Work.&Bank._API(Drop = Hierarchy_X Find);
 	Set Work.&Bank._API;
+
+*--- Remove the Data- value from Hierarchy as the schema spec does not have the value in Hierarchy ---;
 	Hierarchy = Trim(Left(Tranwrd(Hierarchy,'data-','')));
 
 *--- This step is required to remove the values 1,2,3,etc from the Hierarchy field added by the 
@@ -1006,6 +938,7 @@ Data Work.&Bank._API;
 	Length Test_Var_Length_Desc $ 100
 	Test_Var_Length $ 6;
 
+/*
 	If minLength NE '' Then
 	Do;
 		Variable_Length = Length(&Bank._Value);
@@ -1019,6 +952,7 @@ Data Work.&Bank._API;
 			If &Bank._Value EQ '' then Test_Var_Length_Desc = "&Bank. Value is missing";
 		End;
 	End;
+*/
 Run;
 
 %Mend Test_VarLength;
@@ -1029,7 +963,7 @@ Run;
 ======================================================================================================================================================;
 %Macro Test_Format(Bank, API);
 
-Data Work.&Bank._API OBDATA.X;
+Data Work.&Bank._API;
 	Set Work.&Bank._API;
 
 	Length Test_Format_Value_Desc $ 100
@@ -1651,7 +1585,13 @@ Run;
 %Let NOBS = %sysfunc(attrn(&dsid,nobs)); 
 %Let rc = %sysfunc(close(&dsid)); 
 %Put NOBS = &NOBS;
-
+*=====================================================================================================================================================
+--- Test if the Bank_API_SCH dataset contains any observations to select the correct report to print ---
+======================================================================================================================================================;
+%Let dsid = %sysfunc(open(OBDATA._&BANK._API_SCH)); 
+%Let MATCHOBS = %sysfunc(attrn(&dsid,nobs)); 
+%Let rc = %sysfunc(close(&dsid)); 
+%Put MATCHOBS = &MATCHOBS;
 *=====================================================================================================================================================
 --- Test if the _A_BANK_API dataset contains any observations which did not match with the Schema values ---
 ======================================================================================================================================================;
@@ -1678,6 +1618,7 @@ Data Work.Stats;
 	Version_No $ 12
 	Fail_Obs $ 10
 	NOBS_API $ 10
+	MATCHOBS_API $ 10
 	NOBS_SCH $ 10
 	API_Link $ 250
 	SCH_Link $ 250;
@@ -1690,6 +1631,7 @@ Data Work.Stats;
 	VERSION_No = "&_VersionNo";
 	FAIL_OBS = "&NOBS";
 	NOBS_API = "&NOBS_API";
+	MATCHOBS = "&MATCHOBS";
 	NOBS_SCH = "&NOBS_SCH";
 	API_Link = "&API_Link./&Main_API";
 	SCH_Link = "&SCH_Link";
@@ -1779,7 +1721,7 @@ Proc Template;
  end; 
 
 Run;
-%Mend Template
+%Mend Template;
 %Template;
 *=====================================================================================================================================================
 --- Run Macro to Print the CMA9 Reports for ATMS, BRANCHES, PCA, etc ---
@@ -1790,8 +1732,84 @@ Run;
 %Do;
 	%Sys_Errors(&_BankName, &_APIName);
 %End;
+*=====================================================================================================================================================
+						LIST OF MATCHED RECORDS REPORT
+=====================================================================================================================================================;
+%If &ErrorCode = 0 and &MATCHOBS > 0 %Then 
+%Do;
+%Macro API_Matches(Bank, API);
+
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+=====================================================================================================================================================;
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+=====================================================================================================================================================;
+ODS _All_ Close;
+ods listing close; 
 
 
+ods tagsets.tableeditor file=_Webout
+    style=styles.OBStyle 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="0" 
+            frozen_rowheaders="0" 
+            ); 
+
+		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
+		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
+		Title3 "RECORDS IN BOTH %Sysfunc(UPCASE(&API)) AND SCHEMA FILES - %Sysfunc(UPCASE(&Fdate))";
+		Title4 "";
+		Title5 "API LOCATION: &API_Link";
+		Title6 "SCHEMA LOCATION: &SCH_Link";
+
+		Proc Summary Data = OBDATA._&BANK._API_SCH NWAY Missing;
+			Class Hierarchy Flag;
+			Var RowCnt;
+			Output Out = Work.Matches(Drop=_Type_ _Freq_ RowCnt) Sum=;
+		Run;
+
+		Proc Report Data = Work.Matches nowd
+			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+			style(header)=[background=lightskyblue foreground=black] 
+			style(column)=[background=lightcyan foreground=black];
+
+		Columns Hierarchy
+		Flag;
+
+		Define Hierarchy / display 'Data Hierarchy' left;
+		Define Flag / display "Mandatory/Optional" left;
+
+		Compute Hierarchy;
+
+		If Hierarchy NE '' then 
+			Do;
+				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
+			End;
+		Endcomp;
+
+		Run;
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
+	%ReturnButton();
+*=====================================================================================================================================================
+--- Open Output Delivery Parameters  ---
+======================================================================================================================================================;
+		ODS HTML Close;	
+		ODS Listing;	
+
+	%Mend API_Matches;
+	%API_Matches(&Bank, &API);
+
+ods tagsets.tableeditor close; 
+ods listing; 
+
+%End;
 
 %If &ErrorCode = 0 and &NOBS > 0 %Then 
 %Do;
@@ -1974,7 +1992,7 @@ Proc Export Data = Work.Fail
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&Bank._&_APIName._Fail.csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail.csv);
 
 %End;
 
@@ -2063,13 +2081,13 @@ ods listing;
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
 %Macro ExportXL(Path);
-Proc Export Data = Work._a_&Bank._API
+Proc Export Data = Work._a_&Bank._API(Keep = Hierarchy &Bank._Value Table)
  	Outfile = "&Path"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\_a_&Bank._&_APIName..csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_a_&Bank._&_APIName..csv);
 
 %End;
 
@@ -2157,13 +2175,13 @@ ods listing;
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
 %Macro ExportXL(Path);
-Proc Export Data = Work._s_&Bank._API
+Proc Export Data = Work._s_&Bank._API(Keep = Hierarchy Table Flag Description)
  	Outfile = "&Path"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\_s_&Bank._&_APIName..csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_s_&Bank._&_APIName..csv);
 
 %End;
 
@@ -2282,7 +2300,7 @@ PUT "Thank you";
 RUN;
 
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&Bank._&APIName._No_Obs.csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&APIName._No_Obs.csv);
 
 
 %End;
@@ -2297,19 +2315,20 @@ RUN;
 %Do;
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
-%If "&_VersionNo" EQ "v2.1" or "&_VersionNo" = "v2.1.1" and
-	%Sysfunc(Find(&API_Path,'localhost')) GT 0 %Then
+
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOI" %Then
 %Do;
-/*	%API(&API_Path/OD/&Version/&Main_API,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Main_API..json,&Bank_Name,&Main_API);
 %End;
-/*
-%If "&_VersionNo" EQ "v2.1" or "&_VersionNo" = "v2.1.1" and
-	%Sysfunc(Find(&API_Path,'localhost')) EQ 0 %Then
+
+%Put _VersionNo = &_VersionNo;
+%Put BankName_C = &BankName_C;
+
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "HSBC" %Then
 %Do;
-	%API(&API_Path/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON,&Bank_Name,&Main_API);
 %End;
-*/
+
 *=====================================================================================================================================================
 --- The values are passed from the Main macro to resolve in the macro below which allows execution of the API data extract ---
 ======================================================================================================================================================;
@@ -2328,6 +2347,7 @@ RUN;
 &Version_C,
 &BankName_C);
 
+%Put _All_;
 /*
 https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master/personal_current_account.json
 *====================================================================================
