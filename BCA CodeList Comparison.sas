@@ -193,7 +193,7 @@ RUN;
 
     data WORK.BCA_CODELIST_NONFEES    ;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\BCA_CodeList_NonFees.csv'
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\BCA_CodeList_NonFees.csv'
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat Endpoint_CodeName $50. ;
@@ -239,7 +239,7 @@ RUN;
 
 data WORK.BCA_CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\BCA_CodeList_Fees.csv' 
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\BCA_CodeList_Fees.csv' 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
@@ -421,7 +421,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\bcal_001_001_01DD.csv,BCA);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\bcal_001_001_01DD.csv,BCA);
 
 Proc Sort Data = OBData.API_BCA
 	Out = Work.API_BCA(Keep = Hierarchy DataType CodeName CodeDescription

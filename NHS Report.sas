@@ -220,7 +220,7 @@ Run;
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 /*		Put '<H1>TEST</H1>';*/
 /*		Put '<p><br></p>';*/
-		Put '<H2>SELECT FORESCAST %</H2>';
+		Put '<H3>SELECT FORESCAST %</H3>';
 		Put '<SELECT NAME="_forecast" size="10" "</option>';/*onchange="this.form.submit()*/
 		Put '<OPTION VALUE="0"> </option>';
 		Put '<OPTION VALUE="05"> 0.5 % </option>';
@@ -234,15 +234,23 @@ Run;
 		Put '<OPTION VALUE="75"> 75 % </option>';
 		Put '<OPTION VALUE="100"> 100 % </option>';
 		Put '</SELECT>';
+
+		Put '<p><br></p>';
+
+		Put '<H3>ADD TIME INTERVAL</H3>';
+		Put '<textarea name="_Interval" rows="1" cols="10">';
+		Put '</textarea>';
+
 		Put '</div>';
 		Put '</td>';
+
 
 	*--- Table 2 - Drop Down Table for Dimension columns---;
 		Put '<td>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 /*		Put '<H1>TEST</H1>';*/
 /*		Put '<p><br></p>';*/
-		Put '<H2>SELECT DIMENSIONS</H2>';
+		Put '<H3>SELECT DIMENSIONS</H3>';
 		Put '<SELECT NAME="_Dimension" size="7" Multiple </option>';/*onchange="this.form.submit()*/
 
 		%Do i = 1 %To &_CountVal;

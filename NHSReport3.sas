@@ -184,13 +184,9 @@ Run;
 	Put '<FORM ID=NHS NAME=NHS METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 
 
-
-
-
 		%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
 		title "Listing of Product Sales"; 
 		ods listing close; 
-		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
 		ods tagsets.tableeditor file=_Webout
 		    style=styles.OBStyle 
 		    options(autofilter="YES" 
@@ -205,7 +201,46 @@ Run;
 					Set NHSData.NHS(Where=(Tranwrd(Trim(Left(&_DimName)),' ','_') EQ "&_DimVal"));
 				Run;
 
-				Proc Print; Run;
+				Proc Report Data = Work.NHS_Percentage_1 nowd
+					style(report)=[rules=all cellspacing=0 bordercolor=gray] 
+					style(header)=[background=lightskyblue foreground=black] 
+					style(column)=[background=lightcyan foreground=black];
+
+					Title1 "Test Ad-hoc &_forecast Summary Proc Report";
+					Title2 "%Sysfunc(UPCASE(&Fdate))";
+
+					Column &_DimName
+					Elect_Ordinary_Admis
+					Elect_Daycase_Admis	
+					Elect_Total_Admis
+					Elect_Plan_Ordinary_Admi	
+					Elect_Plan_Daycase_Admis
+					Elect_Plan_Total_Admis	
+					Elect_Admis_NHS_TreatCentre	
+					Total_Non_elect_Admis
+/*					GPRefer_Special*/
+					GPRefer_Seen_Special
+					GPRefer_Made_GA
+/*					GPRefer_Seen_GA*/
+					Other_Refer_Made_GA
+					All_1st_Outpat_Att_GA;
+
+					Define &_DimName / Display "&_DimVal";
+					Define Elect_Ordinary_Admis/ Display "Elect Ordinary Admis";
+					Define Elect_Daycase_Admis/ Display "Elect Daycase Admis";	
+					Define Elect_Total_Admis/ Display "Elect Total Admis";
+					Define Elect_Plan_Ordinary_Admis/ Display "Elect Plan Ordinary Admis";	
+					Define Elect_Plan_Daycase_Admis/ Display "Elect Plan Daycase Admis";
+					Define Elect_Plan_Total_Admis/ Display "Elect Plan Total Admis";	
+					Define Elect_Admis_NHS_TreatCentre/ Display "Elect Admis NHS TreatCentre";	
+					Define Total_Non_elect_Admis/ Display "Total Non elect Admis";
+/*					Define GPRefer_Special/ Display "GPRefer Special"; 	*/
+					Define GPRefer_Seen_Special/ Display "GPRefer Seen Special";
+					Define GPRefer_Made_GA/ Display "GPRefer Made GA";
+/*					Define GPRefer_Seen_GA/ Display "GPRefer Seen GA";*/
+					Define Other_Refer_Made_GA/ Display "Other Refer Made GA";
+					Define All_1st_Outpat_Att_GA/ Display "All 1st Outpat Att GA";
+				Run;
 
 		%ReturnButton;
 

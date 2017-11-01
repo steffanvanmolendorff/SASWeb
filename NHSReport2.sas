@@ -7,6 +7,7 @@ Options MPrint MLogic Symbolgen Source Source2;
 %Global _Fact0;
 %Global _Dimension1;
 %Global _Fact1;
+%Global _USerPerc;
 
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
@@ -16,7 +17,9 @@ Options MPrint MLogic Symbolgen Source Source2;
 
 %Global _Multiple;
 %Global _Forecast;
+
 %Let _Forecast = &_Forecast;
+%Let _Interval = &_Interval;
 
 %Macro Main();
 *--- This section will determine which report to run based on a single or multiple columns selection that ---;
@@ -237,7 +240,8 @@ Run;
 	Put '<p><br></p>';
 	Put '<FORM ID=NHS NAME=NHS METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 
-				Data Work.NHS_Percentage;
+/*
+			Data Work.NHS_Percentage;
 				Length
 				_&_forecast._Elect_Ordinary_Admis
 				Elect_Ordinary_Admis
@@ -287,9 +291,9 @@ Run;
 				_&_forecast._All_1st_Outpat_Att_GA = (All_1st_Outpat_Att_GA * (&_forecast/100));
 
 				Run;
+*/
 
-
-
+/*
 *--- Concatenate all fact variables into a macro variable ---;
 			%Let Perc_FactCols =;
 			%Do i = 1 %to &_Fact0;
@@ -298,15 +302,9 @@ Run;
 
 					%Let Perc_FactCols = &Perc_FactCols _&_Forecast._&ColX;
 					%Put Perc_FactCols = &Perc_FactCols;
-/*
-*--- Sample code to create a macro variable for a graph ---;
-					%If i = 1 %Then
-				%Do;
-					%Let PlotBubble = Year*Total_Non_elect_Admis;
-				%End;
-*/
 			%End;
-
+*/
+/*
 *--- Create 12 month interval Forecast values to use in Proc Report ---;
 			%Let Month_Int =;
 			%Do i = 1 %to 12;
@@ -316,49 +314,43 @@ Run;
 					%Let Month_Int = &Month_Int &ColX;
 					%Put Month_Int = &Month_Int;
 			%End;
-
+*/
 
 				Data Work.NHS_Percentage_1;
-					Set Work.NHS_Percentage(Keep = &DimCols &FactCols &Perc_FactCols);
+					Set NHSDATA.NHS(Keep = &DimCols &FactCols /*&Perc_FactCols*/);
 					RowCnt = 1;
-					Format &FactCols &Perc_FactCols Dollar12.2;
+					Format &FactCols /*&Perc_FactCols*/ Dollar12.2;
 					Region_Name = Tranwrd(Trim(Left(Region_Name)),' ','_');
 				Run;
 
 
 				Proc Summary Data = Work.NHS_Percentage_1 Nway Missing;
 					Class &DimCols;
-					Var &FactCols &Perc_FactCols;
+					Var &FactCols /*&Perc_FactCols*/;
 					Output Out = Work.NHS_Percentage_1_Sum(Drop = _Freq_ _Type_) Sum=;
 				Run;
 
 				Data Work.NHS_Percentage_2_Sum;
 					Set Work.NHS_Percentage_1_Sum;
 
-					%Do j = 1 %To &_Fact0;
-						_&_forecast._Month_&j = 0;
-						_Val_&j = 0;
-					%End;
-
-					%Do j = 1 %To &_Fact0;
-/*						_&_forecast._Month_&j = 0;*/
-/*						_Val_&j = 0;*/
-						%Do i = 1 %To 12;
-							%If &i = 1 %Then
+					%Do k = 1 %To &_Interval;
+					_Month_ = &k;
+						%Do j = 1 %To &_Fact0;
+							%If &k = 1 %Then
 							%Do;
-/*								_&_forecast._Month_&j._&i = &&_Fact&i;*/
-								_&_forecast._Month_&j = &&_Fact&i;
-								_Val_&j = _&_forecast._Month_&j;
-								Retain _Val_&j;
-								Output;
+								_Perc_&j = &&_Fact&j * (&_Forecast/100);
+								_&_forecast._Forecast_&j = &&_Fact&j + _Perc_&j;
+								_Month_ = &k;
 							%End;
 							%Else %Do;
-/*								_&_forecast._Month_&j._&i = _Val * (&_Forecast/100);*/
-								_&_forecast._Month_&j = _Val_&j * (&_Forecast/100);
-								_Val_&j = _Val_&j + _&_forecast._Month_&j;
-								Output;
+								_&_forecast._Forecast_&j = _&_forecast._Forecast_&j;
+								_Perc_&j = _&_forecast._Forecast_&j * (&_Forecast/100);
+								_&_forecast._Forecast_&j = _Perc_&j + _&_forecast._Forecast_&j;
+								_Month_ = &k;
 							%End;
+							Format _&_forecast._Forecast_&j _Perc_&j Dollar12.2;
 						%End;
+						Output;
 					%End;
 				Run;
 
@@ -410,6 +402,10 @@ Run;
 					Title1 "Test Ad-hoc &_forecast Summary Report";
 					Title2 "%Sysfunc(UPCASE(&Fdate))";
 				Run;
+
+*=========================================================================================================
+					START PROC REPORT HERE
+==========================================================================================================;
 *--- Create a unique URLSTRING(1) value to use in proc report. this is to create a unique _C1_ value ---;
 				%Macro Urlstring1();
 								urlstring&k=	"http://localhost/scripts/broker.exe"||
@@ -423,6 +419,8 @@ Run;
 											"&_WebUser"||
 											'&_WebPass='||
 											"&_WebPass"||
+											'&_Forecast='||
+											"&_Forecast"||
 											'&_DimName='||
 											"&_DimName"||
 											'&_DimVal='||
@@ -443,6 +441,8 @@ Run;
 											"&_WebUser"||
 											'&_WebPass='||
 											"&_WebPass"||
+											'&_Forecast='||
+											"&_Forecast"||
 											'&_DimName='||
 											"&_DimName"||
 											'&_DimVal='||
@@ -463,6 +463,8 @@ Run;
 											"&_WebUser"||
 											'&_WebPass='||
 											"&_WebPass"||
+											'&_Forecast='||
+											"&_Forecast"||
 											'&_DimName='||
 											"&_DimName"||
 											'&_DimVal='||
@@ -483,6 +485,8 @@ Run;
 											"&_WebUser"||
 											'&_WebPass='||
 											"&_WebPass"||
+											'&_Forecast='||
+											"&_Forecast"||
 											'&_DimName='||
 											"&_DimName"||
 											'&_DimVal='||
@@ -502,6 +506,8 @@ Run;
 											'&_WebUser='||
 											"&_WebUser"||
 											'&_WebPass='||
+											'&_Forecast='||
+											"&_Forecast"||
 											"&_WebPass"||
 											'&_DimName='||
 											"&_DimName"||
@@ -523,6 +529,8 @@ Run;
 											"&_WebUser"||
 											'&_WebPass='||
 											"&_WebPass"||
+											'&_Forecast='||
+											"&_Forecast"||
 											'&_DimName='||
 											"&_DimName"||
 											'&_DimVal='||
@@ -543,6 +551,8 @@ Run;
 											"&_WebUser"||
 											'&_WebPass='||
 											"&_WebPass"||
+											'&_Forecast='||
+											"&_Forecast"||
 											'&_DimName='||
 											"&_DimName"||
 											'&_DimVal='||
@@ -559,7 +569,7 @@ Run;
 
 					Title1 "Test Ad-hoc &_forecast Summary Proc Report";
 					Title2 "%Sysfunc(UPCASE(&Fdate))";
-					Column &DimCols &FactCols &Perc_FactCols Forecast &Month_Int;
+					Column &DimCols &FactCols /*&Perc_FactCols*/ Forecast /*&Month_Int*/;
 					 
 					%Do i = 1 %to &_Dimension0;
 						Define &&_Dimension&i / group "&&_Dimension&i" left;
@@ -571,27 +581,31 @@ Run;
 
 					Define Forecast / Computed format=Dollar15.2;
 
-					Define Month_Int / Computed format=Dollar15.2;
+/*					Define Month_Int / Computed format=Dollar15.2;*/
 
 					Compute Forecast;
-						Forecast = &_Fact1..sum * &_Forecast;
+						Forecast = &_Fact1..sum * (&_Forecast/100);
 					Endcomp;
 
 					%Do i = 1 %To 12;
 						%If &i = 1 %Then
 						%Do;
+					
 							Compute Month&i;
-								Month&i = &_Fact1..sum + (&_Fact1..sum * (&_Forecast/100));
+								Month&i = &&_Fact.&i..sum + (&&_Fact.&i..sum * (&_Forecast/100));
 							Endcomp;
+
 						%End;
 						%Else %If &i >= 2 %Then 
 						%Do;
+					
 							Compute Month&i;
-								Month&i = &_Fact1..sum + (&_Fact1..sum * (&_Forecast/100));
+								Month&i = &&_Fact.&i..sum + (&&_Fact.&i..sum * (&_Forecast/100));
 							Endcomp;
+
 						%End;
 					%End;
-
+					
 					%Do k = 1 %to &_Dimension0;
 						%Let _DimName = &&_Dimension&k;
 						%Let _DimVal = &_DimName;
@@ -656,8 +670,8 @@ Run;
 			   title "Region Code vs Total Non Elective Admissions";
 
 			   	%Do i = 1 %to &_Fact0;
-					VBar Region_Code / response = &&_Fact&i;
-				   	VLine Region_Code / response=_&_forecast._&&_Fact&i y2axis;
+				   	VLine _Month_ / response = _Perc_&i y2axis;
+					VBar _Month_ / response = _&_forecast._Forecast_&i;
 				%End;
 			run;
 
@@ -718,77 +732,6 @@ Run;
 
 		ODS _ALL_ Close;
 
-		/*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
-
-*		%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
-		title "Listing of Product Sales"; 
-*		ods listing close; 
-		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
-		ods tagsets.tableeditor file=_Webout
-		    style=styles.OBStyle 
-		    options(autofilter="YES" 
-		 	    autofilter_table="1" 
-		            autofilter_width="9em" 
-		 	    autofilter_endcol= "50" 
-		            frozen_headers="0" 
-		            frozen_rowheaders="0" 
-		            ); 
-
-				Data Work.NHS_Percentage;
-				Length
-				_&_forecast._Elect_Ordinary_Admis
-				Elect_Ordinary_Admis
-				_&_forecast._Elect_Daycase_Admis
-				Elect_Daycase_Admis
-				_&_forecast._Elect_Total_Admis
-				Elect_Total_Admis
-				_&_forecast._Elect_Plan_Ordinary_Admis
-				Elect_Plan_Ordinary_Admis	
-				_&_forecast._Elect_Plan_Daycase_Admis
-				Elect_Plan_Daycase_Admis
-				_&_forecast._Elect_Plan_Total_Admis 
-				Elect_Plan_Total_Admis	
-				_&_forecast._Elect_Admis_NHS_TreatCentre
-				Elect_Admis_NHS_TreatCentre	
-				_&_forecast._Total_Non_elect_Admis
-				Total_Non_elect_Admis
-				_&_forecast._GPRefer_All_special
-				GPRefer_All_specialties 	
-				_&_forecast._GPRefer_Seen_special
-				GPRefer_Seen_All_special	
-				_&_forecast._GPRefer_Made_GA
-				GPRefer_Made_GA
-				_&_forecast._GP_Refer_Seen_GA
-				GP_Refer_Seen_GA	
-				_&_forecast._Other_Refer_Made_GA
-				Other_Refer_Made_GA	
-				_&_forecast._All_1st_Outpat_Att_GA
-				All_1st_Outpat_Att_GA 8;
-
-
-				Set NHSData.NHS;
-						
-				_&_forecast._Elect_Ordinary_Admis = (Elect_Ordinary_Admis * (&_forecast/100));
-				_&_forecast._Elect_Daycase_Admis = (Elect_Daycase_Admis * (&_forecast/100));	
-				_&_forecast._Elect_Total_Admis = (Elect_Total_Admis * (&_forecast/100));
-				_&_forecast._Elect_Plan_Ordinary_Admis = (Elect_Plan_Ordinary_Admis * (&_forecast/100));	
-				_&_forecast._Elect_Plan_Daycase_Admis = (Elect_Plan_Daycase_Admis * (&_forecast/100));
-				_&_forecast._Elect_Plan_Total_Admis = (Elect_Plan_Total_Admis * (&_forecast/100));	
-				_&_forecast._Elect_Admis_NHS_TreatCentre = (Elect_Admis_NHS_TreatCentre * (&_forecast/100));	
-				_&_forecast._Total_Non_elective_Admis = (Total_Non_elect_Admis * (&_forecast/100));
-				_&_forecast._GPRefer_special = (GPRefer_special * (&_forecast/100)); 	
-				_&_forecast._GPRefer_Seen_special = (GPRefer_Seen_special * (&_forecast/100));
-				_&_forecast._GPRefer_Made_GA = (GPRefer_Made_GA * (&_forecast/100));
-				_&_forecast._GPRefer_Seen_GA = (GP_Refer_Seen_GA * (&_forecast/100));
-				_&_forecast._Other_Refer_Made_GA = (Other_Refer_Made_GA * (&_forecast/100));
-				_&_forecast._All_1st_Outpat_Att_GA = (All_1st_Outpat_Att_GA * (&_forecast/100));
-
-				Run;
-
-				Proc Print Data=Work.NHS_Percentage;
-					Title1 "Test - &_Forecast % Ad-hoc Report";
-					Title2 "%Sysfunc(UPCASE(&Fdate))";
-				Run;
 
 		%ReturnButton;
 

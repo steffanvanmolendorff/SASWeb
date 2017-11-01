@@ -134,7 +134,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\&_APIVersion\UML\&API_DSN.l_001_001_01DD.csv,&API_DSN);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\&_APIVersion\&API_DSN.l_001_001_01DD.csv,&API_DSN);
 /*%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\UML\pcal_001_001_01DD.csv,PCA);*/
 
 
@@ -695,7 +695,7 @@ Data OBData.Compare_&API_DSN(Keep = Hierarchy
 	Swag_MinLength $25.
 	&API_DSN._MinLength $25.;
 
-/*	Swagger_&API_DSN._Lev1 = Hierarchy;*/
+	Swagger_&API_DSN._Lev1 = Hierarchy;
 
 *--- Find mismatches between EhancedDefinition and Description variables ---;
 If Substr(Reverse(Trim(Left(Hierarchy))),5,1) NE ':' Then
@@ -819,7 +819,7 @@ Proc Sort Data = OBData.Compare_&API_DSN;
 Run;
 
 %Mend Schema;
-%Schema(http://&_Host/sasweb/data/temp/&_APIVersion/json/&File..json,&API_DSN,Swagger_&API_DSN);
+*%Schema(http://&_Host/sasweb/data/temp/od/ob/&_APIVersion/&File..json,&API_DSN,Swagger_&API_DSN);
 
 %Macro ReturnButton();
 Data _Null_;

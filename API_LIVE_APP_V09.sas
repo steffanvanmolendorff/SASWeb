@@ -410,7 +410,7 @@ Run;
 Data Work.&JSON
 	(Rename=(Var3 = Data_Element Var2 = Hierarchy));
 
-	Length Bank_API $ 8 Var2 $ 300 Var3 $ 300 P1 - P&H_Num $ 300;
+	Length Bank_API $ 8 Var2 $ 500 Var3 $ 500 P1 - P&H_Num $ 500;
 
 	RowCnt = _N_;
 
@@ -464,7 +464,7 @@ Run;
 Data Work.&JSON(Drop = Value1 Value2);
 	Set Work.&JSON;
 
-	Length New_Data_Element New_Data_Element1 New_Data_Element2 $ 250 Value $ 1000;
+	Length New_Data_Element New_Data_Element1 New_Data_Element2 $ 500 Value $ 1000;
 
 	Value1 = Compbl(Trim(Left(Tranwrd(Value,"'"," "))));
 	Value2 = Compbl(Trim(Left(Tranwrd(Value1,'"'," "))));
@@ -502,7 +502,7 @@ Data Work.&JSON(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy));
 	Set Work.&JSON;
 	By Hierarchy;
 
-	Length Data_Element_1 Attribute Hierarchy_1 $ 250;
+	Length Data_Element_1 Attribute Hierarchy_1 $ 500;
 
 	If First.Hierarchy then
 	Do;
@@ -654,7 +654,7 @@ Run;
 %Put _ALL_;
 
 	Data Work.Schema_Columns;
-		Length Hierarchy $ 300;
+		Length Hierarchy $ 500;
 	Run;
 
 %Do i = 1 %To %Eval(&HierCnt);
@@ -779,7 +779,7 @@ Run;
 
 Data Work.&Bank._API;
 
-	Length Bank_API $ 32 Var2 Value1 Value2 $ 250 Var3 $ 250 P1 - P&H_Num $ 250 Value $ 619;
+	Length Bank_API $ 32 Var2 Value1 Value2 $ 500 Var3 $ 500 P1 - P&H_Num $ 500 Value $ 700;
 
 	RowCnt = _N_;
 
@@ -869,11 +869,11 @@ Run;
 --- Manually change the data (Edit Mode) in OpenData.&Bank._&API._Schema_Fail datasets ---
 ======================================================================================================================================================;
 Data Work.&Bank._API
-		Work._A_&Bank._API
-		Work._S_&Bank._API
+		Work._API_&Bank._API
+		Work._SCH_&Bank._API
 		OBDATA._&BANK._API_SCH;
 
-	Length Hierarchy $ 250
+	Length Hierarchy $ 500
 	Table $ 32;
 
 	Merge Work.&Bank._API(In=a)
@@ -884,12 +884,12 @@ Data Work.&Bank._API
 	If a and not b Then 
 	Do;
 		Table = "&Main_API";
-		Output Work._A_&Bank._API;
+		Output Work._API_&Bank._API;
 	End;
 	If b and not a Then 
 	Do;
 		Table = 'Schema';
-		Output Work._S_&Bank._API;
+		Output Work._SCH_&Bank._API;
 	End;
 	If a and b Then 
 	Do;
@@ -1593,17 +1593,17 @@ Run;
 %Let rc = %sysfunc(close(&dsid)); 
 %Put MATCHOBS = &MATCHOBS;
 *=====================================================================================================================================================
---- Test if the _A_BANK_API dataset contains any observations which did not match with the Schema values ---
+--- Test if the _API_BANK_API dataset contains any observations which did not match with the Schema values ---
 ======================================================================================================================================================;
-%Let dsid = %sysfunc(open(Work._a_&Bank._API)); 
+%Let dsid = %sysfunc(open(Work._API_&Bank._API)); 
 %Let NOBS_API = %sysfunc(attrn(&dsid,nobs)); 
 %Let rc = %sysfunc(close(&dsid)); 
 %Put NOBS_API = &NOBS_API;
 
 *=====================================================================================================================================================
---- Test if the _S_BANK_API dataset contains any observations which did not match with the API values ---
+--- Test if the _SCH_BANK_API dataset contains any observations which did not match with the API values ---
 ======================================================================================================================================================;
-%Let dsid = %sysfunc(open(Work._s_&Bank._API)); 
+%Let dsid = %sysfunc(open(Work._SCH_&Bank._API)); 
 %Let NOBS_SCH = %sysfunc(attrn(&dsid,nobs)); 
 %Let rc = %sysfunc(close(&dsid)); 
 %Put NOBS_SCH = &NOBS_SCH;
@@ -2040,7 +2040,7 @@ ods tagsets.tableeditor file=_Webout
 		Title5 "API LOCATION: &API_Link";
 		Title6 "SCHEMA LOCATION: &SCH_Link";
 
-		Proc Report Data =  Work._a_&Bank._API nowd
+		Proc Report Data =  Work._API_&Bank._API nowd
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 			style(header)=[background=lightskyblue foreground=black] 
 			style(column)=[background=lightcyan foreground=black];
@@ -2081,13 +2081,13 @@ ods listing;
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
 %Macro ExportXL(Path);
-Proc Export Data = Work._a_&Bank._API(Keep = Hierarchy &Bank._Value Table)
+Proc Export Data = Work._API_&Bank._API(Keep = Hierarchy &Bank._Value Table)
  	Outfile = "&Path"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_a_&Bank._&_APIName..csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName..csv);
 
 %End;
 
@@ -2134,7 +2134,7 @@ ods tagsets.tableeditor file=_Webout
 		Title5 "API LOCATION: &API_Link";
 		Title6 "SCHEMA LOCATION: &SCH_Link";
 
-		Proc Report Data =  Work._s_&Bank._API nowd
+		Proc Report Data =  Work._SCH_&Bank._API nowd
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 			style(header)=[background=lightskyblue foreground=black] 
 			style(column)=[background=lightcyan foreground=black];
@@ -2175,13 +2175,13 @@ ods listing;
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
 %Macro ExportXL(Path);
-Proc Export Data = Work._s_&Bank._API(Keep = Hierarchy Table Flag Description)
+Proc Export Data = Work._SCH_&Bank._API(Keep = Hierarchy Table Flag Description)
  	Outfile = "&Path"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_s_&Bank._&_APIName..csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName..csv);
 
 %End;
 
