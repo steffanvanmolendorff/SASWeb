@@ -455,39 +455,9 @@ Run;
 
 %Macro Template;
 Proc Template;
- define style OBStyle;
- notes "My Simple Style";
- class body /
- backgroundcolor = white
- color = black
- fontfamily = "Palatino"
- ;
- class systemtitle /
- fontfamily = "Verdana, Arial"
- fontsize = 16pt
- fontweight = bold
- ;
- class table /
- backgroundcolor = #f0f0f0
- bordercolor = red
- borderstyle = solid
- borderwidth = 1pt
- cellpadding = 5pt
- cellspacing = 0pt
- frame = void
- rules = groups
- ;
- class header, footer /
- backgroundcolor = #c0c0c0
- fontfamily = "Verdana, Arial"
- fontweight = bold
- ;
- class data /
- fontfamily = "Palatino"
- ;
- end; 
-
-Run;
+ 	Define style Style.Sasweb;
+	End;
+Run; 
 %Mend Template
 %Template;
 
@@ -498,7 +468,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -508,11 +478,11 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.CCC_Code_Compare nowd
+Proc Report Data = OBData.CCC_Code_Compare nowd/*
 	style(report)=[width=100%]
 	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black];
+	style(column)=[background=lightcyan foreground=black]*/;
 
 	Title1 "Open Banking - CodeList Comparison";
 	Title2 "Data Dictionary vs. CodeList Comparison Reports - %Sysfunc(UPCASE(&Fdate))";
@@ -615,7 +585,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -625,11 +595,11 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='Both')) nowd
+Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='Both')) nowd/*
 	style(report)=[width=100%]
 	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black];
+	style(column)=[background=lightcyan foreground=black]*/;
 
 	Title1 "Open Banking - CodeList Comparison";
 	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - %Sysfunc(UPCASE(&Fdate))";
@@ -725,7 +695,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -736,11 +706,11 @@ ods tagsets.tableeditor file=_Webout
 
 /*	ODS HTML File="C:\inetpub\wwwroot\sasweb\data\Results\CodeList Results.xls";*/
 
-Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='CodeList')) nowd
+Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	style(report)=[width=100%]
 	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black];
+	style(column)=[background=lightcyan foreground=black]*/;
 
 	Title1 "Open Banking - CodeList Comparison";
 	Title2 "Records only in the CodeList Excel Reports - %Sysfunc(UPCASE(&Fdate))";
@@ -842,7 +812,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -851,11 +821,11 @@ ods tagsets.tableeditor file=_Webout
             frozen_rowheaders="0" 
             ); 
 
-Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='DD')) nowd
+Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='DD')) nowd/*
 	style(report)=[width=100%]
 	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black];
+	style(column)=[background=lightcyan foreground=black]*/;
 
 	Title1 "Open Banking - CodeList Comparison";
 	Title2 "Records only in the Data Dictionary (DD) Excel Reports - %Sysfunc(UPCASE(&Fdate))";

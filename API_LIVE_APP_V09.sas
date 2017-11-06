@@ -1,7 +1,6 @@
 *=====================================================================================================================================================
 --- Set system options to track comments in the log file ---
 ======================================================================================================================================================;
-
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN SPOOL;
 OPTIONS NOSYNTAXCHECK;
 
@@ -1684,43 +1683,13 @@ Put '</HTML>';
 Run;
 %Mend Header;
 *=====================================================================================================================================================
---- Proc Template creates the style OBStyle and the macro is called by Proc Report ---
+--- Proc Template creates the style SASWeb and the macro is called by Proc Report ---
 ======================================================================================================================================================;
 %Macro Template;
 Proc Template;
- define style OBStyle;
- notes "My Simple Style";
- class body /
- backgroundcolor = white
- color = black
- fontfamily = "Palatino"
- ;
- class systemtitle /
- fontfamily = "Verdana, Arial"
- fontsize = 16pt
- fontweight = bold
- ;
- class table /
- backgroundcolor = #f0f0f0
- bordercolor = red
- borderstyle = solid
- borderwidth = 1pt
- cellpadding = 5pt
- cellspacing = 0pt
- frame = void
- rules = groups
- ;
- class header, footer /
- backgroundcolor = #c0c0c0
- fontfamily = "Verdana, Arial"
- fontweight = bold
- ;
- class data /
- fontfamily = "Palatino"
- ;
- end; 
-
-Run;
+ 	Define style Style.Sasweb;
+	End;
+Run; 
 %Mend Template;
 %Template;
 *=====================================================================================================================================================
@@ -1751,7 +1720,7 @@ ods listing close;
 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -1763,7 +1732,7 @@ ods tagsets.tableeditor file=_Webout
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
 		Title3 "RECORDS IN BOTH %Sysfunc(UPCASE(&API)) AND SCHEMA FILES - %Sysfunc(UPCASE(&Fdate))";
-		Title4 "";
+		Title4 " ";
 		Title5 "API LOCATION: &API_Link";
 		Title6 "SCHEMA LOCATION: &SCH_Link";
 
@@ -1843,7 +1812,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -1855,14 +1824,14 @@ ods tagsets.tableeditor file=_Webout
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
 		Title3 "FAILED VALIDATION REPORT - %Sysfunc(UPCASE(&Fdate))";
-		Title4 "";
+		Title4 " ";
 		Title5 "&API_Link";
 		Title6 "&SCH_Link";
 
-		Proc Report Data =  Work.Fail nowd
+		Proc Report Data =  Work.Fail nowd/*
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black];
+			style(column)=[background=lightcyan foreground=black]*/;
 
 		Columns Hierarchy 
 		&Bank._Value
@@ -2024,7 +1993,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -2040,10 +2009,10 @@ ods tagsets.tableeditor file=_Webout
 		Title5 "API LOCATION: &API_Link";
 		Title6 "SCHEMA LOCATION: &SCH_Link";
 
-		Proc Report Data =  Work._API_&Bank._API nowd
+		Proc Report Data =  Work._API_&Bank._API nowd/*
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black];
+			style(column)=[background=lightcyan foreground=black]*/;
 
 		Columns Hierarchy
 		&Bank._Value;
@@ -2118,7 +2087,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -2134,10 +2103,10 @@ ods tagsets.tableeditor file=_Webout
 		Title5 "API LOCATION: &API_Link";
 		Title6 "SCHEMA LOCATION: &SCH_Link";
 
-		Proc Report Data =  Work._SCH_&Bank._API nowd
+		Proc Report Data =  Work._SCH_&Bank._API nowd/*
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black];
+			style(column)=[background=lightcyan foreground=black]*/;
 
 		Columns Hierarchy
 		&Bank._Value;
@@ -2217,7 +2186,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style= OBStyle 
+    style= styles.SASWeb
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -2248,10 +2217,10 @@ ods tagsets.tableeditor file=_Webout
 		Title5 "&API_Link";
 		Title6 "&SCH_Link";
 
-		Proc Report Data =  Work.No_Obs nowd
+		Proc Report Data =  Work.No_Obs nowd/*
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black];
+			style(column)=[background=lightcyan foreground=black]*/;
 
 		Columns ERROR_DESC ;
 

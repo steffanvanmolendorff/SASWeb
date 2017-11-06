@@ -147,11 +147,11 @@ Data _Null_;
 
 		Put '</HEAD>';
 		Put '<BODY>';
-
+/*
 		Put '<p></p>';
 		Put '<HR>';
 		Put '<p></p>';
-
+*/
 		Put '<Table valign="center" align="center" style="width: 100%; height: 8%" border="0">';
 		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
@@ -276,7 +276,7 @@ Data _NULL_;
 		Put '</table>';
 
 	*--- Space below image ---;
-		Put '<p><br></p>';
+/*		Put '<p><br></p>';*/
 
 		ODS _ALL_ Close;
 
@@ -296,18 +296,18 @@ Data _NULL_;
 
 
 	*--- Space below image ---;
-	Put '<p><br></p>';
+/*	Put '<p><br></p>';*/
 	Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 
 	*--- Table 2 - Drop Down Table ---;
-	Put '<table align = "center" style="width: 40%; height: 8%" border="1">';
+	Put '<table align = "center" style="width: 100%; height: 8%" border="1">';
 	Put '<tr>';
 
-
-	Put '<td valign="top" style="background-color: white; color: black" border="1">';
+	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<p><br></p>';
 		Put '<b>SELECT AD-HOC REPORT COLUMNS</b>';
-		Put '<p></p>';
+		Put '<p><br></p>';
 
 
 	*--- Read Dataset UniqueNames ---;
@@ -345,13 +345,12 @@ Data _NULL_;
 
 					%Let Rc = %Sysfunc(Close(&Dsn));
 
-		Put '</div>';
+	Put '</div>';
 	Put '</td>';
 	Put '</tr>';
 	Put '</table>';
 
 	*--- Space below image ---;
-	Put '<p><br></p>';
 
 	*--- Table 3 - Submit button ---;
 		Put '<Table valign="center" align="center" style="width: 100%; height: 8%" border="0">';

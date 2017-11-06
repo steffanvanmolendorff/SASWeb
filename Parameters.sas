@@ -20,7 +20,7 @@ Put '<table style="width: 100%; height: 5%" border="0">';
 Put '</table>';
 Put '</BODY>';
 
-		Put '<p><br></p>';
+/*Put '<p><br></p>';*/
 
 Put '</HTML>';
 
@@ -64,14 +64,86 @@ Run;
 %Mend Import;
 %Import(C:\inetpub\wwwroot\sasweb\Data\Perm\Bank_API_List.csv);
 
+*=====================================================================================================================================================
+--- Macro code for the Resubmit-Return button at the bottom of the reports ---
+======================================================================================================================================================;
+%Macro ReturnButton();
+Data _Null_;
+		File _Webout;
+
+		Put '<HTML>';
+		Put '<HEAD>';
+		Put '<html xmlns="http://www.w3.org/1999/xhtml">';
+		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+		Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
+		Put '<title>OB TESTING</title>';
+
+		Put '<meta charset="utf-8" />';
+		Put '<title>Open Data Test Harness</title>';
+		Put '<meta name="description" content="">';
+		Put '<meta name="author" content="">';
+
+		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
+
+		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+		Put '<title>LRM</title>';
+
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
+		Put '</script>';
+
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
+
+		Put '</HEAD>';
+		Put '<BODY>';
+
+		Put '<p></p>';
+		Put '<HR>';
+		Put '<p></p>';
+
+		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+		Put '</Form>';
+		Put '</td>';
+		Put '</tr>';
+		Put '</Table>';
+
+		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
+		Put '<td valign="top" style="background-color: White; color: black">';
+		Put '<H3>All Rights Reserved</H3>';
+		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
+		Put '</td>';
+		Put '</Table>';
+
+		Put '</BODY>';
+		Put '<HTML>';
+		
+Run;
+%Mend ReturnButton;
 
 %Macro Populate();
 Data _NULL_;
 File _Webout;
 
-Put '<p></p>';
+/*Put '<p></p>';*/
 
-
+/*
 	Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
 	Put '<tr>';
 
@@ -91,22 +163,21 @@ Put '<p></p>';
 	Put '</td>';
 	Put '</tr>';
 	Put '</table>';
-
+*/
 
 /*	Put '<p><br></p>';*/
-	Put '<HR>';
+/*	Put '<HR>';*/
 /*	Put '<p><br></p>';*/
 
 	Put '<FORM Name="param" ID="param" METHOD=GET ACTION="http://localhost/scripts/broker.exe">';
 
-	Put '<Table align="center" style="width: 100%; height: 50%" border="1">';
-
+	Put '<Table align="center" style="width: 100%; height: 60%" border="1">';
 	Put '<tr>';
-	Put '<td>';
+/*	Put '<td>';*/
+	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
 	Put '<div class="dropdown" align="center" style="float:center; width: 100%">';
 	Put '<b>SELECT  BANK</b>';	
 	Put '<p></p>';
-
 
 	Put '<select name="_BankName" size="18" style="width: 25%; height: 30%" onchange="this.form.submit()">' /;
 
@@ -160,6 +231,15 @@ Put '<p></p>';
 
 	Put '</div>';
 	Put '</td>';
+	Put '</tr>';
+	Put '</table>';
+
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
+/*	%ReturnButton();*/
+
+
 /*
 	Put '<td>';
 	Put '<div class="dropdown" align="center" style="float:left; width: 50%">';
@@ -191,22 +271,30 @@ Put '<p></p>';
 	Put '</td>';
 */
 *	Put '</div>';
-	Put '</td>';
-	Put '</tr>';
-	Put '</table>';
-
+*	Put '</td>';
+*	Put '</tr>';
+*	Put '</table>';
+/*
 	Put '<p><br></p>';
+
 	Put '<p><br></p>';
 
 	Put '<p></p>';
 	Put '<HR>';
 	Put '<p></p>';
+*/
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
 
-	Put '<Table align="center" style="width: 100%; height: 20%" border="0">';
-	Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-	Put '<p><br></p>';
+/*	Put '<Table align="center" style="width: 100%; height: 20%" border="0">';*/
+	Put '<Table>';
+	Put '<tr>';
+	Put '<td>';
+/*	Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';*/
+*	Put '<p><br></p>';
 /*	Put '<INPUT TYPE=submit VALUE=Submit align="center">';*/
-	Put '<p><br></p>';
+*	Put '<p><br></p>';
 	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Parameters1.sas">';
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"
@@ -222,15 +310,18 @@ Put '<p></p>';
 		'>';
 
 	Put '</FORM>';
-
 	Put '</td>';
-	Put '</tr>';
+	Put '</table>';
+
+
+	Put '<table>';
+	Put '<tr>';
 	Put '<td valign="top" style="background-color: White; color: black">';
 	Put '<H3>All Rights Reserved</H3>';
 	Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
 	Put '</td>';
+   	Put '</tr>';
 	Put '</table>';
-
 
 Put '</body>';
 Put '</html>';

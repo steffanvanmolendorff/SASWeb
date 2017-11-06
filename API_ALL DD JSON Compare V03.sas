@@ -903,40 +903,10 @@ Run;
 %Fdate(worddate12., datetime.);
 
 %Macro Template;
-
 Proc Template;
-	Define style style.OBStyle;
- 	notes "My Simple Style";
- 	class body /
- 	backgroundcolor = white
- 	color = black
- 	fontfamily = "Palatino";
-
- 	Class systemtitle /
- 	fontfamily = "Verdana, Arial"
- 	fontsize = 16pt
- 	fontweight = bold;
-
- 	Class table /
- 	backgroundcolor = #f0f0f0
- 	bordercolor = red
- 	borderstyle = solid
- 	borderwidth = 1pt
- 	cellpadding = 5pt
- 	cellspacing = 0pt
- 	frame = void
- 	rules = groups;
-
- 	Class header, footer /
- 	backgroundcolor = #c0c0c0
- 	fontfamily = "Verdana, Arial"
- 	fontweight = bold;
-
-	Class data /
- 	fontfamily = "Palatino";
- 	End; 
-Run;
-
+ 	Define style Style.Sasweb;
+	End;
+Run; 
 %Mend Template;
 %Template;
 
@@ -970,21 +940,24 @@ ODS _ALL_ Close;
 ods listing close; 
 /*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
 ods tagsets.tableeditor file=_Webout 
-    style=styles./*meadow*/OBStyle 
+    style=Styles.SASWeb
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="10em" 
  	    autofilter_endcol= "50" 
-            frozen_headers="0" 
-            frozen_rowheaders="0" 
+            frozen_headers="1" 
+            frozen_rowheaders="1" 
             ) ; 
 
 
 Proc Report Data = OBData.Compare_&API_DSN nowd
-	style(report)=[width=100%]
+	/*style(report)=[width=100%]
 	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black];
+	style(column)=[background=lightcyan foreground=black]
+	Style(Report) = OBSTyle
+	Style(Header) = OBStyle
+	Style(Column) = OBStyle*/;
 
 	Title1 "Open Banking - &API_DSN";
 	Title2 "&API_DSN &_APIVersion Comparison Report - %Sysfunc(UPCASE(&Fdate))";
@@ -1024,8 +997,9 @@ Proc Report Data = OBData.Compare_&API_DSN nowd
 
 
 *--- Define columns in the report and associated parameters for output ---;
-	Define CountRows / display 'Row Count' left style(column)=[width=5%];
-	Define Hierarchy / display 'Hierarchy' left style(column)=[width=15%];
+	Define CountRows / display 'Row Count' left/* style(column)=[width=5%]*/;
+	Define Hierarchy / display 'Hierarchy' left/* style(column)=[width=15%]*/;
+/*	Define Hierarchy / display 'Hierarchy' left style(column)= Styles.SASWeb;*/
 	Define Swagger_&API_DSN._Lev1 / display "Swagger &API_DSN Data Structure" left;
 	Define &API_DSN._Lev1 / display "API &API_DSN Data Structure" left;
 	Define Mandatory_Flag / display "Mandatory Flag" left;

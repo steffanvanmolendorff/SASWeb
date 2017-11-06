@@ -170,9 +170,9 @@ Put '</td>';
 Put '</tr>';
 Put '</table>';
 
-Put '<p></p>';
+/*Put '<p></p>';*/
 
-
+/*
 	Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
 	Put '<tr>';
 
@@ -192,30 +192,20 @@ Put '<p></p>';
 	Put '</td>';
 	Put '</tr>';
 	Put '</table>';
-
+*/
 
 /*	Put '<p><br></p>';*/
-	Put '<HR>';
+/*	Put '<HR>';*/
 /*	Put '<p><br></p>';*/
 
 	Put '<FORM NAME=check METHOD=GET ACTION="http://localhost/scripts/broker.exe">';
 
-	Put '<Table align="center" style="width: 100%; height: 30%" border="1">';
+	Put '<Table align="center" style="width: 100%; height: 40%" border="1">';
 	Put '<tr>';
-	Put '<td>';
-
-	Put '<div id="myProgress">' /
-  			'<div id="myBar"></div>' /
-		'</div>';	
-
-/*	Put '<div id="header" style="width:100%;">';*/
-
+	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
 	Put '<div class="header" align="center" style="float:left; width: 100%">';
 	Put '<b>SELECTED BANK</b>';
 	Put '<p></p>';
-*	Put '<SELECT NAME="_BankName" Size="6">';
-
-
 	
 				*--- Read Dataset UniqueNames ---;
 				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName"))));
@@ -224,7 +214,7 @@ Put '<p></p>';
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 
 				*--- Populate Drop Down Box on HTML Page ---;
-				Put	'<select name="_BankName" size="6" style="width: 80%; height: 30%">' /;
+				Put	'<select name="_BankName" size="7" style="width: 80%; height: 30%">' /;
 				    %Do I = 1 %To 1 /*&Count*/;
 				        %Let Rc = %Sysfunc(fetch(&Dsn,&i));
 				        %Let Start=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,Bank_Name))));
@@ -276,9 +266,9 @@ Put '<p></p>';
 	Put '</td>';
 
 
-	Put '<td>';
-	Put '<div class="dropdown" align="center" style="float:center; width: 100%">';
-	Put '<b>SELECT API</b>';
+	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<div class="header" align="center" style="float:left; width: 100%">';
+	Put '<b>SELECT API NAME</b>';
 	Put '<p></p>';
 
 				*--- Read Dataset UniqueNames ---;
@@ -384,11 +374,10 @@ Put '<p></p>';
 	Put '</div>';
 	Put '</td>';
 
-	Put '<td>';
-	Put '<div class="dropdown" align="center" style="float:right; width: 100%">';
-	Put '<b>SELECT VERSION</b>';
+	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<div class="header" align="center" style="float:center; width: 80%">';
+	Put '<b>SELECT API VERSION</b>';
 	Put '<p></p>';
-
 
 					*--- Read Dataset UniqueNames ---;
 				 	%Let Dsn = %Sysfunc(Open(Work.Unique_No(Where=(Bank_Name = "&_BankName"))));
@@ -397,7 +386,7 @@ Put '<p></p>';
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 
 				*--- Populate Drop Down Box on HTML Page ---;
-				Put	'<select name="_VersionNo" size="4" style="width: 80%; height: 30%" onchange="this.form.submit()">' /;
+				Put	'<select name="_VersionNo" size="7" style="width: 80%; height: 30%" onchange="this.form.submit()">' /;
 				    %Do I = 1 %To &Count+1 /*&Count*/;
 				        %Let Rc = %Sysfunc(fetch(&Dsn,&i));
 				        %Let Start=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,Version_No))));
@@ -453,18 +442,19 @@ Put '<p></p>';
 	Put '</tr>';
 	Put '</table>';
 
-	Put '<p><br></p>';
-	Put '<p><br></p>';
+/*	Put '<p><br></p>';*/
+/*	Put '<p><br></p>';*/
 
-	Put '<p></p>';
-	Put '<HR>';
-	Put '<p></p>';
+/*	Put '<p></p>';*/
+/*	Put '<HR>';*/
+/*	Put '<p></p>';*/
 
-	Put '<Table align="center" style="width: 100%; height: 20%" border="0">';
-	Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-	Put '<p><br></p>';
-	Put '<INPUT TYPE=submit VALUE=Return align="center">';
-	Put '<p><br></p>';
+	Put '<Table align="center" style="width: 100%; height: 10%" border="1">';
+	Put '<tr>';
+/*	Put '<td valign="top" align="center" style="background-color: lightblue; color: White">';*/
+/*	Put '<p><br></p>';
+	Put '<INPUT TYPE=submit VALUE="Submit" align="center">';
+	Put '<p><br></p>';*/
 	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_LIVE_APP_V09.sas">';
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"
@@ -480,12 +470,11 @@ Put '<p></p>';
 		'>';
 
 	Put '</FORM>';
-	Put '</td>';
-	Put '</tr>';
 	Put '<td valign="top" style="background-color: White; color: black">';
 	Put '<H3>All Rights Reserved</H3>';
 	Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
 	Put '</td>';
+	Put '</tr>';
 	Put '</table>';
 
 

@@ -191,15 +191,19 @@ File _Webout;
 	Put '</table>';
 
 	*--- Space below image ---;
-	Put '<p><br></p>';
+/*	Put '<p><br></p>';*/
 	Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 
 	*--- Table 2 - Drop Down Table ---;
-	Put '<table align = "center" style="width: 60%; height: 5%" border="1">';
+	Put '<table align = "center" style="width: 100%; height: 5%" border="1">';
 	Put '<tr>';
 
-	Put '<td valign="top" style="background-color: white; color: black" border="1">';
-		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+	Put '<td valign="top" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<p><br></p>';
+/*	Put '<td valign="top" style="background-color: white; color: black" border="1">';*/
+/*	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';*/
+
 		Put '<b>API ' /
 		"&_API_Val." 
 		' SELECTED</b>';
@@ -221,8 +225,12 @@ File _Webout;
 	Put '</td>';
 
 
-	Put '<td valign="top" style="background-color: white; color: black" border="1">';
-		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+/*	Put '<td valign="top" style="background-color: white; color: black" border="1">';*/
+/*	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';*/
+
+	Put '<td valign="top" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<p><br></p>';
 		Put '<b>SELECT BANK NAME</b>';
 		Put '<p></p>';
 
@@ -270,8 +278,11 @@ File _Webout;
 
 
 
-	Put '<td valign="top" style="background-color: white; color: black" border="1">';
+/*		Put '<td valign="top" style="background-color: white; color: black" border="1">';*/
+/*		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';*/
+		Put '<td valign="top" align="center" style="background-color: lightblue; color: Blue" border="1">';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<p><br></p>';
 		Put '<b>SELECT ' /
 		"&_API_Val." 
 		' FIELD NAMES </b>';
@@ -318,13 +329,14 @@ File _Webout;
 	Put '</table>';
 
 	*--- Space below image ---;
-	Put '<p><br></p>';
+/*	Put '<p><br></p>';*/
 
 	*--- Table 3 - Submit button ---;
 	Put '<table style="width: 100%; height: 5%" border="0">';
 	Put '<td valign="center" align="center" border="1" style="background-color: lightblue; color: Black">';
+	Put '<p><br></p>';
 	Put '<INPUT TYPE=submit VALUE="Submit Details" valign="center">';
-
+	Put '<p><br></p>';
 	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_Columns_Report.sas">';
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"

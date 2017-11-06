@@ -97,42 +97,9 @@ Run;
 
 %Macro Template;
 Proc Template;
- define style styles.OBStyle;
- parent = styles.BarrettsBlue;
- notes "My Simple Style";
-
- class body /
- backgroundcolor = white
- color = black
- fontfamily = "Palatino"
- ;
- class systemtitle /
- fontfamily = "Verdana, Arial"
- fontsize = 16pt
- fontweight = bold
- ;
- class table /
- backgroundcolor = #f0f0f0
- bordercolor = black
- borderstyle = solid
- borderwidth = 1pt
- cellpadding = 5pt
- cellspacing = 1pt
- frame = void
- rules = groups
- fontfamily = "Verdana"
-;
- class header, footer /
- backgroundcolor = #c0c0c0
- fontfamily = "Verdana, Arial"
- fontweight = bold
- ;
- class data /
- fontfamily = "Palatino"
- ;
- end; 
-
-Run;
+ 	Define style Style.Sasweb;
+	End;
+Run; 
 %Mend Template;
 %Template;
 
@@ -188,7 +155,7 @@ Run;
 		title "Listing of Product Sales"; 
 		ods listing close; 
 		ods tagsets.tableeditor file=_Webout
-		    style=styles.OBStyle 
+		    style=styles.SASWeb 
 		    options(autofilter="YES" 
 		 	    autofilter_table="0" 
 		            autofilter_width="9em" 
@@ -201,10 +168,7 @@ Run;
 					Set NHSData.NHS(Where=(Tranwrd(Trim(Left(&_DimName)),' ','_') EQ "&_DimVal"));
 				Run;
 
-				Proc Report Data = Work.NHS_Percentage_1 nowd
-					style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-					style(header)=[background=lightskyblue foreground=black] 
-					style(column)=[background=lightcyan foreground=black];
+				Proc Report Data = Work.NHS_Percentage_1 nowd;
 
 					Title1 "Test Ad-hoc &_forecast Summary Proc Report";
 					Title2 "%Sysfunc(UPCASE(&Fdate))";

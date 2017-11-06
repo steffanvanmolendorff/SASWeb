@@ -60,13 +60,15 @@ Data _Null_;
 
 		Put '</HEAD>';
 		Put '<BODY>';
-
+/*
 		Put '<p></p>';
 		Put '<HR>';
 		Put '<p></p>';
-
+*/
 		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<tr>';
+		Put '<td>';
+/*		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';*/
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
@@ -113,40 +115,10 @@ Run;
 %Fdate(worddate12., datetime.);
 
 %Macro Template;
-
 Proc Template;
-	Define style style.OBStyle;
- 	notes "My Simple Style";
- 	class body /
- 	backgroundcolor = white
- 	color = black
- 	fontfamily = "Palatino";
-
- 	Class systemtitle /
- 	fontfamily = "Verdana, Arial"
- 	fontsize = 16pt
- 	fontweight = bold;
-
- 	Class table /
- 	backgroundcolor = #f0f0f0
- 	bordercolor = red
- 	borderstyle = solid
- 	borderwidth = 1pt
- 	cellpadding = 5pt
- 	cellspacing = 0pt
- 	frame = void
- 	rules = groups;
-
- 	Class header, footer /
- 	backgroundcolor = #c0c0c0
- 	fontfamily = "Verdana, Arial"
- 	fontweight = bold;
-
-	Class data /
- 	fontfamily = "Palatino";
- 	End; 
-Run;
-
+ 	Define style Style.Sasweb;
+	End;
+Run; 
 %Mend Template;
 %Template;
 
@@ -204,20 +176,19 @@ Run;
 		Put '</table>';
 
 	*--- Space below image ---;
-		Put '<p><br></p>';
+/*		Put '<p><br></p>';*/
 
 
 	*--- Space below image ---;
-	Put '<p><br></p>';
-	Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
+/*	Put '<p><br></p>';*/
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 
-
-		Put '<table align="center" style="width: 75%; height: 15%" border="1">';
+		Put '<table align="center" style="width: 100%; height: 15%" border="1">';
 		Put '<tr>';
-		Put '<td>';
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
 
 	*--- Table 1 - Drop Down Table for Percentage values ---;
-		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<div class="dropdown" align="center" style="float:center; width: 100%">';
 /*		Put '<H1>TEST</H1>';*/
 /*		Put '<p><br></p>';*/
 		Put '<H3>SELECT FORESCAST %</H3>';
@@ -246,7 +217,7 @@ Run;
 
 
 	*--- Table 2 - Drop Down Table for Dimension columns---;
-		Put '<td>';
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 /*		Put '<H1>TEST</H1>';*/
 /*		Put '<p><br></p>';*/
@@ -277,11 +248,11 @@ Run;
 		Put '</td>';
 
 	*--- Table 3 - Drop Down Table for Fact columns---;
-		Put '<td>';
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 /*		Put '<H1>TEST</H1>';*/
 /*		Put '<p><br></p>';*/
-		Put '<H2>SELECT FACTS</H2>';
+		Put '<H3>SELECT FACTS</H3>';
 		Put '<SELECT NAME="_Fact" size="15" Multiple </option>';/*onchange="this.form.submit()*/
 		%Do i = 1 %To &_CountVal;
 			Options Minoperator MLogic;
@@ -327,9 +298,8 @@ Run;
 	Put '<table style="width: 100%; height: 10%" border="0">';
 	Put '<td valign="center" align="center" border="1" style="background-color: lightblue; color: Black">';
 	Put '<p><br></p>';
-
 	Put '<INPUT TYPE=submit VALUE="Submit Details" valign="center">';
-
+	Put '<p><br></p>';
 	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.NHSReport2.sas">';
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"
@@ -360,7 +330,7 @@ Run;
 		ods listing close; 
 		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
 		ods tagsets.tableeditor file=_Webout 
-		    style=styles./*meadow*/OBStyle 
+		    style=styles.SASWeb 
 		    options(autofilter="YES" 
 		 	    autofilter_table="1" 
 		            autofilter_width="10em" 
@@ -433,7 +403,7 @@ Run;
 		ods listing close; 
 		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
 		ods tagsets.tableeditor file=_Webout 
-		    style=styles./*meadow*/OBStyle 
+		    style=styles.SASWeb 
 		    options(autofilter="YES" 
 		 	    autofilter_table="1" 
 		            autofilter_width="10em" 

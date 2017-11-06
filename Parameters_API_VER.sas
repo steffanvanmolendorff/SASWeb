@@ -67,7 +67,7 @@ File _Webout;
 			
 
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		Put '<title>LRM</title>';
+		Put '<title>OBIE</title>';
 
 		Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
 		Put '</script>';
@@ -85,9 +85,9 @@ File _Webout;
 		Put '</tr>';
 		Put '</table>';
 
-Put '<p></p>';
+/*Put '<p></p>';*/
 
-
+/*
 	Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
 	Put '<tr>';
 
@@ -107,24 +107,29 @@ Put '<p></p>';
 	Put '</td>';
 	Put '</tr>';
 	Put '</table>';
-
+*/
 
 /*	Put '<p><br></p>';*/
-	Put '<HR>';
+/*	Put '<HR>';*/
 /*	Put '<p><br></p>';*/
 
 	Put '<FORM NAME=check METHOD=GET ACTION="http://localhost/scripts/broker.exe">';
 
-	Put '<Table align="center" style="width: 70%; height: 30%" border="1">';
-	Put '<tr>';
+/*	Put '<Table align="center" style="width: 100%; height: 30%" border="1">';*/
+/*	Put '<tr>';*/
 /**/
 /*	Put '<div id="myProgress">' /*/
 /*  			'<div id="myBar"></div>' /*/
 /*		'</div>';	*/
 /**/
 
-	Put '<td>';
-	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+	Put '<Table align="center" style="width: 100%; height: 40%" border="1">';
+	Put '<tr>';
+	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<div class="dropdown" align="center" style="float:left; width: 100%">';
+
+/*	Put '<td>';*/
+/*	Put '<div class="dropdown" align="center" style="float:center; width: 100%">';*/
 	Put '<b>SELECT API CATEGORY</b>';
 	Put '<p></p>';
 
@@ -166,7 +171,7 @@ Put '<p></p>';
 	%End;
 
 				*--- Populate Drop Down Box on HTML Page ---;
-				Put	'<select name="_APIName" size="6">' /;
+				Put	'<select name="_APIName" size="7">' /;
 				    %Do I = 1 %To &Count;
 				        %Let Rc = %Sysfunc(fetch(&Dsn,&i));
 				        %Let Start=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,API_Name))));
@@ -197,11 +202,11 @@ Put '<p></p>';
 	Put '</div>';
 	Put '</td>';
 
-	Put '<td>';
-	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<div class="dropdown" align="center" style="float:left; width: 100%">';
 	Put '<b>SELECT VERSION</b>';
 	Put '<p></p>';
-	Put '<SELECT NAME="_APIVersion" size="4" onchange="this.form.submit()"</option>';
+	Put '<SELECT NAME="_APIVersion" size="7" onchange="this.form.submit()"</option>';
 	Put '<OPTION VALUE="V1_3"> Version 1.3 </option>';
 	Put '<OPTION VALUE="V2_0"> Version 2.0 </option>';
 	Put '<OPTION VALUE="V2_1"> Version 2.1 </option>';
@@ -213,21 +218,19 @@ Put '<p></p>';
 	Put '</tr>';
 	Put '</table>';
 
-	Put '<p><br></p>';
-	Put '<p><br></p>';
+/*	Put '<p><br></p>';*/
+/*	Put '<p><br></p>';*/
+/**/
+/*	Put '<p></p>';*/
+/*	Put '<HR>';*/
+/*	Put '<p></p>';*/
 
-	Put '<p></p>';
-	Put '<HR>';
-	Put '<p></p>';
-
-	Put '<Table align="center" style="width: 100%; height: 20%" border="0">';
-	Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
-	Put '<p><br></p>';
+	Put '<Table align="center" style="width: 100%; height: 10%" border="1">';
+	Put '<tr>';
+/*	Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';*/
 
 	%If "&_action" EQ "API_ALL DD JSON COMPARE" %Then
 	%Do;
-		Put '<INPUT TYPE=submit VALUE=Return align="center">';
-		Put '<p><br></p>';
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
@@ -244,8 +247,6 @@ Put '<p></p>';
 	%End;
 	%Else %If "&_SWAGGER" EQ "SWAGGER" %Then
 	%Do;
-		Put '<INPUT TYPE=submit VALUE=Return align="center">';
-		Put '<p><br></p>';
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
@@ -267,12 +268,11 @@ Put '<p></p>';
 
 
 	Put '</FORM>';
-	Put '</td>';
-	Put '</tr>';
 	Put '<td valign="top" style="background-color: White; color: black">';
 	Put '<H3>All Rights Reserved</H3>';
 	Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
 	Put '</td>';
+	Put '</tr>';
 	Put '</table>';
 
 

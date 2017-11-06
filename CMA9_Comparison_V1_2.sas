@@ -982,39 +982,9 @@ Run;
 
 %Macro Template;
 Proc Template;
- define style OBStyle;
- notes "My Simple Style";
- class body /
- backgroundcolor = white
- color = black
- fontfamily = "Palatino"
- ;
- class systemtitle /
- fontfamily = "Verdana, Arial"
- fontsize = 16pt
- fontweight = bold
- ;
- class table /
- backgroundcolor = #f0f0f0
- bordercolor = red
- borderstyle = solid
- borderwidth = 1pt
- cellpadding = 5pt
- cellspacing = 0pt
- frame = void
- rules = groups
- ;
- class header, footer /
- backgroundcolor = #c0c0c0
- fontfamily = "Verdana, Arial"
- fontweight = bold
- ;
- class data /
- fontfamily = "Palatino"
- ;
- end; 
-
-Run;
+ 	Define style Style.Sasweb;
+	End;
+Run; 
 %Mend Template;
 %Template;
 
@@ -1208,7 +1178,7 @@ title "Listing of Product Sales";
 ods listing close; 
 /*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -1229,10 +1199,10 @@ Run;
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
 
-Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd
+Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd/*
 			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black];
+			style(column)=[background=lightcyan foreground=black]*/;
 
 	%If "&_action" EQ "CMA9 COMPARISON CCC" %Then
 	%Do;

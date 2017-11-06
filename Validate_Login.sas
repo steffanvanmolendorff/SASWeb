@@ -89,7 +89,7 @@
 		Put '<BODY>';
 
 				*--- Include horizontal line under image ---;
-		Put '<hr size="2" color="blue">'  /;
+/*		Put '<hr size="2" color="blue">'  /;*/
 
 		*--- Create Progress Bar ---;
 		Put '<table align="center"><tr><td>' /
@@ -189,7 +189,7 @@
 		Put '</div>';
 
 
-		Put '<H2>OPEN DATA V2 CODELIST VALIDATION</H2>';
+		Put '<H2>OPEN DATA INTERNAL JSON VALIDATION</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="8" onchange="this.form.submit()"</option>';
 		Put '<OPTION VALUE="ATM CODELIST COMPARISON"> 1. ATM CODELIST COMPARISON </option>';
@@ -203,7 +203,7 @@
 		Put '</SELECT>';
 		Put '</div>';
 
-		Put '<H2>OPEN DATA V1 SCHEMA - API VALIDATION</H2>';
+		Put '<H2>OPEN DATA V2.1 JSON VALIDATION TOOL</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
 		Put '<OPTION VALUE="SELECT API PARAMETERS"> 1. SELECT API PARAMETERS </option>';

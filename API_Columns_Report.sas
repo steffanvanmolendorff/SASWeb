@@ -40,42 +40,9 @@ Options MPrint MLogic Symbolgen Source Source2;
 
 %Macro Template;
 Proc Template;
- define style styles.OBStyle;
- parent = styles.BarrettsBlue;
- notes "My Simple Style";
-
- class body /
- backgroundcolor = white
- color = black
- fontfamily = "Palatino"
- ;
- class systemtitle /
- fontfamily = "Verdana, Arial"
- fontsize = 16pt
- fontweight = bold
- ;
- class table /
- backgroundcolor = #f0f0f0
- bordercolor = black
- borderstyle = solid
- borderwidth = 1pt
- cellpadding = 5pt
- cellspacing = 1pt
- frame = void
- rules = groups
- fontfamily = "Verdana"
-;
- class header, footer /
- backgroundcolor = #c0c0c0
- fontfamily = "Verdana, Arial"
- fontweight = bold
- ;
- class data /
- fontfamily = "Palatino"
- ;
- end; 
-
-Run;
+ 	Define style Style.Sasweb;
+	End;
+Run; 
 %Mend Template;
 %Template;
 
@@ -218,7 +185,7 @@ Run;
 		ods listing close; 
 		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
 		ods tagsets.tableeditor file=_Webout
-		    style=styles.OBStyle 
+		    style=styles.SASWeb 
 		    options(autofilter="YES" 
 		 	    autofilter_table="1" 
 		            autofilter_width="9em" 
@@ -308,7 +275,7 @@ Run;
 		ods listing close; 
 		/*ods tagsets.tableeditor file="C:\inetpub\wwwroot\sasweb\Data\Results\Sales_Report_1.html" */
 		ods tagsets.tableeditor file=_Webout
-		    style=styles.OBStyle 
+		    style=styles.SASWeb 
 		    options(autofilter="YES" 
 		 	    autofilter_table="1" 
 		            autofilter_width="9em" 
