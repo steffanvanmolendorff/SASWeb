@@ -135,9 +135,9 @@
 		'</script>' /
 		'<p>' /;
 
-		Put '<p></p>';
-		Put '<HR>';
-		Put '<p></p>';
+/*		Put '<p></p>';*/
+/*		Put '<HR>';*/
+/*		Put '<p></p>';*/
 
 		*--- Load Progress Bar ---;
 		Put '<div class="ldBar" data-value="50"></div>';
@@ -146,7 +146,7 @@
 
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
-		Put '<td valign="top" style="background-color: lightblue; color: orange">';
+		Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
 		Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 		Put '</td>';
 		Put '</tr>';
@@ -158,24 +158,23 @@
 		Put '<p><br></p>';
 		Put '<H1 align="center">OPEN BANKING - STANDARDS</H1>';
 /*		Put '<p><br></p>';*/
-		Put '<H2 valign="top" align="center">OPEN DATA & READ-WRITE TEST APPLICATION</H2>';
+/*		Put '<H2 valign="top" align="center">OPEN DATA - JSON VALIDATION APPLICATION</H2>';*/
 /*		Put '<p><br></p>';*/
 		Put '</tr>';
 		Put '</td>';
 		Put '</table>';
 /*		Put '<tr>';*/
-/*		Put '<td valign="center" align="center" style="background-color: lightblue; color: White" border="1">';*/
+/*		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: White" border="1">';*/
 
-		Put '<table style="width: 100%; height: 5%" border="1">';
+		Put '<table style="width: 100%; height: 20%" border="1">';
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<tr>';
-
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 		Put '<p><br></p>';
 		Put '<H1>OPEN DATA</H1>';
 		Put '<p><br></p>';
 		Put '<H2>OPEN DATA CMA9 COMPARISON REPORTS</H2>';
-/*		Put '<p><br></p>';*/
+		Put '<p><br></p>';
 
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="6" onchange="this.form.submit()"</option>';
@@ -187,6 +186,7 @@
 		Put '<OPTION VALUE="CMA9 COMPARISON CCC"> 6. CMA9 COMPARISON CCC </option>';
 		Put '</SELECT>';
 		Put '</div>';
+
 
 
 		Put '<H2>OPEN DATA INTERNAL JSON VALIDATION</H2>';
@@ -203,16 +203,16 @@
 		Put '</SELECT>';
 		Put '</div>';
 
-		Put '<H2>OPEN DATA V2.1 JSON VALIDATION TOOL</H2>';
+		Put '<H2>OPEN DATA - JSON VALIDATION APPLICATION</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
-		Put '<OPTION VALUE="SELECT API PARAMETERS"> 1. SELECT API PARAMETERS </option>';
+		Put '<OPTION VALUE="SELECT API PARAMETERS"> 1. RUN JSON VALIDATION APP </option>';
 		Put '<OPTION VALUE="STATISTICS REPORT"> 2. STATISTICS REPORT </option>';
 		Put '</SELECT>';
 		Put '</div>';
 		Put '<p><br></p>';
 
-/*
+
 		Put '<H2>OPEN DATA V2 SWAGGER VALIDATION</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
@@ -220,9 +220,10 @@
 		Put '<OPTION VALUE="VALIDATE BCA V2 SWAGGER"> 2. VALIDATE BCA V2 SWAGGER </option>';
 		Put '</SELECT>';
 		Put '</div>';
-*/
 
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+
+
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 		Put '<p><br></p>';
 		Put '<p><br><br></p>';
 		Put '<p><br><br></p>';
@@ -329,7 +330,7 @@
 		Put '<BODY>';
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
-		Put '<td valign="top" style="background-color: lightblue; color: orange">';
+		Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
 		Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 		Put '</td>';
 		Put '</tr>';
@@ -346,7 +347,7 @@
 		Put '</td>';
 		Put '</tr>';
 		Put '<tr>';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: White">';
 
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
@@ -406,7 +407,7 @@
 		Put '<BODY>';
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
-		Put '<td valign="top" style="background-color: lightblue; color: orange">';
+		Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
 		Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 		Put '</td>';
 		Put '</tr>';
@@ -423,7 +424,7 @@
 		Put '</td>';
 		Put '</tr>';
 		Put '<tr>';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: White">';
 
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
@@ -496,13 +497,13 @@ ODS _ALL_ Close;
 ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
 
 Data OBData.Validate;
-*	Length Username WebUser $ 100 Password WebPass $ 25 ValidUser InvalidUser ValidPass InvalidPass $ 1;
+	Length Username WebUser $ 100 Password WebPass $ 25 ValidUser InvalidUser ValidPass InvalidPass $ 1;
 	Set OBData.Client_Login;
 
-	If Trim(Left(Username)) EQ Trim(Left("&_WebUser")) and Trim(Left(Password)) EQ Trim(Left("&_WebPass")) then
+	If Trim(Left(Username)) EQ "&_WebUser" and Trim(Left(Password)) EQ "&_WebPass" then
 	Do;
-		ValidUser = '1';
-		ValidPass = '1';
+		ValidUser = "1";
+		ValidPass = "1";
 		Call Symput('ValidUser',Trim(Left(ValidUser)));
 		Call Symput('ValidPass',Trim(Left(ValidPass)));
 		Output OBData.Validate;
