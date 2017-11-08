@@ -21,129 +21,22 @@
 
 
 %Macro Valid();
+Data _Null_;
 		File _Webout;
 
 		Put '<HTML>';
-		Put '<HEAD>';
-		Put '<html xmlns="http://www.w3.org/1999/xhtml">';
-		Put '<head>';
-		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
-		Put '<title>OBIE</title>';
 
-		Put '<meta charset="utf-8" />';
-		Put '<title>Open Data Test Application</title>';
-		Put '<meta name="description" content="">';
-		Put '<meta name="author" content="">';
-			
-		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
-			
-
-		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		Put '<title>LRM</title>';
+		Put '<Head>';
+		Put '<title>OBIE JSON APP</title>';
+		Put '</Head>';
 
 		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
 
 		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
-				Put '<SCRIPT language="javascript">' /
-		'function MySubmit()' /
-		'{document.NHS.submit();} ' /
-		'</SCRIPT>' /;
-
-		*--- Create styles for HTML links on page ---;
-		Put '<style>' /
-		'td{font-size:"25";color:"green"}' /
-
-		'a' /
-		'{' /
-			'font-family:arial;' /
-			'font-size:10px;' /
-			'color:black;' /
-			'font-weight:normal;' /
-			'font-style:normal;' /
-			'text-decoration:none;' /
-		'}' /
-		'a:hover' /
-		'{' /
-			'font-family:arial;' /
-			'font-size:10px;' /
-			'color:blue;' /
-			'text-decoration:none;' /
-		'}' /
-		'.nav' /
-		'{' /
-			'font-family:arial;' /
-			'font-size:10px;' /
-			'color:#ffffff;' /
-			'font-weight:normal;' /
-			'font-style:normal;' /
-			'text-decoration:none;' /
-			'border:inset 0px #ececec;' /
-			'cursor:hand;' /
-		'}' /
-		'</style>' /
-		'</HEAD>';
 
 		Put '<BODY>';
-
-				*--- Include horizontal line under image ---;
-/*		Put '<hr size="2" color="blue">'  /;*/
-
-		*--- Create Progress Bar ---;
-		Put '<table align="center"><tr><td>' /
-			'<div style="font-size:8pt;padding:2px;border:solid black 0px">' /
-			'<span id="progress1"> &nbsp; &nbsp;</span>' /
-			'<span id="progress2"> &nbsp; &nbsp;</span>' /
-			'<span id="progress3"> &nbsp; &nbsp;</span>' /
-			'<span id="progress4"> &nbsp; &nbsp;</span>' /
-			'<span id="progress5"> &nbsp; &nbsp;</span>' /
-			'<span id="progress6"> &nbsp; &nbsp;</span>' /
-			'<span id="progress7"> &nbsp; &nbsp;</span>' /
-			'<span id="progress8"> &nbsp; &nbsp;</span>' /
-			'<span id="progress9"> &nbsp; &nbsp;</span>'
-			'</div>' /
-			'</td></tr></table>';
-
-		Put '<script language="javascript">' /
-		'var progressEnd = 9;' /		
-		'var progressColor = "blue";' /	
-		'var progressInterval = 1000;' /	
-		'var progressAt = progressEnd;' /
-		'var progressTimer;' /
-
-		'function progress_clear() {' /
-		'	for (var i = 1; i <= progressEnd; i++) ' /
-		"	document.getElementById('progress'+i).style.backgroundColor = 'transparent';" /
-		'	progressAt = 0;' /
-		'}' /
-
-		'function progress_update() {' /
-		'	progressAt++;' /
-		'	if (progressAt > progressEnd) progress_clear();' /
-		"	else document.getElementById('progress'+progressAt).style.backgroundColor = progressColor;" /
-		"	progressTimer = setTimeout('progress_update()',progressInterval);" /
-		'}' /
-
-		'function progress_stop() {' /
-		'	clearTimeout(progressTimer);' /
-		'	progress_clear();' /
-		'}' /
-
-		'progress_update();' /		
-		'</script>' /
-		'<p>' /;
-
-/*		Put '<p></p>';*/
-/*		Put '<HR>';*/
-/*		Put '<p></p>';*/
-
-		*--- Load Progress Bar ---;
-		Put '<div class="ldBar" data-value="50"></div>';
-
-		Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
-
 		Put '<table style="width: 100%; height: 5%" border="0">';
 		Put '<tr>';
 		Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
@@ -152,26 +45,23 @@
 		Put '</tr>';
 		Put '</table>';
 
+
 		Put '<table style="width: 100%; height: 5%" border="1">';
 		Put '<tr>';
 		Put '<td valign="middle" style="background-color: white; color: black" style="width: 100%; height: 40%" border="1">';
 		Put '<p><br></p>';
 		Put '<H1 align="center">OPEN BANKING - STANDARDS</H1>';
-/*		Put '<p><br></p>';*/
-/*		Put '<H2 valign="top" align="center">OPEN DATA - JSON VALIDATION APPLICATION</H2>';*/
-/*		Put '<p><br></p>';*/
 		Put '</tr>';
 		Put '</td>';
 		Put '</table>';
-/*		Put '<tr>';*/
-/*		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: White" border="1">';*/
+
 
 		Put '<table style="width: 100%; height: 20%" border="1">';
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<tr>';
 		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 		Put '<p><br></p>';
-		Put '<H1>OPEN DATA</H1>';
+/*		Put '<H1>OPEN DATA</H1>';
 		Put '<p><br></p>';
 		Put '<H2>OPEN DATA CMA9 COMPARISON REPORTS</H2>';
 		Put '<p><br></p>';
@@ -202,8 +92,8 @@
 		Put '<OPTION VALUE="API_ALL DD SWAGGER COMPARE"> 8. API_ALL DD SWAGGER COMPARE </option>';
 		Put '</SELECT>';
 		Put '</div>';
-
-		Put '<H2>OPEN DATA - JSON VALIDATION APPLICATION</H2>';
+*/
+		Put '<H2>JSON VALIDATION APPLICATION</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
 		Put '<OPTION VALUE="SELECT API PARAMETERS"> 1. RUN JSON VALIDATION APP </option>';
@@ -212,7 +102,7 @@
 		Put '</div>';
 		Put '<p><br></p>';
 
-
+/*
 		Put '<H2>OPEN DATA V2 SWAGGER VALIDATION</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
@@ -260,6 +150,7 @@
 		Put '</SELECT>';
 		Put '</div>';
 		Put '<p><br></p>';
+*/
 
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
@@ -280,27 +171,13 @@
 		Put '</tr>';
 		Put '</table>';
 
-		*--- Stop Progress Bar and close HTML page ---;
-		Put '<SCRIPT language="javascript">' /
-			'progress_stop();' /
-			'</SCRIPT>';
-
-		Put '<table style="width: 100%; height: 5%" border="1">';
-		Put '<tr>';
-		Put '<td valign="top" style="background-color: White; color: black">';
-		Put '<H3>All Rights Reserved</H3>';
-		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
-		Put '</td>';
-		Put '</tr>';
-		Put '</table>';
-
 		Put '</BODY>';
 		Put '</HTML>';
-	Run;
+Run;
 %Mend Valid;
 
-
 %Macro NewUser();
+Data _Null_;
 		File _Webout;
 		Put '<HTML>';
 		Put '<HEAD>';
@@ -378,6 +255,7 @@
 %Mend NewUser;
 
 %Macro InValid();
+Data _Null_;
 		File _Webout;
 		Put '<HTML>';
 		Put '<HEAD>';
@@ -456,7 +334,6 @@
 	Run;
 %Mend InValid;
 
-
 %If "&_RegUser" NE "" and "_RegPass" NE "" %Then
 %Do;
 %Macro Register_User();
@@ -486,6 +363,7 @@ Run;
 %Register_User();
 %End;
 
+
 %Macro Validate_Login(_WebUser,_WebPass);
 /*
 *%Let WebUser = vamola@mac.com;
@@ -493,8 +371,6 @@ Run;
 */
 Option Spool Symbolgen MLogic Mprint Source Source2;
 
-ODS _ALL_ Close;
-ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
 
 Data OBData.Validate;
 	Length Username WebUser $ 100 Password WebPass $ 25 ValidUser InvalidUser ValidPass InvalidPass $ 1;
@@ -510,46 +386,21 @@ Data OBData.Validate;
 	End;
 Run;
 
-Data _Null_;
-
 	%If	"&ValidUser" = "1" and "&ValidPass" EQ "1" %Then
 	%Do;
-		%Valid;
+		%Valid();
 	%End;
 	%Else %If "&ValidUser" = "2" and "&ValidPass" EQ "2" %Then
 	%Do;
-		%NewUser;
+		%NewUser();
 	%End;
 	%Else %Do;
-		%Invalid;
+		%Invalid();
 	%End;
-Run;
 
-ODS HTML;
-ODS Listing;
 
 %Mend Validate_Login;
 %Validate_Login(&_Webuser,&_WebPass);
 
 %Mend Main;
 %Main();
-
-
-/*
-
-Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
-Proc Append Base = OBData.Client_Login
-	Data = OBData.Validate_Login;
-Run;
-
-
-Data OBData.Client_Login;
-	Length Username $ 100 Password $ 25;
-	Username = "vamola@mac.com";
-	Password = "Test";
-	Output;
-	Username = "";
-	Password = "";
-	Output;
-Run;
-*/
