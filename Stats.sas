@@ -71,7 +71,7 @@ Data _Null_;
 		Put '<p></p>';
 
 		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: White">';
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
@@ -122,7 +122,7 @@ Put '<BODY>';
 
 Put '<table style="width: 100%; height: 5%" border="0">';
    Put '<tr>';
-      Put '<td valign="top" style="background-color: lightblue; color: orange">';
+      Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
 	Put '<img src="'"&_Path/images/london.jpg"'" alt="Cant find image" style="width:100%;height:8%px;">';
       Put '</td>';
    Put '</tr>';
@@ -147,39 +147,9 @@ Run;
 
 %Macro Template;
 Proc Template;
- define style OBStyle;
- notes "My Simple Style";
- class body /
- backgroundcolor = white
- color = black
- fontfamily = "Palatino"
- ;
- class systemtitle /
- fontfamily = "Verdana, Arial"
- fontsize = 16pt
- fontweight = bold
- ;
- class table /
- backgroundcolor = #f0f0f0
- bordercolor = red
- borderstyle = solid
- borderwidth = 1pt
- cellpadding = 5pt
- cellspacing = 0pt
- frame = void
- rules = groups
- ;
- class header, footer /
- backgroundcolor = #c0c0c0
- fontfamily = "Verdana, Arial"
- fontweight = bold
- ;
- class data /
- fontfamily = "Palatino"
- ;
- end; 
-
-Run;
+ 	Define style Style.Sasweb;
+	End;
+Run; 
 %Mend Template
 %Template;
 
@@ -207,7 +177,7 @@ ODS _All_ Close;
 ods listing close; 
 
 ods tagsets.tableeditor file=_Webout
-    style=styles.OBStyle 
+    style=styles.SASWeb 
     options(autofilter="YES" 
  	    autofilter_table="1" 
             autofilter_width="9em" 
@@ -224,11 +194,11 @@ Proc Print Data = OBData.Stats;
 Run;
 */
 	
-Proc Report Data = OBData.Stats nowd
+Proc Report Data = OBData.Stats nowd/*
 	style(report)=[width=100%]
 	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
 	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black];
+	style(column)=[background=lightcyan foreground=black]*/;
 
 	Title1 "OPEN BANKING - STATUS REPORT";
 	Title2 "Statistical Analysis of API/SCHEMA Validations - %Sysfunc(UPCASE(&Fdate))";

@@ -13,7 +13,7 @@ Put '<BODY>';
 
 Put '<table style="width: 100%; height: 5%" border="0">';
    Put '<tr>';
-      Put '<td valign="top" style="background-color: lightblue; color: orange">';
+      Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
 	Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cant find image" style="width:100%;height:8%px;">';
       Put '</td>';
    Put '</tr>';
@@ -79,14 +79,14 @@ Data _Null_;
 		Put '<title>OB TESTING</title>';
 
 		Put '<meta charset="utf-8" />';
-		Put '<title>Open Data Test Harness</title>';
+		Put '<title>JSON VALIDATION APPLICATION</title>';
 		Put '<meta name="description" content="">';
 		Put '<meta name="author" content="">';
 
 		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
 
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		Put '<title>LRM</title>';
+		Put '<title>OBIE</title>';
 
 		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
@@ -101,7 +101,7 @@ Data _Null_;
 		Put '<p></p>';
 
 		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: White">';
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
@@ -174,9 +174,9 @@ File _Webout;
 	Put '<Table align="center" style="width: 100%; height: 60%" border="1">';
 	Put '<tr>';
 /*	Put '<td>';*/
-	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 	Put '<div class="dropdown" align="center" style="float:center; width: 100%">';
-	Put '<b>SELECT  BANK</b>';	
+	Put '<H2>SELECT BANK NAME</H2>';
 	Put '<p></p>';
 
 	Put '<select name="_BankName" size="18" style="width: 25%; height: 30%" onchange="this.form.submit()">' /;
@@ -291,7 +291,7 @@ File _Webout;
 	Put '<Table>';
 	Put '<tr>';
 	Put '<td>';
-/*	Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';*/
+/*	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: White">';*/
 *	Put '<p><br></p>';
 /*	Put '<INPUT TYPE=submit VALUE=Submit align="center">';*/
 *	Put '<p><br></p>';

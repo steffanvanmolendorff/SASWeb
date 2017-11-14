@@ -40,7 +40,7 @@ Put '</HEAD>';
 Put '<BODY>';
 Put '<table style="width: 100%; height: 5%" border="0">';
 Put '<tr>';
-Put '<td valign="top" style="background-color: lightblue; color: orange">';
+Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
 Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 Put '</td>';
 Put '</tr>';
@@ -49,9 +49,9 @@ Put '</table>';
 Put '<table style="width: 100%; height: 20%" border="0">';
 Put '<tr>';
 Put '<td valign="middle" style="background-color: White; color: black">';
-Put '<p><br><br></p>';
+Put '<p><br></p>';
 Put '<H1 align="center">OPEN BANKING - API STANDARDS</H1>';
-Put '<p><br><br></p>';
+Put '<p><br></p>';
 Put '<H2 valign="top" align="center">API TEST APPLICATION</H2>';
 Put '<p><br><br></p>';
 Put '</td>';
@@ -63,7 +63,7 @@ Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">'
 Put '<table align="center" style="width: 100%; height: 20%" border="0">';
 Put '<tr>';
 
-Put '<td valign="center" align="center" border="0" style="background-color: lightblue; color: Black">';
+Put '<td valign="center" align="center" border="0" style="background-color: #D4E6F1; color: Black">';
 Put '<p><br></p>';
 Put '<b>Existing Users</b>';
 Put '<p></p>';
@@ -74,7 +74,7 @@ Put '<INPUT TYPE=submit VALUE="Submit Details" valign="center">';
 Put '<p><br></p>';
 Put '</td>';
 
-Put '<td valign="center" align="center" border="0" style="background-color: lightblue; color: Black">';
+Put '<td valign="center" align="center" border="0" style="background-color: #D4E6F1; color: Black">';
 Put '<p><br></p>';
 Put '<b>New Users</b>';
 Put '<p></p>';
@@ -82,7 +82,7 @@ Put '<font size=5><font color="black"><input type="text" placeholder="Enter Emai
 Put '<font size=5><font color="white"><input type="password" placeholder="Password" name="_RegPass"><br /><br /></font>';
 Put '<INPUT TYPE=submit VALUE="Register Details" valign="center">';
 Put '<p><br></p>';
-Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login.sas">';
+Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login1.sas">';
 Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 	"&_service"
 	'>';

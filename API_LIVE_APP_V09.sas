@@ -29,6 +29,7 @@ Run;
 %Global Sch_Version;
 %Global FDate;
 %Global _WebUser;
+%Global _Attach_Email;
 
 %Global _Host;
 %Global _Path;
@@ -41,6 +42,7 @@ Run;
 %Put _Path = &_Path;
 
 /*
+*--- Uncomment to run on local laptop/pc machine ---;
 %Let _BankName = BOI;
 %Let _APIName = PCA;
 %Let _VersionNo = v2.1;
@@ -51,23 +53,13 @@ Run;
 --- Macro Imports read the API_Config CSV sheet and saves the values in macro variables to use in program below ---
 ======================================================================================================================================================;
 %Macro Import(Filename);
-/*
-PROC IMPORT DATAFILE="&Filename"
- 	OUT=OBData.API_Config
- 	DBMS=csv
- 	REPLACE;
- 	GETNAMES=Yes;
-RUN;
-*/
  *=====================================================================================================================================================
- **********************************************************************
  *   PRODUCT:   SAS
  *   VERSION:   9.4
  *   CREATOR:   External File Interface
  *   DATE:      04JUL17
  *   DESC:      Generated SAS Datastep Code
  *   TEMPLATE SOURCE:  (None Specified.)
- ***********************************************************************
 ======================================================================================================================================================;
 Data Work.API_CONFIG    ;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
@@ -81,7 +73,7 @@ Data Work.API_CONFIG    ;
        informat SCH_Name $24. ;
        informat Perm_SCH_Table $10. ;
        informat Version $6. ;
-	   informat API_JSON $30.;
+	   informat API_JSON $25.;
        format Bank_Name $20. ;
        format API_Abb $3. ;
        format API_Link $100. ;
@@ -90,7 +82,7 @@ Data Work.API_CONFIG    ;
        format SCH_Name $24. ;
        format Perm_SCH_Table $10. ;
        format Version $6. ;
-	   format API_JSON $30.;
+	   format API_JSON $25.;
     input
                 Bank_Name $
                 API_Abb $
@@ -116,7 +108,7 @@ Data OBDATA.API_Config;
 	Call Symput('Perm_Sch_Table',Perm_Sch_Table);
 	Call Symput('Version_C',Version);
 	Call Symput('Sch_Version',Tranwrd(Version,'.','_'));
-	Call Symput('API_JSON',API_JSON);
+	Call Symput('API_JSON',Trim(Left(API_JSON)));
 Run;
 
 %Mend Import;
@@ -207,12 +199,6 @@ Libname OBData "&Path\Perm";
 --- Set Output Delivery Parameters  ---
 ======================================================================================================================================================;
 		ODS _All_ Close;
-	/*
-				ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
-					Contents="&Bank._&API._Contents.html" 
-					Frame="&Bank._&API._Frame.html" 
-					Style=HTMLBlue;
-	*/
   		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;
 
 	Data Work.System_Error;
@@ -240,7 +226,6 @@ Libname OBData "&Path\Perm";
 
 
 				Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
-	/*			Title2 "%Sysfunc(UPCASE(&Bank)) %Sysfunc(UPCASE(&API)) API HAS DATA VALIDATION ERRORS - %Sysfunc(UPCASE(&Fdate))";*/
 
 				Proc Report Data =  OBData.System_Error nowd
 					style(report)=[rules=all cellspacing=0 bordercolor=gray] 
@@ -305,7 +290,7 @@ Data _Null_;
 		Put '<p></p>';
 
 		Put '<Table align="center" style="width: 100%; height: 15%" border="0">';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: White">';
 		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=submit VALUE="Return" align="center">';
@@ -348,8 +333,6 @@ Run;
 --- Set a temporary file name to extract the content of the Schema JSON file into ---
 ======================================================================================================================================================;
 Filename API Temp;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 *=====================================================================================================================================================
 --- Proc HTTP assigns the GET method in the URL to access the data contained within the Schema ---
@@ -359,23 +342,17 @@ Proc HTTP
  	Method = "GET" Verbose
  	Out = API;
 Run;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 *=====================================================================================================================================================
 --- The JSON engine will extract the data from the JSON script ---
 ======================================================================================================================================================;
 Libname LibAPIs JSON Fileref=API;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 *=====================================================================================================================================================
 --- Proc datasets will create the datasets to examine resulting tables and structures ---
 ======================================================================================================================================================;
 Proc Datasets Lib = LibAPIs; 
 Run;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 *=====================================================================================================================================================
 --- Create the Bank Schema dataset ---
@@ -383,8 +360,6 @@ Run;
 Data Work.&JSON;
 	Set LibAPIs.Alldata(Where=(V NE 0));
 Run;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 *=====================================================================================================================================================
 --- Sort the Bank Schema file ---
@@ -487,7 +462,6 @@ Data Work.&JSON(Drop = Value1 Value2);
 
 	End;
 
-/*	Data_Element = Compress(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Hierarchy,'data-',''),'properties-',''),'-enum',''),'-items',''),'-required',''),'items-',''));*/
 	Data_Element = Compress(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Hierarchy,'properties-',''),'-enum',''),'-items',''),'-required',''),'items-',''));
 
 Run;
@@ -730,30 +704,22 @@ Proc HTTP
  	Method = "GET"
  	Out = API;
 Run;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 *=====================================================================================================================================================
 --- The JSON engine will extract the data from the JSON script ---
 ======================================================================================================================================================;
 Libname LibAPIs JSON Fileref=API;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 *=====================================================================================================================================================
 --- Proc datasets will create the datasets to examine resulting tables and structures ---
 ======================================================================================================================================================;
 Proc Datasets Lib = LibAPIs; 
 Run;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 
 Data Work.&Bank._API;
 	Set LibAPIs.Alldata;
 Run;
-/*%Let ErrorCode = %Eval(&SysErr);*/
-/*%Let ErrorDesc = &SysErrorText;*/
 %ErrorCheck;
 
 *=====================================================================================================================================================
@@ -1170,9 +1136,6 @@ Data Work.&Bank._API;
 	Do;
 		Pattern1 = Substr(Scan(Pattern,1,']'),2);
 		Pattern2 = InPut(Scan(Scan(Pattern,1,'}'),2,'{'),2.);
-/*		Pattern2a = IndexC(UPCASE(&Bank._Value),'0','1','2','3','4','5','6','7','8','9');*/
-
-
 
 		If &Bank._Value EQ '' then
 		Do;
@@ -1235,8 +1198,6 @@ Data Work.&Bank._API;
 		End;
 
 	End;
-
-
 
 *=====================================================================================================================================================
 --- Test the 3rd of 6 Pattern Values ---
@@ -1314,7 +1275,6 @@ Data Work.&Bank._API;
 
 	End;
 
-
 *=====================================================================================================================================================
 --- Test the 5th of 6 Pattern Values ---
 ======================================================================================================================================================;
@@ -1370,8 +1330,6 @@ Data Work.&Bank._API;
 		Pattern16 = InPut(Scan(Scan(Pattern,1,'}'),2,'{'),3.);
 		Pattern17 = Length(Trim(Left(&Bank._Value)));
 		Pattern18 = IndexC(Trim(Left(&Bank._Value)),"0","1","2","3","4","5","6","7","8","9");
-
-*		Pattern_Length = Length(&Bank._Value);
 
 		If &Bank._Value EQ '' then
 		Do;
@@ -1667,7 +1625,7 @@ Put '<BODY>';
 
 Put '<table style="width: 100%; height: 5%" border="0">';
    Put '<tr>';
-      Put '<td valign="top" style="background-color: lightblue; color: orange">';
+      Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
 	Put '<img src="'"&_Path/images/london.jpg"'" alt="Cant find image" style="width:100%;height:8%px;">';
       Put '</td>';
    Put '</tr>';
@@ -1701,6 +1659,85 @@ Run;
 %Do;
 	%Sys_Errors(&_BankName, &_APIName);
 %End;
+
+
+*=====================================================================================================================================================
+						DEFAULT REPORT IF NO MISMATCHES HAVE BEEN IDENTIFIED
+=====================================================================================================================================================;
+%If &ErrorCode = 0 and &NOBS_API = 0 %Then 
+%Do;
+%Macro API_NO_ERRORS(Bank, API);
+
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+=====================================================================================================================================================;
+%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+*=====================================================================================================================================================
+--- Set Output Delivery Parameters  ---
+=====================================================================================================================================================;
+ODS _All_ Close;
+ods listing close; 
+
+
+ods tagsets.tableeditor file=_Webout
+    style=styles.SASWeb 
+    options(autofilter="YES" 
+ 	    autofilter_table="1" 
+            autofilter_width="9em" 
+ 	    autofilter_endcol= "50" 
+            frozen_headers="0" 
+            frozen_rowheaders="0" 
+            ); 
+
+		Data Work.No_Mismatches;
+			Bank = "&Bank";
+			API = "&API";
+			Description = "There were no Mismatches reported in the &API JSON File";
+		Run;
+
+		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
+/*		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";*/
+		Title2 "NO MISMATCES FOUND IN THE %Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API)) REPORT - %Sysfunc(UPCASE(&Fdate))";
+		Footnote1 "API LOCATION: &API_Link";
+		Footnote2 "SCHEMA LOCATION: &SCH_Link";
+
+		Proc Print Data = Work.No_Mismatches;
+		Run;
+*=====================================================================================================================================================
+--- Add bottom of report Menu ReturnButton code here ---
+======================================================================================================================================================;
+	%ReturnButton();
+*=====================================================================================================================================================
+--- Open Output Delivery Parameters  ---
+======================================================================================================================================================;
+		ODS HTML Close;	
+		ODS Listing;	
+
+	%Mend API_NO_ERRORS;
+	%API_NO_ERRORS(&Bank, &API);
+
+ods tagsets.tableeditor close; 
+ods listing; 
+
+*=====================================================================================================================================================
+						EXPORT REPORT NO-ERROR REPORT RESULTS TO RESULTS FOLDER
+=====================================================================================================================================================;
+%Macro ExportXL(Path);
+Proc Export Data = Work.No_Mismatches
+ 	Outfile = "&Path"
+	DBMS = CSV REPLACE;
+	PUTNAMES=YES;
+Run;
+%Mend ExportXL;
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._NO_MISMATCHES.csv);
+
+%Macro SendMail();
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._NO_MISMATCHES.csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches.csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName..csv";
+%Mend;
+
+%End;
 *=====================================================================================================================================================
 						LIST OF MATCHED RECORDS REPORT
 =====================================================================================================================================================;
@@ -1732,9 +1769,8 @@ ods tagsets.tableeditor file=_Webout
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
 		Title3 "RECORDS IN BOTH %Sysfunc(UPCASE(&API)) AND SCHEMA FILES - %Sysfunc(UPCASE(&Fdate))";
-		Title4 " ";
-		Title5 "API LOCATION: &API_Link";
-		Title6 "SCHEMA LOCATION: &SCH_Link";
+		Footnote1 "API LOCATION: &API_Link";
+		Footnote2 "SCHEMA LOCATION: &SCH_Link";
 
 		Proc Summary Data = OBDATA._&BANK._API_SCH NWAY Missing;
 			Class Hierarchy Flag;
@@ -1742,10 +1778,7 @@ ods tagsets.tableeditor file=_Webout
 			Output Out = Work.Matches(Drop=_Type_ _Freq_ RowCnt) Sum=;
 		Run;
 
-		Proc Report Data = Work.Matches nowd
-			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black];
+		Proc Report Data = Work.Matches nowd;
 
 		Columns Hierarchy
 		Flag;
@@ -1757,7 +1790,7 @@ ods tagsets.tableeditor file=_Webout
 
 		If Hierarchy NE '' then 
 			Do;
-				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
+				call define(_col_,'style',"style=[foreground=blue background=#D4E6F1 font_weight=bold]");
 			End;
 		Endcomp;
 
@@ -1778,6 +1811,18 @@ ods tagsets.tableeditor file=_Webout
 ods tagsets.tableeditor close; 
 ods listing; 
 
+*=====================================================================================================================================================
+						EXPORT REPORT RESULTS TO RESULTS FOLDER
+=====================================================================================================================================================;
+%Macro ExportXL(Path);
+Proc Export Data = Work.Matches
+ 	Outfile = "&Path"
+	DBMS = CSV REPLACE;
+	PUTNAMES=YES;
+Run;
+%Mend ExportXL;
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches.csv);
+
 %End;
 
 %If &ErrorCode = 0 and &NOBS > 0 %Then 
@@ -1788,23 +1833,11 @@ ods listing;
 %Macro API_Errors(Bank, API);
 
 *=====================================================================================================================================================
---- Run Header code to include OPEN BANKING Imaage at the top of the Report ---
-=====================================================================================================================================================;
-/*%Header();*/
-
-*=====================================================================================================================================================
 --- Set Output Delivery Parameters  ---
 =====================================================================================================================================================;
-		ODS _All_ Close;
-/*
-		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
-			Contents="&Bank._&API._Contents.html" 
-			Frame="&Bank._&API._Frame.html" 
-			Style=HTMLBlue;
-*/
-/*  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
+	ODS _All_ Close;
 
-%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+	%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
 *=====================================================================================================================================================
 --- Set Output Delivery Parameters  ---
 =====================================================================================================================================================;
@@ -1824,14 +1857,10 @@ ods tagsets.tableeditor file=_Webout
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
 		Title3 "FAILED VALIDATION REPORT - %Sysfunc(UPCASE(&Fdate))";
-		Title4 " ";
-		Title5 "&API_Link";
-		Title6 "&SCH_Link";
+		Footnote1 "API LOCATION: &API_Link";
+		Footnote2 "SCHEMA LOCATION: &SCH_Link";
 
-		Proc Report Data =  Work.Fail nowd/*
-			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black]*/;
+		Proc Report Data =  Work.Fail nowd;
 
 		Columns Hierarchy 
 		&Bank._Value
@@ -1943,13 +1972,11 @@ Run;
 ======================================================================================================================================================;
 	%ReturnButton();
 
-
+%Mend API_Errors;
+%API_Errors(&Bank, &API);
 
 ods tagsets.tableeditor close; 
 ods listing; 
-
-%Mend API_Errors;
-%API_Errors(&Bank, &API);
 
 *=====================================================================================================================================================
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
@@ -1961,12 +1988,11 @@ Proc Export Data = Work.Fail
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail.csv);
+*%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail.csv);
 
 %End;
 
-
-/*%Else*/ %If &ErrorCode = 0 and &NOBS_API > 0 %Then 
+%If &ErrorCode = 0 and &NOBS_API > 0 %Then 
 %Do;
 *=====================================================================================================================================================
 						LIST OF DATA RECORDS ONLY IN BANK API TABLE REPORT
@@ -1976,14 +2002,6 @@ Run;
 *=====================================================================================================================================================
 --- Print Report with reocrds only in the Bank API dataset ---
 =====================================================================================================================================================;
-
-/*		ODS _All_ Close;*/
-/*		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
-			Contents="&Bank._&API._Contents.html" 
-			Frame="&Bank._&API._Frame.html" 
-			Style=Brick;
-*/
-/*   		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
 %include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
 *=====================================================================================================================================================
@@ -2004,15 +2022,17 @@ ods tagsets.tableeditor file=_Webout
 
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
-		Title3 "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) API OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
-		Title4 "";
-		Title5 "API LOCATION: &API_Link";
-		Title6 "SCHEMA LOCATION: &SCH_Link";
+		Title3 color=red "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) API OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
+		Footnote1 "API LOCATION: &API_Link";
+		Footnote2 "SCHEMA LOCATION: &SCH_Link";
 
-		Proc Report Data =  Work._API_&Bank._API nowd/*
-			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black]*/;
+		Proc Summary Data = Work._API_&Bank._API Nway Missing;
+			Class Hierarchy &Bank._Value;
+			Var RowCnt;
+			Output Out = Work._API_&Bank._API_Sum(Drop = _Freq_ _Type_)Sum=;
+		Run;
+
+		Proc Report Data =  Work._API_&Bank._API_Sum nowd;
 
 		Columns Hierarchy
 		&Bank._Value;
@@ -2024,7 +2044,7 @@ ods tagsets.tableeditor file=_Webout
 
 		If Hierarchy NE '' then 
 			Do;
-				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
+				call define(_col_,'style',"style=[foreground=blue background=#D4E6F1 font_weight=bold]");
 			End;
 		Endcomp;
 
@@ -2058,9 +2078,17 @@ Run;
 %Mend ExportXL;
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName..csv);
 
+
+%Macro SendMail();
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches.csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName..csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName..csv";
+%Mend;
+
+
 %End;
 
-/*%Else*/ %If &ErrorCode = 0 and &NOBS_SCH > 0 %Then 
+%If &ErrorCode = 0 and &NOBS_SCH > 0 %Then 
 %Do;
 *=====================================================================================================================================================
 						LIST OF DATA RECORDS ONLY IN BANK API TABLE REPORT
@@ -2070,13 +2098,6 @@ Run;
 *=====================================================================================================================================================
 --- Print Report with reocrds only in the Bank API dataset ---
 ======================================================================================================================================================;
-/*		ODS _All_ Close;*/
-/*		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
-			Contents="&Bank._&API._Contents.html" 
-			Frame="&Bank._&API._Frame.html" 
-			Style=Brick;
-*/
-/*   		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
 %include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
 
@@ -2096,30 +2117,45 @@ ods tagsets.tableeditor file=_Webout
             frozen_rowheaders="0" 
             ); 
 
+		Proc Format;
+			Value $NoValue ' ' = 'Value not provided';
+		Run;
+
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) - %Sysfunc(UPCASE(&API))";
-		Title3 "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) OB SCHEMA OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
-		Title4 "";
-		Title5 "API LOCATION: &API_Link";
-		Title6 "SCHEMA LOCATION: &SCH_Link";
+		Title3 color=red "RECORDS ONLY IN %Sysfunc(UPCASE(&API)) OB SCHEMA OUTPUT FILE - %Sysfunc(UPCASE(&Fdate))";
+		Footnote1 "API LOCATION: &API_Link";
+		Footnote2 "SCHEMA LOCATION: &SCH_Link";
 
-		Proc Report Data =  Work._SCH_&Bank._API nowd/*
-			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black]*/;
+		Proc Report Data = Work._SCH_&Bank._API nowd;
 
 		Columns Hierarchy
+		Flag
 		&Bank._Value;
 
 		Define Hierarchy / display 'Data Hierarchy' left;
-		Define &Bank._Value / display "&Bank. Value" left;
-
+		Define Flag / display 'Mandatory Flag' left;
+		Define &Bank._Value / display "&Bank. Value" format = $NoValue. left;
 
 		Compute Hierarchy;
-
 		If Hierarchy NE '' then 
 			Do;
-				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
+				call define(_col_,'style',"style=[foreground=blue background=#D4E6F1 font_weight=bold]");
+			End;
+		Endcomp;
+
+		Compute Flag;
+		If Flag EQ 'Mandatory' then 
+			Do;
+				call define(_col_,'style',"style=[foreground=red background=#D4E6F1 font_weight=bold]");
+			End;
+		Endcomp;
+
+		Compute &Bank._Value;
+		If &Bank._Value EQ '' and Flag EQ 'Mandatory' then 
+			Do;
+				&Bank._Value = 'Value not provided';
+				call define(_col_,'style',"style=[foreground=red background=#D4E6F1 font_weight=bold]");
 			End;
 		Endcomp;
 
@@ -2162,23 +2198,10 @@ Run;
 %Macro No_Errors(Bank, API);
 
 *=====================================================================================================================================================
---- Run Header code to include OPEN BANKING Imaage at the top of the Report ---
-======================================================================================================================================================;
-/*%Header();*/
-
-*=====================================================================================================================================================
 --- Set Output Delivery Parameters  ---
 ======================================================================================================================================================;
-		ODS _All_ Close;
-/*
-		ODS HTML Body="&Bank._&API._Body_%sysfunc(datetime(),B8601DT15.).html" 
-			Contents="&Bank._&API._Contents.html" 
-			Frame="&Bank._&API._Frame.html" 
-			Style=HTMLBlue;
-*/
-/*  		ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
-
-%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
+	ODS _All_ Close;
+	%include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
 *=====================================================================================================================================================
 --- Set Output Delivery Parameters  ---
 ======================================================================================================================================================;
@@ -2213,14 +2236,10 @@ ods tagsets.tableeditor file=_Webout
 
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&Bank)) %Sysfunc(UPCASE(&API)) SCHEMA vs. API VALIDATION REPORT - %Sysfunc(UPCASE(&Fdate))";
-		Title4 "";
-		Title5 "&API_Link";
-		Title6 "&SCH_Link";
+		Footnote1 "API LOCATION: &API_Link";
+		Footnote2 "SCHEMA LOCATION: &SCH_Link";
 
-		Proc Report Data =  Work.No_Obs nowd/*
-			style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-			style(header)=[background=lightskyblue foreground=black] 
-			style(column)=[background=lightcyan foreground=black]*/;
+		Proc Report Data =  Work.No_Obs nowd;
 
 		Columns ERROR_DESC ;
 
@@ -2230,7 +2249,7 @@ ods tagsets.tableeditor file=_Webout
 
 		If ERROR_DESC NE '' then 
 			Do;
-				call define(_col_,'style',"style=[foreground=blue background=lightblue font_weight=bold]");
+				call define(_col_,'style',"style=[foreground=blue background=#D4E6F1 font_weight=bold]");
 			End;
 		Endcomp;
 
@@ -2242,11 +2261,12 @@ ods tagsets.tableeditor file=_Webout
 *=====================================================================================================================================================
 --- Open Output Delivery Parameters  ---
 ======================================================================================================================================================;
-ods tagsets.tableeditor close; 
-ods listing; 
 
 	%Mend No_Errors;
 	%No_Errors(&Bank, &API);
+
+ods tagsets.tableeditor close; 
+ods listing; 
 
 *=====================================================================================================================================================
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
@@ -2257,22 +2277,48 @@ Proc Export Data = Work.No_Obs
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
-
-
-FILENAME Mailbox EMAIL "&_WebUser"
-Subject='Test Mail message' ATTACH="&Path";
-DATA _NULL_;
-FILE Mailbox;
-PUT "Hello";
-PUT "Please find Report as an attachment";
-PUT "Thank you";
-RUN;
-
 %Mend ExportXL;
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&APIName._No_Obs.csv);
 
 
 %End;
+
+
+*================================================================================
+					EMAIL REPORTS TO WEBUSER
+=================================================================================;
+options emailhost=
+ (
+   "smtp.office365.com" 
+   /* alternate: port=487 SSL */
+   port=587 STARTTLS 
+   auth=login
+   /* your Gmail address */
+   id="steffan.vanmolendorff@qlick2.com"
+   /* optional: encode PW with PROC PWENCODE */
+   pw="@FDi2014" 
+ )
+;
+
+Filename myemail EMAIL
+  To=("steffan.vanmolendorff@openbanking.org.uk" "&_WebUser") 
+  Subject="JSON VALIDATION - &_BankName &_APIName &_VersionNo"
+		%SendMail;
+
+Data _Null_;
+  File Myemail;
+  Put "Dear &_WebUser,";
+  Put " ";
+  Put "This email contain the results of the &_BankName &_APIName &_VersionNo API validation test.";
+  Put " ";
+  Put "Regards";
+  Put " ";
+  Put "Open Banking - Test Team";
+Run;
+ 
+Filename Myemail Clear;
+
+
 
 %Mend Print_Results;
 %Print_Results(&Bank, &API);
@@ -2280,11 +2326,12 @@ RUN;
 --- The values are passed from the Main macro to resolve in the macro below which allows execution of the API data extract ---
 ======================================================================================================================================================;
 %Mend API;
+*--- For json files end point - remove *.json* in %API(&API_Path/&Main_API) ---;
 %If "&_VersionNo" EQ "v1.2" or "&_VersionNo" = "v1.3" %Then
 %Do;
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
-
+*--- For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOI" %Then
 %Do;
 	%API(&API_Path/&Main_API..json,&Bank_Name,&Main_API);
@@ -2292,20 +2339,28 @@ RUN;
 
 %Put _VersionNo = &_VersionNo;
 %Put BankName_C = &BankName_C;
-
+*--- For json files end point - remove *.json* in %API(&API_Path/&Main_API) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "HSBC" %Then
 %Do;
 	%API(&API_Link/&API_JSON,&Bank_Name,&Main_API);
 %End;
+*--- For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Barclays" %Then
+%Do;
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+%End;
 
-*=====================================================================================================================================================
---- The values are passed from the Main macro to resolve in the macro below which allows execution of the API data extract ---
-======================================================================================================================================================;
+
+*=================================================================================================
+--- The values are passed from the Main macro to resolve in the macro below which allows 
+	execution of the API data extract ---
+==================================================================================================;
 %Mend Schema;
 %Schema(&GitHub_Path/%Sysfunc(Tranwrd(&Github_API..json,'-','_')),&Bank_Name,&API_SCH);
-*=====================================================================================================================================================
---- The values are passed from the UI to resolve in the macro below which allows execution of the API data extract ---
-======================================================================================================================================================;
+*=================================================================================================
+--- The values are passed from the UI to resolve in the macro below which allows 
+	execution of the API data extract ---
+===================================================================================================;
 %Mend Main;
 
 %Main(&SCH_Link,
@@ -2317,6 +2372,7 @@ RUN;
 &BankName_C);
 
 %Put _All_;
+
 /*
 https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master/personal_current_account.json
 *====================================================================================
@@ -2362,8 +2418,6 @@ branches,
 v1.3,
 Barclays);
 
-
-/*
 %Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
 business_current_account,
 https://atlas.api.barclays/open-banking,
@@ -2371,146 +2425,5 @@ business-current-accounts,
 BCA_Schema,
 v1.3,
 Barclays);
-
-
-%Global SCH_Name;
-%Global SCH_Link;
-%Global API_Link;
-%Global API_Name;
-%Global Perm_Sch_Table;
-%Global BankName_C;
-%Global Version_C;
-
-
-*=====================================================================================================
-		Schema V1.3 - END
-======================================================================================================;
-*--- PERSONNAL-CURRENT-ACCOUNT ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-personal_current_account,
-https://obp-api.danskebank.com/open-banking,
-personal-current-accounts,
-v1.2,
-Danske_Bank);
-
-
-/*
-*--- BUSINESS-CURRENT-ACCOUNT ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-business_current_account,
-https://obp-api.danskebank.com/open-banking,
-business-current-accounts,
-v1.2,
-Danske_Bank);
-
-*--- BUSINESS-CURRENT-ACCOUNT ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-business_current_account,
-https://atlas.api.barclays/open-banking,
-business-current-accounts,
-v1.3,
-Barclays);
-
-
-*--- BUSINESS-CURRENT-ACCOUNT ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-business_current_account,
-https://obp-api.danskebank.com/open-banking,
-business-current-accounts,
-v1.2,
-Danske_Bank);
-
-*--- BUSINESS-CURRENT-ACCOUNT V1.3 ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-business_current_account,
-https://api.hsbc.com/open-banking,
-business-current-accounts,
-v1.2,
-HSBC);
-
-*--- BUSINESS-CURRENT-ACCOUNT V1.2.4 ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUKShared/opendata-test-harness/master/Schema/v1.2.4/BRANCH_v1.2.4.JSON?token=AZNlhSu99TD83rQXy2H0FFms5Cv4GvPCks5ZGVoFwA%3D%3D);
-*%Main(http://localhost/openbanking,
-branches124,
-https://obp-api.danskebank.com/open-banking,
-branches,
-v1.2,
-Danske_Bank);
-
-*--- BUSINESS-CURRENT-ACCOUNT V1.2.4 ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUKShared/opendata-test-harness/master/Schema/v1.2.4/BRANCH_v1.2.4.JSON?token=AZNlhSu99TD83rQXy2H0FFms5Cv4GvPCks5ZGVoFwA%3D%3D);
-*%Main(http://localhost/openbanking,
-branches124,
-https://api.hsbc.com/open-banking,
-branches,
-v1.2,
-HSBC);
-
-*--- ATMS DANSKE BANK---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-atm,
-https://obp-api.danskebank.com/open-banking,
-atms,
-v1.2,
-Danske_Bank);
-
-*--- ATMS HSBC ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-atm,
-https://api.hsbc.com/open-banking,
-atms,
-v1.2,
-HSBC);
-
-*--- ATMS BARCLAYS ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-atm,
-https://atlas.api.barclays/open-banking,
-atms,
-v1.3,
-Barclays);
-
-*--- BRANCHES BARCLAYS ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-branch,
-https://atlas.api.barclays/open-banking,
-branches,
-v1.3,
-Barclays);
-*/
-
-*--- SWAGGER SPEC ---;
-*%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-opendata-swagger,
-https://obp-api.danskebank.com/open-banking,
-personal-current-accounts,
-v1.2,
-Danske_Bank);
-
-/*
-%Main(https://raw.githubusercontent.com/OpenBankingUK/opendata-api-spec-compiled/master,
-opendata-swagger,
-https://obp-api.danskebank.com/open-banking,
-personal-current-accounts,
-v1.2,
-Danske_Bank);
-*/
-
-
-/*
-%API(https://openapi.bankofireland.com/open-banking/v1.2/&Path,Bank_of_Ireland,&Main_API);
-%API(https://api.bankofscotland.co.uk/open-banking/v1.2/&Path,Bank_of_Scotland,&Main_API);
-%API(https://atlas.api.barclays/open-banking/v1.3/&Path,Barclays,&Main_API);
-%API(https://obp-api.danskebank.com/open-banking/v1.2/&Path,Danske_Bank,&Main_API);
-%API(https://api.firsttrustbank.co.uk/open-banking/v1.2/&Path,First_Trust_Bank,&Main_API);
-%API(https://api.halifax.co.uk/open-banking/v1.2/&Path,Halifax,&Main_API);
-%API(https://api.hsbc.com/open-banking/v1.2/&Path,HSBC,&Main_API);
-%API(https://api.lloydsbank.com/open-banking/v1.2/&Path,Lloyds_Bank,&Main_API);
-%API(https://openapi.nationwide.co.uk/open-banking/v1.2/&Path,Nationwide,&Main_API);
-%API(https://openapi.natwest.com/open-banking/v1.2/&Path,Natwest,&Main_API);
-%API(https://openapi.rbs.co.uk/open-banking/v1.2/&Path,RBS,&Main_API);
-%API(https://api.santander.co.uk/retail/open-banking/v1.2/&Path,Santander,&Main_API);
-%API(https://openapi.ulsterbank.co.uk/open-banking/v1.2/&Path,Ulster_Bank,&Main_API);
-*/
 
 

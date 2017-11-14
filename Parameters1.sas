@@ -164,7 +164,7 @@ Put '<BODY>';
 
 Put '<table style="width: 100%; height: 5%" border="1">';
 Put '<tr>';
-Put '<td valign="top" style="background-color: lightblue; color: orange">';
+Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
 Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cannot find image" style="width:100%;height:8%px;">';
 Put '</td>';
 Put '</tr>';
@@ -202,10 +202,10 @@ Put '</table>';
 
 	Put '<Table align="center" style="width: 100%; height: 40%" border="1">';
 	Put '<tr>';
-	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 	Put '<div class="header" align="center" style="float:left; width: 100%">';
-	Put '<b>SELECTED BANK</b>';
-	Put '<p></p>';
+	Put '<H2>SELECTED BANK NAME</H2>';
+	Put '<p><br></p>';
 	
 				*--- Read Dataset UniqueNames ---;
 				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName"))));
@@ -266,10 +266,10 @@ Put '</table>';
 	Put '</td>';
 
 
-	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 	Put '<div class="header" align="center" style="float:left; width: 100%">';
-	Put '<b>SELECT API NAME</b>';
-	Put '<p></p>';
+	Put '<H2>SELECT API NAME</H2>';
+	Put '<p><br></p>';
 
 				*--- Read Dataset UniqueNames ---;
 				%If %Sysfunc(Compress("&_BankName")) = "Barclays" %Then
@@ -374,10 +374,10 @@ Put '</table>';
 	Put '</div>';
 	Put '</td>';
 
-	Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
-	Put '<div class="header" align="center" style="float:center; width: 80%">';
-	Put '<b>SELECT API VERSION</b>';
-	Put '<p></p>';
+	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
+	Put '<div class="header" align="center" style="float:left; width: 100%">';
+	Put '<H2>SELECT API VERSION</H2>';
+	Put '<p><br></p>';
 
 					*--- Read Dataset UniqueNames ---;
 				 	%Let Dsn = %Sysfunc(Open(Work.Unique_No(Where=(Bank_Name = "&_BankName"))));
@@ -451,7 +451,7 @@ Put '</table>';
 
 	Put '<Table align="center" style="width: 100%; height: 10%" border="1">';
 	Put '<tr>';
-/*	Put '<td valign="top" align="center" style="background-color: lightblue; color: White">';*/
+/*	Put '<td valign="top" align="center" style="background-color: #D4E6F1; color: White">';*/
 /*	Put '<p><br></p>';
 	Put '<INPUT TYPE=submit VALUE="Submit" align="center">';
 	Put '<p><br></p>';*/
