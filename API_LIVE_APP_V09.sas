@@ -2118,7 +2118,16 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 		Proc Format;
-			Value $NoValue ' ' = 'Value not provided';
+			Value $NoValue ' ' = "&Bank Value not provided";
+		Run;
+
+		Data Work._SCH_&Bank._API;
+			Set Work._SCH_&Bank._API;
+
+			If &Bank._Value EQ '' and Flag EQ 'Mandatory' then 
+			Do;
+				OB_Comment = 'Note: Review conditional lower level Optional/Mandatory values';
+			End;
 		Run;
 
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
@@ -2131,11 +2140,13 @@ ods tagsets.tableeditor file=_Webout
 
 		Columns Hierarchy
 		Flag
-		&Bank._Value;
+		&Bank._Value
+		OB_Comment;
 
-		Define Hierarchy / display 'Data Hierarchy' left;
-		Define Flag / display 'Mandatory Flag' left;
-		Define &Bank._Value / display "&Bank. Value" format = $NoValue. left;
+		Define Hierarchy / display 'Data Hierarchy' style(column)=[width=65%] left;
+		Define Flag / display 'Mandatory Flag' style(column)=[width=5%] left;
+		Define &Bank._Value / display "&Bank. Value" style(column)=[width=10%] left format = $NoValue.;
+		Define OB_Comment / display 'OB Comment' style(column)=[width=20%] left;
 
 		Compute Hierarchy;
 		If Hierarchy NE '' then 
@@ -2154,7 +2165,13 @@ ods tagsets.tableeditor file=_Webout
 		Compute &Bank._Value;
 		If &Bank._Value EQ '' and Flag EQ 'Mandatory' then 
 			Do;
-				&Bank._Value = 'Value not provided';
+				call define(_col_,'style',"style=[foreground=red background=#D4E6F1 font_weight=bold]");
+			End;
+		Endcomp;
+
+		Compute OB_Comment;
+		If OB_Comment NE '' then 
+			Do;
 				call define(_col_,'style',"style=[foreground=red background=#D4E6F1 font_weight=bold]");
 			End;
 		Endcomp;
@@ -2180,7 +2197,7 @@ ods listing;
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
 %Macro ExportXL(Path);
-Proc Export Data = Work._SCH_&Bank._API(Keep = Hierarchy Table Flag Description)
+Proc Export Data = Work._SCH_&Bank._API(Keep = Hierarchy Table Flag &Bank._Value OB_Comment Description)
  	Outfile = "&Path"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
@@ -2309,7 +2326,7 @@ Data _Null_;
   File Myemail;
   Put "Dear &_WebUser,";
   Put " ";
-  Put "This email contain the results of the &_BankName &_APIName &_VersionNo API validation test.";
+  Put "This email contains the results of the &_BankName &_APIName &_VersionNo API validation test.";
   Put " ";
   Put "Regards";
   Put " ";
