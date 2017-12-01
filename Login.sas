@@ -82,6 +82,7 @@ Put '<font size=5><font color="black"><input type="text" placeholder="Enter Emai
 Put '<font size=5><font color="white"><input type="password" placeholder="Password" name="_RegPass"><br /><br /></font>';
 Put '<INPUT TYPE=submit VALUE="Register Details" valign="center">';
 Put '<p><br></p>';
+/*Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login.sas">';*/
 Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Validate_Login1.sas">';
 Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 	"&_service"

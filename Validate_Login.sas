@@ -101,6 +101,30 @@ Data _Null_;
 		Put '</SELECT>';
 		Put '</div>';
 		Put '<p><br></p>';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+
+		Put '</Form>';
+
+		Put '<Form>';
+		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
+		Put '<INPUT TYPE=Submit VALUE="Logout">';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.Login.sas">';
+		Put '</SELECT>';
+		Put '</div>';
+		Put '<p><br></p>';
+
 
 /*
 		Put '<H2>OPEN DATA V2 SWAGGER VALIDATION</H2>';
@@ -150,9 +174,9 @@ Data _Null_;
 		Put '</SELECT>';
 		Put '</div>';
 		Put '<p><br></p>';
-*/
 
-		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
+*/
+/*		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';*/
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
 			'>';
@@ -165,8 +189,8 @@ Data _Null_;
 		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
 			"&_WebPass"
 			'>';
-
 		Put '</Form>';
+
 		Put '</td>';
 		Put '</tr>';
 		Put '</table>';

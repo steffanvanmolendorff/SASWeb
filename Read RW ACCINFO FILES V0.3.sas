@@ -66,15 +66,15 @@ Options MPrint MLogic Symbolgen Source Source2;
 Run;
 
 %Mend AccInfo;
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBACCOUNT);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBBALANCE);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBBENEFICIARY);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBDIRECTDEBIT);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBPRODUCT);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBREQUEST);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBRESPONSE);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBSTANDINGORDER);
-%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\A_1_1_1,OBTRANSACTION);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBACCOUNT);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBBALANCE);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBBENEFICIARY);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBDIRECTDEBIT);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBPRODUCT);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBREQUEST);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBRESPONSE);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBSTANDINGORDER);
+%AccInfo(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1,OBTRANSACTION);
 
 
 
@@ -631,7 +631,7 @@ Run;
 
 
 %Mend Schema;
-%Schema(http://localhost/sasweb/Data/Temp/V1_1_1/accinfo_swagger.json,AccInfo,Swagger_AccInfo);
+%Schema(http://localhost/sasweb/Data/Temp/RW/ob/v1_1/accinfo_swagger.json,AccInfo,Swagger_AccInfo);
 
 
 Data Work.AccInfo_DD_SWAGGER;

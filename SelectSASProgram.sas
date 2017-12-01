@@ -41,7 +41,12 @@ Options Source Source2 Symbolgen MLogic MPrint;
 		BANK API END POINT vs. SCHEMA STRUCTURE - LIST DIFFERENCES BETWEEN API AND JSON SCHEMA
 =====================================================================================================;
 */
-%Else %If "&_action" EQ "SELECT API PARAMETERS" %Then
+%Else %If "&_action" EQ "SELECT OD API PARAMETERS" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters.sas";
+%End;
+
+%Else %If "&_action" EQ "SELECT RW API PARAMETERS" %Then
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters.sas";
 %End;

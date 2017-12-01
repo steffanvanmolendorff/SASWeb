@@ -1,3 +1,13 @@
+%Global _service;
+%Global _Host;
+%Global _Path;
+
+%Let _Host = &_SRVNAME;
+%Put _Host = &_Host;
+
+%Let _Path = http://&_Host/sasweb;
+%Put _Path = &_Path;
+
 Options MPrint MLogic Source Source2 Symbolgen;
 
 %Macro Import(Filename);
@@ -154,58 +164,31 @@ Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum
 Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 Put '<title>LRM</title>';
 
-Put '<script type="text/javascript" src="http://localhost/sasweb/js/jquery.js">';
+Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 Put '</script>';
 
-Put '<link rel="stylesheet" type="text/css" href="http://localhost/sasweb/css/style.css">';
+Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
 
 Put '</HEAD>';
 Put '<BODY>';
 
-Put '<table style="width: 100%; height: 5%" border="1">';
+Put '<table style="width: 100%; height: 5%" border="0">';
 Put '<tr>';
 Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
-Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cannot find image" style="width:100%;height:8%px;">';
+Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 Put '</td>';
 Put '</tr>';
 Put '</table>';
 
-/*Put '<p></p>';*/
 
-/*
-	Put '<Table align="center" style="width: 100%; height: 10%" border="0">';
+	Put '<FORM NAME=check METHOD=GET ACTION="'"http://&_Host/scripts/broker.exe"'">';
+
+	Put '<Table align="center" style="width: 100%; height: 40%" border="0">';
 	Put '<tr>';
-
-	Put '<td>';
-	Put '<div style="float:left; width: 10%">';
-	Put '<a href="https://www.openbanking.org.uk/">Home</a>';
-	Put '</div>';
-	Put '<div style="float:left; width: 10%">';
-	Put '<a href="https://www.openbanking.org.uk/about/">About</a>';
-	Put '</div>';
-	Put '<div style="float:left; width: 10%">';
-	Put '<a href="https://www.openbanking.org.uk/industry/">Portfolio</a>';
-	Put '</div>';
-	Put '<div style="float:left; width: 10%">';
-	Put '<a href="https://www.openbanking.org.uk/contact/">Contact</a>';
-	Put '</div>';
-	Put '</td>';
-	Put '</tr>';
-	Put '</table>';
-*/
-
-/*	Put '<p><br></p>';*/
-/*	Put '<HR>';*/
-/*	Put '<p><br></p>';*/
-
-	Put '<FORM NAME=check METHOD=GET ACTION="http://localhost/scripts/broker.exe">';
-
-	Put '<Table align="center" style="width: 100%; height: 40%" border="1">';
-	Put '<tr>';
-	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
+	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="0">';
 	Put '<div class="header" align="center" style="float:left; width: 100%">';
-	Put '<H2>SELECTED BANK NAME</H2>';
-	Put '<p><br></p>';
+	Put '<H3>SELECTED BANK NAME</H3>';
+	Put '<p></p>';
 	
 				*--- Read Dataset UniqueNames ---;
 				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName"))));
@@ -243,33 +226,15 @@ Put '</table>';
 
 				    %Let Rc = %Sysfunc(Close(&Dsn));
 
-
-/*
-	Put '<OPTION VALUE="AIB">ALLIED IRISH BANK</OPTION>';
-	Put '<OPTION VALUE="BOI">BANK OF IRELAND</OPTION>';
-	Put '<OPTION VALUE="BOS">BANK OF SCOTLAND</OPTION>';
-	Put '<OPTION SELECTED VALUE="Barclays">BARCLAYS BANK</OPTION>';
-	Put '<OPTION VALUE="Danske">DANSKE BANK</OPTION>';
-	Put '<OPTION VALUE="Firsttrust">FIRST TRUST BANK</OPTION>';
-	Put '<OPTION VALUE="Halifax">HALIFAX</OPTION>';
-	Put '<OPTION VALUE="HSBC">HSBC GROUP</OPTION>';
-	Put '<OPTION VALUE="Lloyds">LLOYDS BANK</OPTION>';
-	Put '<OPTION VALUE="NBS">NATIONWIDE BUILDING SOCIETY</OPTION>';
-	Put '<OPTION VALUE="Natwest">NATWEST</OPTION>';
-	Put '<OPTION VALUE="RBS">ROYAL BANK OF SCOTLAND</OPTION>';
-	Put '<OPTION VALUE="Santander">SANTANDER</OPTION>';
-	Put '<OPTION VALUE="Ulster">ULSTER BANK</OPTION>';
-*/
-
 	Put '</SELECT>';
 	Put '</div>';
 	Put '</td>';
 
 
-	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
+	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="0">';
 	Put '<div class="header" align="center" style="float:left; width: 100%">';
-	Put '<H2>SELECT API NAME</H2>';
-	Put '<p><br></p>';
+	Put '<H3>SELECT API NAME</H3>';
+	Put '<p></p>';
 
 				*--- Read Dataset UniqueNames ---;
 				%If %Sysfunc(Compress("&_BankName")) = "Barclays" %Then
@@ -313,9 +278,8 @@ Put '</table>';
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 				%End;
 
-
 				%Else %Do;
-				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No = "v1.2"))));
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No in ("v2.1","v1.1")))));
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 				%End;
@@ -359,25 +323,15 @@ Put '</table>';
 				    %Let Rc = %Sysfunc(Close(&Dsn));
 
 
-/*
-	Put '<b>SELECT API</b>';
-	Put '<SELECT NAME="_APIName" Size="6"</option>';
-	Put '<OPTION VALUE="ATM">ATMS</option>';
-	Put '<OPTION VALUE="BCH">BRANCHES</option>';
-	Put '<OPTION SELECTED VALUE="BCA">BUSINESS CURRENT ACCOUNTS</option>';
-	Put '<OPTION VALUE="PCA">PERSONAL CURRENT ACCOUNTS</option>';
-	Put '<OPTION VALUE="CCC">COMMERCIAL CREDIT CARDS</option>';
-	Put '<OPTION VALUE="SME">UNSECURED SME LOANS</option>';
-*/
 	Put '</SELECT>';
 
 	Put '</div>';
 	Put '</td>';
 
-	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
+	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="0">';
 	Put '<div class="header" align="center" style="float:left; width: 100%">';
-	Put '<H2>SELECT API VERSION</H2>';
-	Put '<p><br></p>';
+	Put '<H3>SELECT API VERSION</H3>';
+	Put '<p></p>';
 
 					*--- Read Dataset UniqueNames ---;
 				 	%Let Dsn = %Sysfunc(Open(Work.Unique_No(Where=(Bank_Name = "&_BankName"))));
@@ -409,52 +363,22 @@ Put '</table>';
 					            "&Label"
 					            '</option>' /;
 							%End;
-/*							%Else %If &I = &Count+1 %Then
-							%Do;
-					            Put '<option Selected value='
-					            "&Start"
-					            '>' /
-					            "&Label"
-					            '</option>' /;
-							%End;*/
-
 				        %End;
 				        %Else %Let I = &Count;
 				    %End;
 
 				    %Let Rc = %Sysfunc(Close(&Dsn));
-/*
-
-	Put '<SELECT NAME="_VersionNo" Size="6" onchange="this.form.submit()">';
-	Put '<OPTION SELECTED VALUE="v1.2">API VERSION 1.2.4</option>';
-	Put '<OPTION VALUE="v1.3">API VERSION 1.3</option>';
-	Put '<OPTION VALUE="v2.0">API VERSION 2.0</option>';
-	Put '<OPTION Selected VALUE="v2.0"></option>';
-
-*/
 	Put '</SELECT>';
 
 	Put '</div>';
 	Put '</td>';
 
-/*	Put '</div>';*/
 	Put '</td>';
 	Put '</tr>';
 	Put '</table>';
 
-/*	Put '<p><br></p>';*/
-/*	Put '<p><br></p>';*/
-
-/*	Put '<p></p>';*/
-/*	Put '<HR>';*/
-/*	Put '<p></p>';*/
-
-	Put '<Table align="center" style="width: 100%; height: 10%" border="1">';
+	Put '<Table align="center" style="width: 100%; height: 5%" border="0">';
 	Put '<tr>';
-/*	Put '<td valign="top" align="center" style="background-color: #D4E6F1; color: White">';*/
-/*	Put '<p><br></p>';
-	Put '<INPUT TYPE=submit VALUE="Submit" align="center">';
-	Put '<p><br></p>';*/
 	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_LIVE_APP_V09.sas">';
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"

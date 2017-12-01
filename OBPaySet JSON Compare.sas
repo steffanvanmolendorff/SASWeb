@@ -83,7 +83,7 @@ Data OBData.&Dsn(Drop = Hierarchy Position Rename=(Hierarchy1 = Hierarchy));
 	&Dsn._Lev1 = Hierarchy1;
 
 *--- This line ensures that where the &Dsn._lev1 = Data it is concatented with the variable Name 
-	to ensure that it matches with the Swagger_Sch file ---;
+	to ensure that it matches with the Swagger_Payments file ---;
 
 	If Trim(Left(Hierarchy1)) = 'Data' Then
 	Do;
@@ -103,10 +103,10 @@ Proc Sort Data = OBData.&Dsn;
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\OBPaySet.csv,OBPaySet);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\OBPaySetResponse.csv,OBPaySetResponse);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\OBPaySub.csv,OBPaySub);
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\V1_1_1\OBPaySubResponse.csv,OBPaySubResponse);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1\OBPaySet.csv,OBPaySet);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1\OBPaySetResponse.csv,OBPaySetResponse);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1\OBPaySub.csv,OBPaySub);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\RW\ob\v1_1\OBPaySubResponse.csv,OBPaySubResponse);
 
 
 /*
@@ -469,7 +469,7 @@ Run;
 /*		If Hierarchy EQ '' then Delete;*/
 
 		Hierarchy1 = Trim(Left(Substr(Hierarchy, index(Hierarchy, '-D') + 1)));
-		Table  = 'Swagger_Sch';
+		Table  = 'Swagger_Payments';
 
  *--- This line will identify any line or carriage returns within the description field ---;
  		Definition = Compress(Definition,'0D0A'x);
@@ -558,7 +558,7 @@ Run;
 
 
 %Mend Schema;
-%Schema(http://localhost/sasweb/data/temp/V1_1_1/payment_initiation_swagger.json,Test,Swagger_SCH);
+%Schema(http://localhost/sasweb/data/temp/RW/ob/v1_1/payment_initiation_swagger.json,Test,Swagger_Payments);
 
 Data OBData.Compare(Keep = Hierarchy Table MinLength MaxLength type Class
 	OBPaySet_Lev1
@@ -582,7 +582,7 @@ Data OBData.Compare(Keep = Hierarchy Table MinLength MaxLength type Class
 	NewPath $ 70
 	UML_MaxLength UML_MinLength $ 49;
 
-	Merge OBData.Swagger_Sch(In=a)
+	Merge OBData.Swagger_Payments(In=a)
 	OBData.OBPaySet(In=b)
 	OBData.OBPaySub(In=d)
 	OBData.OBPaySetResponse(In=c)

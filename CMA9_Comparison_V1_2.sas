@@ -52,7 +52,7 @@ Libname OBData "&Path";
 %Global ErrorCode;
 %Global ErrorDesc;
 %Global Datasets;
-
+/*
 *--- The Macro Filter executes in the Where statement when the OpenData datasets are created ---;
 %Macro Filter();
 'AnnualBusinessTurnover'
@@ -149,7 +149,7 @@ Libname OBData "&Path";
 'TierBandSetIdentification'
 
 %Mend Filter;
-
+*/
 *=====================================================================================================================================================
 --- Set the ERROR Code macro variables ---
 ======================================================================================================================================================;

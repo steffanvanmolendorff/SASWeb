@@ -1,3 +1,12 @@
+%Global _service;
+%Global _Host;
+%Global _Path;
+
+%Let _Host = &_SRVNAME;
+%Put _Host = &_Host;
+
+%Let _Path = http://&_Host/sasweb;
+%Put _Path = &_Path;
 
 %Macro Header();
 
@@ -14,7 +23,7 @@ Put '<BODY>';
 Put '<table style="width: 100%; height: 5%" border="0">';
    Put '<tr>';
       Put '<td valign="top" style="background-color: #D4E6F1; color: orange">';
-	Put '<img src="http://localhost/sasweb/images/london.jpg" alt="Cant find image" style="width:100%;height:8%px;">';
+	Put '<img src="'"&_Path/images/london.jpg"'" alt="Cant find image" style="width:100%;height:8%px;">';
       Put '</td>';
    Put '</tr>';
 Put '</table>';
@@ -86,7 +95,7 @@ Data _Null_;
 		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
 
 		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		Put '<title>OBIE</title>';
+		Put '<title>LRM</title>';
 
 		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
 		Put '</script>';
@@ -169,14 +178,14 @@ File _Webout;
 /*	Put '<HR>';*/
 /*	Put '<p><br></p>';*/
 
-	Put '<FORM Name="param" ID="param" METHOD=GET ACTION="http://localhost/scripts/broker.exe">';
+	Put '<FORM Name="param" ID="param" METHOD=GET ACTION="'"http://&_Host/scripts/broker.exe"'">';
 
-	Put '<Table align="center" style="width: 100%; height: 60%" border="1">';
+	Put '<Table align="center" style="width: 100%; height: 60%" border="0">';
 	Put '<tr>';
 /*	Put '<td>';*/
-	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
+	Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="0">';
 	Put '<div class="dropdown" align="center" style="float:center; width: 100%">';
-	Put '<H2>SELECT BANK NAME</H2>';
+	Put '<H3>SELECT BANK NAME</H3>';
 	Put '<p></p>';
 
 	Put '<select name="_BankName" size="18" style="width: 25%; height: 30%" onchange="this.form.submit()">' /;
