@@ -29,13 +29,13 @@
 *--- Set Program Options ---;
 /*Option Source Source2 MLogic MPrint Symbolgen;*/
 Options NOERRORABEND;
-
+/*
 %Global _action;
 %Global ErrorCode;
 %Global ErrorDesc;
 %Global Datasets;
-
-/*%Let _SRVNAME = localhost;*/
+*/
+%Let _SRVNAME = localhost;
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
 
@@ -47,7 +47,7 @@ Options NOERRORABEND;
 
 *--- Set Default Data Library as macro variable ---;
 *--- Alternatively set the Data library in Proc Appsrv ---;
-/*
+
 %Let Path = C:\inetpub\wwwroot\sasweb\Data\Perm;
 
 *--- Set X path variable to the default directory ---;
@@ -55,7 +55,7 @@ X "cd &Path";
 
 *--- Set the Library path where the permanent datasets will be saved ---;
 Libname OBData "&Path";
-*/
+
 
 *=====================================================================================================================================================
 --- Set the ERROR Code macro variables ---
@@ -1013,7 +1013,7 @@ ODS HTML Body="Compare_CMA9_&API..html"
 */
 /*ODS HTML BODY = _Webout (url=&_replay) Style=HTMLBlue;*/
 
-
+/*
 %include "C:\inetpub\wwwroot\sasweb\TableEdit\tableeditor.tpl";
 title "Listing of Product Sales"; 
 ods listing close; 
@@ -1026,7 +1026,7 @@ ods tagsets.tableeditor file=_Webout
             frozen_headers="0" 
             frozen_rowheaders="0" 
             ); 
-
+*/
 *--- Sort dataset by the RowCnt value to set the table in the original JSON script order ---; 
 Proc Sort Data = OBData.CMA9_&API;
 	By RowCnt;
@@ -1036,7 +1036,7 @@ Run;
 /*Proc Print Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);*/
 /*Run;*/
 
-
+/*
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
 
@@ -1177,7 +1177,7 @@ Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd;
 
 Run;
 
-
+*/
 
 /*
 PROC EXPORT DATA = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) 
@@ -1188,7 +1188,7 @@ RUN;
 */
 
 *--- Close Output Delivery Parameters  ---;
-ODS HTML Close;
+/*ODS HTML Close;*/
 
 
 ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\CMA9_&API..csv";
@@ -1210,7 +1210,7 @@ ODS HTML Close;
 */
 
 
-%ReturnButton;
+/*%ReturnButton;*/
 
 ods tagsets.tableeditor close; 
 ods listing; 

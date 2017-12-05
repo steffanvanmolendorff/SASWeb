@@ -3,11 +3,18 @@
 *--- Assign Permanent library path to save perm datasets ---;
 Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 
+/*
 *--- Assign Global macro variables to use in the scripts below ---;
 %Global Start;
 %Global ATM_Data_Element_Total;
+%Global BCH_Data_Element_Total;
+%Global BCA_Data_Element_Total;
+%Global PCA_Data_Element_Total;
+%Global CCC_Data_Element_Total;
+%Global SME_Data_Element_Total;
 %Global DataSetName;
-%Global _APIVisual;
+/*%Global _APIVisual;*/
+/*
 *--- Assign Global maro variables to save total number of banks per product type ---;
 %Global ATM_Bank_Name_Total;
 %Global BCH_Bank_Name_Total;
@@ -15,7 +22,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 %Global PCA_Bank_Name_Total;
 %Global CCC_Bank_Name_Total;
 %Global SME_Bank_Name_Total;
-
+*/
 *--- Main Macro that wraps all the code ---;
 %Macro Main();
 
@@ -41,13 +48,12 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 %End;
 %Mend Global_Banks;
 %Global_Banks(ATM);
-/*
 %Global_Banks(BCH);
 %Global_Banks(BCA);
 %Global_Banks(PCA);
 %Global_Banks(CCC);
 %Global_Banks(SME);
-*/
+
 %Macro APIs(API_Dsn,API);
 
 *--- Get a unique list of data elements per Open Data product type ---;
@@ -266,32 +272,3 @@ Run;
 %Mend Main;
 %Main();
 
-%Macro BankName(Dsn);
-Data OBData.&Dsn;
-	Set OBData.&Dsn;
-	If Bank EQ "Barclays" Then Bank = "BARCLAYS BANK";
-	If Bank EQ "Bank of Scotland" Then Bank = "BANK OF SCOTLAND";
-	If Bank EQ "Danske Bank" Then Bank = "DANSKE BANK";
-	If Bank EQ "HSBC" Then Bank = "HSBC GROUP";
-	If Bank EQ "Halifax" Then Bank = "HALIFAX";
-	If Bank EQ "Lloyds Bank" Then Bank = "LLOYDS BANK";
-	If Bank EQ "Nationwide" Then Bank = "NATIONWIDE BUILDING SOCIETY";
-	If Bank EQ "Coutts" Then Bank = "COUTTS";
-	If Bank EQ "Bank of Ireland" Then Bank = "BANK OF IRELAND";
-	If Bank EQ "Allied Irish Bank" Then Bank = "ALLIED IRISH BANK";
-	If Bank EQ "Natwest" Then Bank = "NATWEST";
-	If Bank EQ "RBS" Then Bank = "ROYAL BANK OF SCOTLAND";
-	If Bank EQ "Ulster Bank" Then Bank = "ULSTER BANK";
-	If Bank EQ "Adam" Then Bank = "ADAM AND COMPANY";
-	If Bank EQ "First Trust Bank" Then Bank = "FIRST TRUST BANK";
-	If Bank EQ "Esme" Then Bank = "ESME";
-	If Bank EQ "Santander" Then Bank = "SANTANDER";
-Run;
-%Mend BankName;
-%BankName(ATM_Geographic);
-/*
-%BankName(BCH_Geographic);
-%BankName(BCA_Geographic);
-%BankName(PCA_Geographic);
-%BankName(CCC_Geographic);
-%BankName(SME_Geographic);
