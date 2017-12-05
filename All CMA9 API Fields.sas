@@ -20,9 +20,10 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 %Macro Main();
 
 *--- Uncomment this line to run program locally ---;
+/*
 %Let _APIVisual = ATM;
 %Put _APIVisual = &_APIVisual;
-
+*/
 
 *--- Assign Global Macro variables for storing data values and process in other data/proc steps ---;
 %Macro Global_Banks(API);
@@ -40,12 +41,13 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 %End;
 %Mend Global_Banks;
 %Global_Banks(ATM);
+/*
 %Global_Banks(BCH);
 %Global_Banks(BCA);
 %Global_Banks(PCA);
 %Global_Banks(CCC);
 %Global_Banks(SME);
-
+*/
 %Macro APIs(API_Dsn,API);
 
 *--- Get a unique list of data elements per Open Data product type ---;
@@ -287,6 +289,7 @@ Data OBData.&Dsn;
 Run;
 %Mend BankName;
 %BankName(ATM_Geographic);
+/*
 %BankName(BCH_Geographic);
 %BankName(BCA_Geographic);
 %BankName(PCA_Geographic);
