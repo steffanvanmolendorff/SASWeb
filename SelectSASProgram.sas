@@ -36,6 +36,13 @@ Options Source Source2 Symbolgen MLogic MPrint;
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
 %End;
+
+%Else %If "&_action" EQ "UPDATE OPEN DATA CMA9 TABLES" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Update Open Data Tables V0.1.sas";
+%End;
+
+
 /*
 *====================================================================================================
 		BANK API END POINT vs. SCHEMA STRUCTURE - LIST DIFFERENCES BETWEEN API AND JSON SCHEMA
