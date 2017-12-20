@@ -185,7 +185,7 @@ Run;
 
 		Put '<table align="center" style="width: 100%; height: 15%" border="1">';
 		Put '<tr>';
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 
 	*--- Table 1 - Drop Down Table for Percentage values ---;
 		Put '<div class="dropdown" align="center" style="float:center; width: 100%">';
@@ -217,7 +217,7 @@ Run;
 
 
 	*--- Table 2 - Drop Down Table for Dimension columns---;
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 /*		Put '<H1>TEST</H1>';*/
 /*		Put '<p><br></p>';*/
@@ -248,7 +248,7 @@ Run;
 		Put '</td>';
 
 	*--- Table 3 - Drop Down Table for Fact columns---;
-		Put '<td valign="center" align="center" style="background-color: lightblue; color: Blue" border="1">';
+		Put '<td valign="center" align="center" style="background-color: #D4E6F1; color: Blue" border="1">';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 /*		Put '<H1>TEST</H1>';*/
 /*		Put '<p><br></p>';*/
@@ -296,7 +296,7 @@ Run;
 
 	*--- Table 3 - Submit button ---;
 	Put '<table style="width: 100%; height: 10%" border="0">';
-	Put '<td valign="center" align="center" border="1" style="background-color: lightblue; color: Black">';
+	Put '<td valign="center" align="center" border="1" style="background-color: #D4E6F1; color: Black">';
 	Put '<p><br></p>';
 	Put '<INPUT TYPE=submit VALUE="Submit Details" valign="center">';
 	Put '<p><br></p>';

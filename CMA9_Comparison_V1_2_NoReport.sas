@@ -29,12 +29,13 @@
 *--- Set Program Options ---;
 /*Option Source Source2 MLogic MPrint Symbolgen;*/
 Options NOERRORABEND;
-/*
+
+
 %Global _action;
 %Global ErrorCode;
 %Global ErrorDesc;
 %Global Datasets;
-*/
+
 %Let _SRVNAME = localhost;
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
@@ -43,8 +44,14 @@ Options NOERRORABEND;
 %Put _Path = &_Path;
 
 *--- Un-comment this section to run program locally from Desktop ---;
-/*%Let _action = CMA9 COMPARISON ATMS;*/
+*%Let _action = CMA9 COMPARISON ATMS;
+*%Let _action = CMA9 COMPARISON BRANCHES;
+*%Let _action = CMA9 COMPARISON BCA;
+*%Let _action = CMA9 COMPARISON PCA;
+*%Let _action = CMA9 COMPARISON SME;
+*%Let _action = CMA9 COMPARISON CCC;
 
+/*
 *--- Set Default Data Library as macro variable ---;
 *--- Alternatively set the Data library in Proc Appsrv ---;
 
@@ -55,7 +62,7 @@ X "cd &Path";
 
 *--- Set the Library path where the permanent datasets will be saved ---;
 Libname OBData "&Path";
-
+*/
 
 *=====================================================================================================================================================
 --- Set the ERROR Code macro variables ---
@@ -265,8 +272,8 @@ Data OBData.CMA9_ATM(Drop = P1-P7);
 
 *--- Call the macro in the Where statement to filter the required data elements ---;
 *	Where Data_Element in (%Filter);
-
 Run;
+
 %End;
 *------------------------------------------------------------------------------------------------------
 											BRANCHES
@@ -381,8 +388,8 @@ Data OBData.CMA9_BCH(Drop = P1-P7);
 
 *--- Call the macro in the Where statement to filter the required data elements ---;
 *	Where Data_Element in (%Filter);
-
 Run;
+
 %End;
 *------------------------------------------------------------------------------------------------------
 											PCA
@@ -1032,6 +1039,18 @@ Proc Sort Data = OBData.CMA9_&API;
 	By RowCnt;
 Run;
 
+*--- Create a Record-ID field for all records in the API JSON file ---;
+*--- Each record in the API file starts with the Data_Element LEI ---;
+*--- Every time the Data_Element value LEI is encountered a new records start in the JSON file ---;
+Data OBData.CMA9_&API;
+	Set OBData.CMA9_&API;
+	If Data_Element = 'LEI' Then 
+	Do;
+		_Record_ID + 1;
+	End;
+	Retain _Record_ID;
+Run;
+
 *--- Print ATMS Report ---;
 /*Proc Print Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);*/
 /*Run;*/
@@ -1208,7 +1227,6 @@ Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 Run;
 ODS HTML Close;
 */
-
 
 /*%ReturnButton;*/
 

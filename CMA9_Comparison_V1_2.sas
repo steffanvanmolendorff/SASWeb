@@ -1032,6 +1032,19 @@ Proc Sort Data = OBData.CMA9_&API;
 	By RowCnt;
 Run;
 
+*--- Create a Record-ID field for all records in the API JSON file ---;
+*--- Each record in the API file starts with the Data_Element LEI ---;
+*--- Every time the Data_Element value LEI is encountered a new records start in the JSON file ---;
+Data OBData.CMA9_&API;
+	Set OBData.CMA9_&API;
+	If Data_Element = 'LEI' Then 
+	Do;
+		_Record_ID + 1;
+	End;
+	Retain _Record_ID;
+Run;
+
+
 *--- Print ATMS Report ---;
 /*Proc Print Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);*/
 /*Run;*/
@@ -1039,6 +1052,15 @@ Run;
 
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
+
+ods pdf file="C:\inetpub\wwwroot\sasweb\Data\Results\CMA9_&API._Comparison.pdf" style=styles.SASWeb;
+proc print data=OBData.CMA9_&API(Keep = Hierarchy Data_Element HSBC RBS Barclays obs=25);
+run; 
+
+
+ods html file="C:\inetpub\wwwroot\sasweb\Data\Results\CMA9_&API._Comparison.html" style=styles.SASWeb;
+proc print data=OBData.CMA9_&API(Keep = Hierarchy Data_Element HSBC RBS Barclays obs=25);
+run; 
 
 Proc Report Data = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) nowd;
 
@@ -1181,7 +1203,7 @@ Run;
 
 /*
 PROC EXPORT DATA = OBData.CMA9_&API(Drop=Bank_API P Count RowCnt) 
-            OUTFILE= "H:\STV\Open Banking\SAS\Temp\CMA9_&API..csv" 
+            OUTFILE= "C:\inetpub\wwwroot\sasweb\data\results\CMA9_&API..csv" 
             DBMS=CSV REPLACE;
      PUTNAMES=YES;
 RUN;
@@ -1192,12 +1214,12 @@ ODS HTML Close;
 
 
 ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\CMA9_&API..csv";
-/*
+
 Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 	Title1 "Open Banking - &API";
 	Title2 "CMA9 Product Comparison Report - &Fdate";
 Run;
-*/
+
 ODS CSV Close;
 
 /*

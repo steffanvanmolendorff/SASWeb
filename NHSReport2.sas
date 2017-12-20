@@ -613,7 +613,6 @@ Run;
 		ODS tagsets.tableeditor close; 
 
 
-
 *---- Open the _webout location ---;
 	ODS HTML body=_webout (no_bottom_matter) path=&_tmpcat  (url=&_replay);
 
@@ -642,6 +641,24 @@ Run;
 					VBar _Month_ / response = _&_forecast._Forecast_&i;
 				%End;
 			run;
+
+*--- Test Proc Univariate ---;
+		proc univariate data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA /*&Perc_FactCols*/) PCTLDEF=1;  
+			var Other_Refer_Made_GA;  
+			histogram Other_Refer_Made_GA / kernel;
+			Output Out=Work.Stats pctlpre=P_ pctlpts=90, 95, 97 97.5, 98 to 99 by 0.1;
+		run;
+
+		proc stdize data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA /*&Perc_FactCols*/)
+			PctlMtd=ORD_STAT outstat=StdLongPctls
+           	pctlpts=90, 95, 97 97.5, 98 to 99 by 0.1;
+			var Other_Refer_Made_GA;  
+		run;
+
+
+		Proc Print Data = Work.Stats;
+		Run;
+
 
 /*
 			proc gchart data=Work.NHS_Percentage_1;                                                                                                                

@@ -15,6 +15,7 @@
 /*
 %Macro Columns(Dsn);
 Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
+
 Proc Contents Data=OBData.&Dsn 
 	Out=Work.&Dsn (Keep=Name); 
 Run; 
@@ -184,7 +185,7 @@ File _Webout;
 	*--- Table 1 - Image ---;
 	Put '<table style="width: 100%; height: 5%" border="0">';
 	Put '<tr>';
-	Put '<td valign="top" style="background-color: lightblue; color: orange">';
+	Put '<td valign="top" style="background-color: #D4E6F1; color: White">';
 	Put '<img src="'"&_Path/images/london.jpg"'" alt="Cannot find image" style="width:100%;height:8%px;">';
 	Put '</td>';
 	Put '</tr>';
@@ -195,10 +196,10 @@ File _Webout;
 	Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
 
 	*--- Table 2 - Drop Down Table ---;
-	Put '<table align = "center" style="width: 100%; height: 5%" border="1">';
+	Put '<table align = "center" style="width: 100%; height: 5%" border="0">';
 	Put '<tr>';
 
-	Put '<td valign="top" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<td valign="top" align="center" style="background-color: #D4E6F1; color: Blue" border="0">';
 	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<p><br></p>';
 /*	Put '<td valign="top" style="background-color: white; color: black" border="1">';*/
@@ -228,7 +229,7 @@ File _Webout;
 /*	Put '<td valign="top" style="background-color: white; color: black" border="1">';*/
 /*	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';*/
 
-	Put '<td valign="top" align="center" style="background-color: lightblue; color: Blue" border="1">';
+	Put '<td valign="top" align="center" style="background-color: #D4E6F1; color: Blue" border="0">';
 	Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<p><br></p>';
 		Put '<b>SELECT BANK NAME</b>';
@@ -280,7 +281,7 @@ File _Webout;
 
 /*		Put '<td valign="top" style="background-color: white; color: black" border="1">';*/
 /*		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';*/
-		Put '<td valign="top" align="center" style="background-color: lightblue; color: Blue" border="1">';
+		Put '<td valign="top" align="center" style="background-color: #D4E6F1; color: Blue" border="0">';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<p><br></p>';
 		Put '<b>SELECT ' /
@@ -333,7 +334,7 @@ File _Webout;
 
 	*--- Table 3 - Submit button ---;
 	Put '<table style="width: 100%; height: 5%" border="0">';
-	Put '<td valign="center" align="center" border="1" style="background-color: lightblue; color: Black">';
+	Put '<td valign="center" align="center" border="0" style="background-color: #D4E6F1; color: Black">';
 	Put '<p><br></p>';
 	Put '<INPUT TYPE=submit VALUE="Submit Details" valign="center">';
 	Put '<p><br></p>';

@@ -1,9 +1,10 @@
 /*Options MPrint MLogic Symbolgen Source Source2;*/
 
+/*
 *--- Assign Permanent library path to save perm datasets ---;
 Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
+*/
 
-/*
 *--- Assign Global macro variables to use in the scripts below ---;
 %Global Start;
 %Global ATM_Data_Element_Total;
@@ -14,7 +15,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 %Global SME_Data_Element_Total;
 %Global DataSetName;
 /*%Global _APIVisual;*/
-/*
+
 *--- Assign Global maro variables to save total number of banks per product type ---;
 %Global ATM_Bank_Name_Total;
 %Global BCH_Bank_Name_Total;
@@ -22,16 +23,15 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 %Global PCA_Bank_Name_Total;
 %Global CCC_Bank_Name_Total;
 %Global SME_Bank_Name_Total;
-*/
+
 *--- Main Macro that wraps all the code ---;
 %Macro Main();
 
 *--- Uncomment this line to run program locally ---;
 /*
-%Let _APIVisual = ATM;
+%Let _APIVisual = CCC;
 %Put _APIVisual = &_APIVisual;
 */
-
 *--- Assign Global Macro variables for storing data values and process in other data/proc steps ---;
 %Macro Global_Banks(API);
 *--- Create Global macro variables to save the bank names in each macro variable ---;
@@ -59,7 +59,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 *--- Get a unique list of data elements per Open Data product type ---;
 Proc Summary Data = &API_Dsn Nway Missing;
 	Class Data_Element;
-	Var Rowcnt;
+	Var Count;
 	Output Out = Work.Data_Elements(Drop=_type_ _Freq_) Sum=;
 Run;
 
@@ -71,11 +71,20 @@ Data Work.Data_Elements;
 	Do;
 		Data_Element = Compress(Substr(Data_Element,1,29)||Put(_N_,3.));
 	End;
+
+*--- Test if the Data_Element only contains numeric values ---;
+*--- If it does then (i.e. = 0) then concatenate an underscore to the values ---;
+*--- Because the program below will create a dataset for each value ---;
+*--- If the value is only numbers the program will create an Error and stop executing ---;
+	If Verify(Trim(Left(Data_Element)),"1234567890") = 0 Then
+	Do;
+		Data_Element = '_'||Data_Element;
+	End;
 Run;
 
 *--- Create a dataset with only the Bank names in the tables ---;
 Proc Contents Data = &API_Dsn
-	(Drop = Hierarchy Bank_API Data_Element Rowcnt P Count) Noprint
+	(Drop = Hierarchy Bank_API Data_Element _Record_ID Rowcnt P Count) Noprint
      out = Work.Names(keep = Name Rename=(Name=Bank_Name));
 Run;
 Quit;
@@ -90,6 +99,7 @@ Quit;
 *--- Save the current i = (1,2,3,etc) value ---;
 	&API._Count = &i;
 	&API._Total = &Count;
+	_Record_ID = &_Record_ID;
 *--- Save all the Bank_Names and Data_Elements names in the macro variables created in rows 32 to 40 ---;
 	Call Symput(Compress("&API"||'_'||"&_Var"||Put(&i,3.)),"&_Start");
 *--- Save the total counts of Bank_Names and Data_Element names in Macro variabe ---;
@@ -99,7 +109,7 @@ Quit;
 %Macro Banks(_Dsn, _Var);
 Data Work.&API._&_Var;
 *--- Set variable lengths to 32 characters, API value to length 3 and Total to numeric 3 ---; 
-	Length &_VAR $ 32 API $ 3 &API._Count &API._Total 3 ;
+	Length &_VAR $ 32 API $ 3 _Record_ID 6 &API._Count &API._Total 3 ;
 
 				*--- Read Dataset UniqueNames ---;
 				 	%Let Dsn = %Sysfunc(Open(&_Dsn));
@@ -107,6 +117,9 @@ Data Work.&API._&_Var;
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 					%Put Count = &Count;
+				*--- Count Observations ---;
+				    %Let _Record_ID = %Sysfunc(Attrn(&Dsn,_Record_ID));
+					%Put _Record_ID = &_Record_ID;
 
 				*--- Populate Drop Down Box on HTML Page ---;
 				    %Do i = 1 %To &Count;
@@ -142,7 +155,7 @@ Run;
 %Macro Split_Banks(Dsn);
 *--- Sort Dataset by RowCnt variable and output to each Data_Element dataset ---;
 Proc Sort Data=&API_Dsn
-	Out = &Dsn(Keep = Data_Element RowCnt &Dsn);
+	Out = &Dsn(Keep = Data_Element RowCnt _Record_ID Count &Dsn);
 	By RowCnt;
 Run;
 %Mend Split_Banks;
@@ -183,20 +196,12 @@ Run;
 *--- Split API Banks data into Data_Element tables ---;
 %Do k = 1 %To &&&API._Bank_Name_Total;
 		%Do l = 1 %To &&&API._Data_Element_Total;
-			Data Work.&&&API._Data_Element&l(Keep = Bank Data_Element RowCnt Count &API._Count &&&API._Data_Element&l);
+			Data Work.&&&API._Data_Element&l(Keep = Bank Data_Element RowCnt _Record_ID Count &&&API._Data_Element&l);
 				Set &&&API._Bank_Name&k(Where=(Data_Element = "&&&API._Data_Element&l"));
-			*--- The count for ATM values in the tables start with ATMID ---;
-					%If "&API" EQ "ATM" %Then
-					%Do;
-						If Data_Element = 'ATMID' Then Count + 1;
-					%End;
-			*--- The count for ATM values in the tables start with LEI ---;
-					%If "&API" NE "ATM" %Then
-					%Do;
-						If Data_Element = 'LEI' Then Count + 1;
-					%End;
 			*--- Create a API_Count variable per product type ---;
 					&API._Count = Count;
+			*--- Create the Record ID field to use in the merge of all data_element datasets ---;
+					_Record_ID = _Record_ID;
 			*--- Save the Bank_Name in the Data_Element variable name to list the Bank_Name as a row ---;
 					&&&API._Data_Element&l = &&&API._Bank_Name&k;
 			*--- Save the Bank_Name value in the column Bank ---;
@@ -213,8 +218,9 @@ Run;
 				Work.&&&API._Data_Element&l
 			%End;
 			;
-			By &API._Count;
+			By _Record_ID;
 		Run;
+
 %End;
 
 *--- Concatenate datasets to output to perm library OBData.API_Geographic ---;
@@ -233,9 +239,10 @@ Run;
 	%API_Concat(&&&API._Bank_Name&k)
 %End;
 
-*--- Create the OBData.ATM dataset ---;
+*--- Create the OBData.&API_Geographic datasets ---;
 Data OBData.&API._Geographic;
 	Set &Datasets;
+	Record_Count = 1;
 Run;
 *--- Execute the macro for all API product types ---;
 %Mend APIs;

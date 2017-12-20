@@ -1993,7 +1993,7 @@ Proc Export Data = Work.Fail
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-*%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail.csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail.csv);
 
 %End;
 
@@ -2318,7 +2318,7 @@ options emailhost=
    /* your Gmail address */
    id="steffan.vanmolendorff@qlick2.com"
    /* optional: encode PW with PROC PWENCODE */
-   pw="@FDi2014" 
+   pw="@Octa7700" 
  )
 ;
 
@@ -2367,6 +2367,11 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "HSBC" %Then
 %Do;
 	%API(&API_Link/&API_JSON,&Bank_Name,&Main_API);
+%End;
+*--- Santander - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Santander" %Then
+%Do;
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
 %End;
 *--- BARCLAYS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Barclays" %Then

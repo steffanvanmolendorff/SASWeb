@@ -30,7 +30,6 @@
 %If "&_action" EQ "UPDATE OPEN DATA CMA9 TABLES" %Then
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2_NoReport.sas";
-
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Extract All CMA9 API Data Elements V0.1.sas";
 
 %End;
@@ -43,7 +42,6 @@
 
 
 	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2_NoReport.sas";
-
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Extract All CMA9 API Data Elements V0.1.sas";
 
 %End;

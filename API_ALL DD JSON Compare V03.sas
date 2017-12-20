@@ -819,7 +819,7 @@ Proc Sort Data = OBData.Compare_&API_DSN;
 Run;
 
 %Mend Schema;
-*%Schema(http://&_Host/sasweb/data/temp/od/ob/&_APIVersion/&File..json,&API_DSN,Swagger_&API_DSN);
+%Schema(http://&_Host/sasweb/data/temp/od/ob/&_APIVersion/&File..json,&API_DSN,Swagger_&API_DSN);
 
 %Macro ReturnButton();
 Data _Null_;
