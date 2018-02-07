@@ -29,7 +29,8 @@
 
 %If "&_action" EQ "UPDATE OPEN DATA CMA9 TABLES" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2_NoReport.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1_NoReport.sas";
+
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Extract All CMA9 API Data Elements V0.1.sas";
 
 %End;
@@ -41,7 +42,8 @@
 	%Let _SRVNAME = localhost;
 
 
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2_NoReport.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1_NoReport.sas";
+
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Extract All CMA9 API Data Elements V0.1.sas";
 
 %End;
@@ -80,10 +82,9 @@ Data OBData.&Dsn;
 	*/
 Run;
 %Mend BankName;
-%BankName(ATM_Geographic);
+*%BankName(ATM_Geographic);
 %BankName(BCH_Geographic);
-%BankName(BCA_Geographic);
-%BankName(PCA_Geographic);
-%BankName(CCC_Geographic);
-%BankName(SME_Geographic);
-
+*%BankName(BCA_Geographic);
+*%BankName(PCA_Geographic);
+*%BankName(CCC_Geographic);
+*%BankName(SME_Geographic);

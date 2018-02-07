@@ -27,7 +27,7 @@
 *																								*
 *===============================================================================================;*/
 *--- Set Program Options ---;
-/*Option Source Source2 MLogic MPrint Symbolgen;*/
+Option Source Source2 MLogic MPrint Symbolgen;
 Options NOERRORABEND;
 
 
@@ -51,10 +51,10 @@ Options NOERRORABEND;
 *%Let _action = CMA9 COMPARISON SME;
 *%Let _action = CMA9 COMPARISON CCC;
 
-/*
+
 *--- Set Default Data Library as macro variable ---;
 *--- Alternatively set the Data library in Proc Appsrv ---;
-
+/*
 %Let Path = C:\inetpub\wwwroot\sasweb\Data\Perm;
 
 *--- Set X path variable to the default directory ---;
@@ -164,22 +164,22 @@ Proc Sort Data = Work.&Bank._&API;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
 %Do;
-/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/V2.1/atms)) %Then */
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v2.1/atms)) %Then*/
 /*	%Do;*/
-	%Main(https://openapi.bankofireland.com/open-banking/V2.1/atms,Bank_of_Ireland,ATM);
+		%Main(https://openapi.bankofireland.com/open-banking/v2.1/atms,Bank_of_Ireland,ATM);
 /*	%End;*/
-	%Main(https://api.bankofscotland.co.uk/open-banking/V2.1/atms,Bank_of_Scotland,ATM);
-	%Main(https://atlas.api.barclays/open-banking/V2.1/atms,Barclays,ATM);
-	%Main(https://obp-api.danskebank.com/open-banking/V2.1/atms,Danske_Bank,ATM);
-	%Main(https://api.firsttrustbank.co.uk/open-banking/V2.1/atms,First_Trust_Bank,ATM);
-	%Main(https://api.halifax.co.uk/open-banking/V2.1/atms,Halifax,ATM);
-	%Main(https://api.hsbc.com/open-banking/V2.1/atms,HSBC,ATM);
-	%Main(https://api.lloydsbank.com/open-banking/V2.1/atms,Lloyds_Bank,ATM);
-	%Main(https://openapi.nationwide.co.uk/open-banking/V2.1/atms,Nationwide,ATM);
-	%Main(https://openapi.natwest.com/open-banking/V2.1/atms,Natwest,ATM);
-	%Main(https://openapi.rbs.co.uk/open-banking/V2.1/atms,RBS,ATM);
-	%Main(https://api.santander.co.uk/retail/open-banking/V2.1/atms,Santander,ATM);
-	%Main(https://openapi.ulsterbank.co.uk/open-banking/V2.1/atms,Ulster_Bank,ATM);
+	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/atms,Bank_of_Scotland,ATM);
+	%Main(https://atlas.api.barclays/open-banking/v2.1/atms,Barclays,ATM);
+	%Main(https://obp-data.danskebank.com/open-banking/v2.1/atms,Danske_Bank,ATM);
+	%Main(https://openapi.firsttrustbank.co.uk/open-banking/v2.1/atms,First_Trust_Bank,ATM);
+	%Main(https://api.halifax.co.uk/open-banking/v2.1/atms,Halifax,ATM);
+	%Main(https://api.hsbc.com/open-banking/v2.1/atms,HSBC,ATM);
+	%Main(https://api.lloydsbank.com/open-banking/v2.1/atms,Lloyds_Bank,ATM);
+	%Main(https://openapi.nationwide.co.uk/open-banking/v2.1/atms,Nationwide,ATM);
+	%Main(https://openapi.natwest.com/open-banking/v2.1/atms,Natwest,ATM);
+	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/atms,RBS,ATM);
+	%Main(https://openbanking.santander.co.uk/sanuk/external/open-banking/v2.1/atms,Santander,ATM);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v2.1/atms,Ulster_Bank,ATM);
 %End;
 
 *--- Find unique Hierarchy values for ATMS ---;
@@ -280,22 +280,22 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
 %Do;
-/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/V2.1/branches)) %Then */
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v2.1/branches)) %Then */
 /*	%Do;*/
-	%Main(https://openapi.bankofireland.com/open-banking/V2.1/branches,Bank_of_Ireland,BCH);
+	%Main(https://openapi.bankofireland.com/open-banking/v2.1/branches,Bank_of_Ireland,BCH);
 /*	%End;*/
-	%Main(https://api.bankofscotland.co.uk/open-banking/V2.1/branches,Bank_of_Scotland,BCH);
-	%Main(https://atlas.api.barclays/open-banking/V2.1/branches,Barclays,BCH);
-	%Main(https://obp-api.danskebank.com/open-banking/V2.1/branches,Danske_Bank,BCH);
-	%Main(https://api.firsttrustbank.co.uk/open-banking/V2.1/branches,First_Trust_Bank,BCH);
-	%Main(https://api.halifax.co.uk/open-banking/V2.1/branches,Halifax,BCH);
-	%Main(https://api.hsbc.com/open-banking/V2.1/branches,HSBC,BCH);
-	%Main(https://api.lloydsbank.com/open-banking/V2.1/branches,Lloyds_Bank,BCH);
-	%Main(https://openapi.nationwide.co.uk/open-banking/V2.1/branches,Nationwide,BCH);
-	%Main(https://openapi.natwest.com/open-banking/V2.1/branches,Natwest,BCH);
-	%Main(https://openapi.rbs.co.uk/open-banking/V2.1/branches,RBS,BCH);
-	%Main(https://api.santander.co.uk/retail/open-banking/V2.1/branches,Santander,BCH);
-	%Main(https://openapi.ulsterbank.co.uk/open-banking/V2.1/branches,Ulster_Bank,BCH);
+	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/branches,Bank_of_Scotland,BCH);
+	%Main(https://atlas.api.barclays/open-banking/v2.1/branches,Barclays,BCH);
+	%Main(https://obp-data.danskebank.com/open-banking/v2.1/branches,Danske_Bank,BCH);
+	%Main(https://openapi.firsttrustbank.co.uk/open-banking/v2.1/branches,First_Trust_Bank,BCH);
+	%Main(https://api.halifax.co.uk/open-banking/v2.1/branches,Halifax,BCH);
+	%Main(https://api.hsbc.com/open-banking/v2.1/branches,HSBC,BCH);
+	%Main(https://api.lloydsbank.com/open-banking/v2.1/branches,Lloyds_Bank,BCH);
+	%Main(https://openapi.nationwide.co.uk/open-banking/v2.1/branches,Nationwide,BCH);
+	%Main(https://openapi.natwest.com/open-banking/v2.1/branches,Natwest,BCH);
+	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/branches,RBS,BCH);
+	%Main(https://openbanking.santander.co.uk/sanuk/external/open-banking/v2.1/branches,Santander,BCH);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v2.1/branches,Ulster_Bank,BCH);
 %End;
 
 *--- Get unique Hierarchy values for Branches ---;
@@ -317,6 +317,7 @@ Run;
 	%TestDsn(Bank_of_Scotland_&API);
 	%TestDsn(Barclays_&API);
 	%TestDsn(Danske_Bank_&API);
+	%TestDsn(First_Trust_Bank_&API);
 	%TestDsn(Halifax_&API);
 	%TestDsn(Lloyds_Bank_&API);
 	%TestDsn(Nationwide_&API);
@@ -396,22 +397,22 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
 %Do;
-/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/V2.1/personal-current-accounts)) %Then */
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v2.1/personal-current-accounts)) %Then */
 /*	%Do;*/
-	%Main(https://openapi.bankofireland.com/open-banking/V2.1/personal-current-accounts,Bank_of_Ireland,PCA);
+	%Main(https://openapi.bankofireland.com/open-banking/v2.1/personal-current-accounts,Bank_of_Ireland,PCA);
 /*	%End;*/
-	%Main(https://api.bankofscotland.co.uk/open-banking/V2.1/personal-current-accounts,Bank_of_Scotland,PCA);
-	%Main(https://atlas.api.barclays/open-banking/V2.1/personal-current-accounts,Barclays,PCA);
-	%Main(https://obp-api.danskebank.com/open-banking/V2.1/personal-current-accounts,Danske_Bank,PCA);
-	%Main(https://api.firsttrustbank.co.uk/open-banking/V2.1/personal-current-accounts,First_Trust_Bank,PCA);
-	%Main(https://api.halifax.co.uk/open-banking/V2.1/personal-current-accounts,Halifax,PCA);
-	%Main(https://api.hsbc.com/open-banking/V2.1/personal-current-accounts,HSBC,PCA);
-	%Main(https://api.lloydsbank.com/open-banking/V2.1/personal-current-accounts,Lloyds_Bank,PCA);
-	%Main(https://openapi.nationwide.co.uk/open-banking/V2.1/personal-current-accounts,Nationwide,PCA);
-	%Main(https://openapi.natwest.com/open-banking/V2.1/personal-current-accounts,Natwest,PCA);
-	%Main(https://openapi.rbs.co.uk/open-banking/V2.1/personal-current-accounts,RBS,PCA);
-	%Main(https://api.santander.co.uk/retail/open-banking/V2.1/personal-current-accounts,Santander,PCA);
-	%Main(https://openapi.ulsterbank.co.uk/open-banking/V2.1/personal-current-accounts,Ulster_Bank,PCA);
+	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/personal-current-accounts,Bank_of_Scotland,PCA);
+	%Main(https://atlas.api.barclays/open-banking/v2.1/personal-current-accounts,Barclays,PCA);
+	%Main(https://obp-data.danskebank.com/open-banking/v2.1/personal-current-accounts,Danske_Bank,PCA);
+	%Main(https://openapi.firsttrustbank.co.uk/open-banking/v2.1/personal-current-accounts,First_Trust_Bank,PCA);
+	%Main(https://api.halifax.co.uk/open-banking/v2.1/personal-current-accounts,Halifax,PCA);
+	%Main(https://api.hsbc.com/open-banking/v2.1/personal-current-accounts,HSBC,PCA);
+	%Main(https://api.lloydsbank.com/open-banking/v2.1/personal-current-accounts,Lloyds_Bank,PCA);
+	%Main(https://openapi.nationwide.co.uk/open-banking/v2.1/personal-current-accounts,Nationwide,PCA);
+	%Main(https://openapi.natwest.com/open-banking/v2.1/personal-current-accounts,Natwest,PCA);
+	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/personal-current-accounts,RBS,PCA);
+	%Main(https://openbanking.santander.co.uk/sanuk/external/open-banking/v2.1/personal-current-accounts,Santander,PCA);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v2.1/personal-current-accounts,Ulster_Bank,PCA);
 %End;
 *--- Get unique Hierarchy values for PCA ---;
 %Macro UniquePCA(API);
@@ -505,24 +506,24 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON BCA" %Then
 %Do;
-/*%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/V2.1/business-current-accounts)) %Then */
+/*%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v2.1/business-current-accounts)) %Then */
 /*%Do;*/
-	%Main(https://openapi.bankofireland.com/open-banking/V2.1/business-current-accounts,Bank_of_Ireland,BCA);
+	%Main(https://openapi.bankofireland.com/open-banking/v2.1/business-current-accounts,Bank_of_Ireland,BCA);
 /*%End;*/
-	%Main(https://api.aibgb.co.uk/open-banking/V2.1/business-current-accounts,AIB_Group,BCA);
-	%Main(https://api.bankofscotland.co.uk/open-banking/V2.1/business-current-accounts,Bank_of_Scotland,BCA);
-	%Main(https://atlas.api.barclays/open-banking/V2.1/business-current-accounts,Barclays,BCA);
-	%Main(https://obp-api.danskebank.com/open-banking/V2.1/business-current-accounts,Danske_Bank,BCA);
-	%Main(https://api.firsttrustbank.co.uk/open-banking/V2.1/business-current-accounts,First_Trust_Bank,BCA);
-	%Main(https://api.hsbc.com/open-banking/V2.1/personal-current-accounts,HSBC,BCA);
-	%Main(https://api.lloydsbank.com/open-banking/V2.1/business-current-accounts,Lloyds_Bank,BCA);
-	%Main(https://openapi.natwest.com/open-banking/V2.1/business-current-accounts,Natwest,BCA);
-	%Main(https://openapi.rbs.co.uk/open-banking/V2.1/business-current-accounts,RBS,BCA);
-	%Main(https://api.santander.co.uk/retail/open-banking/V2.1/business-current-accounts,Santander,BCA);
-	%Main(https://openapi.ulsterbank.co.uk/open-banking/V2.1/business-current-accounts,Ulster_Bank,BCA);
-	%Main(https://openapi.coutts.com/open-banking/V2.1/business-current-accounts,Coutts,BCA);
-	%Main(https://openapi.adambank.com/open-banking/V2.1/business-current-accounts,Adam_Bank,BCA);
-
+	%Main(https://openapi.aibgb.co.uk/open-banking/v2.1/business-current-accounts,AIB_Group,BCA);
+	%Main(http://localhost/sasweb/data/temp/od/aib/v2_1/json/business-current-accounts.json,AIB_Group,BCA);
+	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/business-current-accounts,Bank_of_Scotland,BCA);
+	%Main(https://atlas.api.barclays/open-banking/v2.1/business-current-accounts,Barclays,BCA);
+	%Main(https://obp-data.danskebank.com/open-banking/v2.1/business-current-accounts,Danske_Bank,BCA);
+	%Main(https://openapi.firsttrustbank.co.uk/open-banking/v2.1/business-current-accounts,First_Trust_Bank,BCA);
+	%Main(https://api.hsbc.com/open-banking/v2.1/personal-current-accounts,HSBC,BCA);
+	%Main(https://api.lloydsbank.com/open-banking/v2.1/business-current-accounts,Lloyds_Bank,BCA);
+	%Main(https://openapi.natwest.com/open-banking/v2.1/business-current-accounts,Natwest,BCA);
+	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/business-current-accounts,RBS,BCA);
+	%Main(https://openbanking.santander.co.uk/sanuk/external/open-banking/v2.1/business-current-accounts,Santander,BCA);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v2.1/business-current-accounts,Ulster_Bank,BCA);
+	%Main(https://openapi.coutts.com/open-banking/v2.1/business-current-accounts,Coutts,BCA);
+	%Main(https://openapi.adambank.com/open-banking/v2.1/business-current-accounts,Adam_Bank,BCA);
 %End;
 *--- Get unique Hierarchy values for BCA ---;
 %Macro UniqueBCA(API);
@@ -621,22 +622,22 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON SME" %Then
 %Do;
-/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/V2.1/unsecured-sme-loans)) %Then */
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v2.1/unsecured-sme-loans)) %Then */
 /*	%Do;*/
-	%Main(https://openapi.bankofireland.com/open-banking/V2.1/unsecured-sme-loans,Bank_of_Ireland,SME);
+	%Main(https://openapi.bankofireland.com/open-banking/v2.1/unsecured-sme-loans,Bank_of_Ireland,SME);
 /*	%End;*/
-	%Main(https://api.aibgb.co.uk/open-banking/V2.1/unsecured-sme-loans,AIB_Group, SME);
-	%Main(https://api.bankofscotland.co.uk/open-banking/V2.1/unsecured-sme-loans,Bank_of_Scotland,SME);
-	%Main(https://atlas.api.barclays/open-banking/V2.1/unsecured-sme-loans,Barclays,SME);
-	%Main(https://obp-api.danskebank.com/open-banking/V2.1/unsecured-sme-loans,Danske_Bank,SME);
-	%Main(https://openapi.esmeloans.com/open-banking/V2.1/unsecured-sme-loans,ESME,SME);
-	%Main(https://api.firsttrustbank.co.uk/open-banking/V2.1/unsecured-sme-loans,First_Trust_Bank,SME);
-	%Main(https://api.hsbc.com/open-banking/V2.1/unsecured-sme-loans,HSBC,SME);
-	%Main(https://api.lloydsbank.com/open-banking/V2.1/unsecured-sme-loans,Lloyds_Bank,SME);
-	%Main(https://openapi.natwest.com/open-banking/V2.1/unsecured-sme-loans,Natwest,SME);
-	%Main(https://openapi.rbs.co.uk/open-banking/V2.1/unsecured-sme-loans,RBS,SME);
-	%Main(https://api.santander.co.uk/retail/open-banking/V2.1/unsecured-sme-loans,Santander,SME);
-	%Main(https://openapi.ulsterbank.co.uk/open-banking/V2.1/unsecured-sme-loans,Ulster_Bank,SME);
+	%Main(https://openapi.aibgb.co.uk/open-banking/v2.1/unsecured-sme-loans,AIB_Group, SME);
+	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/unsecured-sme-loans,Bank_of_Scotland,SME);
+	%Main(https://atlas.api.barclays/open-banking/v2.1/unsecured-sme-loans,Barclays,SME);
+	%Main(https://obp-data.danskebank.com/open-banking/v2.1/unsecured-sme-loans,Danske_Bank,SME);
+	%Main(https://openapi.esmeloans.com/open-banking/v2.1/unsecured-sme-loans,ESME,SME);
+	%Main(https://openapi.firsttrustbank.co.uk/open-banking/v2.1/unsecured-sme-loans,First_Trust_Bank,SME);
+	%Main(https://api.hsbc.com/open-banking/v2.1/unsecured-sme-loans,HSBC,SME);
+	%Main(https://api.lloydsbank.com/open-banking/v2.1/unsecured-sme-loans,Lloyds_Bank,SME);
+	%Main(https://openapi.natwest.com/open-banking/v2.1/unsecured-sme-loans,Natwest,SME);
+	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/unsecured-sme-loans,RBS,SME);
+	%Main(https://openbanking.santander.co.uk/sanuk/external/open-banking/v2.1/unsecured-sme-loans,Santander,SME);
+	%Main(https://openapi.ulsterbank.co.uk/open-banking/v2.1/unsecured-sme-loans,Ulster_Bank,SME);
 %End;
 *--- Get unique Hierarchy values for SME ---;
 %Macro UniqueSME(API);
@@ -730,17 +731,17 @@ Run;
 -------------------------------------------------------------------------------------------------------;
 %If "&_action" EQ "CMA9 COMPARISON CCC" %Then
 %Do;
-/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/V2.1/commercial-credit-cards)) %Then */
+/*	%If %sysfunc(fileexist(https://openapi.bankofireland.com/open-banking/v2.1/commercial-credit-cards)) %Then */
 /*	%Do;*/
-	%Main(https://openapi.bankofireland.com/open-banking/V2.1/commercial-credit-cards,Bank_of_Ireland,CCC);
+	%Main(https://openapi.bankofireland.com/open-banking/v2.1/commercial-credit-cards,Bank_of_Ireland,CCC);
 /*	%End;*/
-	%Main(https://api.bankofscotland.co.uk/open-banking/V2.1/commercial-credit-cards,Bank_of_Scotland,CCC);
-	%Main(https://atlas.api.barclays/open-banking/V2.1/commercial-credit-cards,Barclays,CCC);
-	%Main(https://api.hsbc.com/open-banking/V2.1/commercial-credit-cards,HSBC,CCC);
-	%Main(https://api.lloydsbank.com/open-banking/V2.1/commercial-credit-cards,Lloyds_Bank,CCC);
-	%Main(https://openapi.natwest.com/open-banking/V2.1/commercial-credit-cards,Natwest,CCC);
-	%Main(https://openapi.rbs.co.uk/open-banking/V2.1/commercial-credit-cards,RBS,CCC);
-	%Main(https://api.santander.co.uk/retail/open-banking/V2.1/commercial-credit-cards,Santander,CCC);
+	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/commercial-credit-cards,Bank_of_Scotland,CCC);
+	%Main(https://atlas.api.barclays/open-banking/v2.1/commercial-credit-cards,Barclays,CCC);
+	%Main(https://api.hsbc.com/open-banking/v2.1/commercial-credit-cards,HSBC,CCC);
+	%Main(https://api.lloydsbank.com/open-banking/v2.1/commercial-credit-cards,Lloyds_Bank,CCC);
+	%Main(https://openapi.natwest.com/open-banking/v2.1/commercial-credit-cards,Natwest,CCC);
+	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/commercial-credit-cards,RBS,CCC);
+	%Main(https://openbanking.santander.co.uk/sanuk/external/open-banking/v2.1/commercial-credit-cards,Santander,CCC);
 %End;
 *--- Get unique Hierarchy values for CCC ---;
 %Macro UniqueCCC(API);

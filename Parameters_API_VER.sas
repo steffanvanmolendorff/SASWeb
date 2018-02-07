@@ -151,6 +151,16 @@ File _Webout;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 	%End;
 *=============================================================================================================================
+			Read Dataset for the JSON Comparison
+=============================================================================================================================;
+	%If "&_action" EQ "API_PAI_BAI DD JSON COMPARE" %then
+	%Do;
+				*--- Read Dataset UniqueNames ---;
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('PAI','BAI')))));
+				*--- Count Observations ---;
+				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
+	%End;
+*=============================================================================================================================
 			Read Dataset for the SWAGGER Comparison
 =============================================================================================================================;
 	%If "&_action" EQ "API_ALL DD SWAGGER COMPARE" %then
@@ -232,6 +242,22 @@ File _Webout;
 	%If "&_action" EQ "API_ALL DD JSON COMPARE" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+	%End;
+	%Else %If "&_action" EQ "API_PAI_BAI DD JSON COMPARE" %Then
+	%Do;
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03 PAI-BAI.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
 			'>';

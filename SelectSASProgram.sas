@@ -9,32 +9,39 @@ Options Source Source2 Symbolgen MLogic MPrint;
 =====================================================================================================;
 %If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
+
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON BCA" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON CCC" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON SME" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
 %End;
 
 %Else %If "&_action" EQ "UPDATE OPEN DATA CMA9 TABLES" %Then
@@ -168,6 +175,12 @@ Options Source Source2 Symbolgen MLogic MPrint;
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
+
+%Else %If "&_action" EQ "API_PAI_BAI DD JSON COMPARE" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
+%End;
+
 
 %Else %If "&_action" EQ "API_ALL DD SWAGGER COMPARE" %Then
 %Do;

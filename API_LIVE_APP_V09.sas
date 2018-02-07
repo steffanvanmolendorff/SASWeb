@@ -1,3 +1,9 @@
+*--- Run the SAS code manually ---;
+/*
+%Global _APIName;
+%Let _APIName = BCH;
+*/
+
 %Macro Select_OD_RW(_API);
 %If "&_API" EQ "PMT" or "&_API" EQ "ACC" %Then
 %Do;
@@ -7,12 +13,14 @@
 *=====================================================================================================================================================
 --- Set system options to track comments in the log file ---
 ======================================================================================================================================================;
+
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN SPOOL;
 OPTIONS NOSYNTAXCHECK;
 
+
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 
-/*
+
 Data Work._Null_;
 _BankName = "&_BankName";
 _APIName = "&_APIName";
@@ -22,7 +30,7 @@ Call Symput('_BankName',_BankName);
 Call Symput('_APIName',_APIName);
 Call Symput('_VersionNo',_VersionNo);
 Run;
-*/
+
 
 %Global SCH_Name;
 %Global SCH_Link;
@@ -47,10 +55,11 @@ Run;
 %Let _Path = http://&_Host/sasweb;
 %Put _Path = &_Path;
 
-/*
+
 *--- Uncomment to run on local laptop/pc machine ---;
+/*
 %Let _BankName = BOI;
-%Let _APIName = PCA;
+%Let _APIName = BCH;
 %Let _VersionNo = v2.1;
 */
 
@@ -193,6 +202,23 @@ Libname OBData "&Path\Perm";
       Call Symput("FdateTime",Left(Put("&Sysdate"d,&Fmt2)));
   Run;
 %Mend Fdate;
+
+/*
+*--- Create a date for the export of thr Report filenames ---;
+%Macro FileNameDate();
+%Global FileDateTime;
+Data _Null_x;
+	FileDateTime = Put(DateTime(),datetime.);
+	FileDateTime1 = Tranwrd(FileDateTime,":","_");
+	Call Symputx('FileDateTime1',FileDateTime1);
+Run;
+%Mend FileNameDate;
+%FileNameDate();
+*/
+
+%let fname = %sysfunc(DateTime(),datetime.);
+%put fname= &fname;
+
 
 
 %Macro Sys_Errors(Bank, API);
@@ -723,7 +749,7 @@ Proc Datasets Lib = LibAPIs;
 Run;
 %ErrorCheck;
 
-Data Work.&Bank._API;
+Data Work.&Bank._API Work.X1;
 	Set LibAPIs.Alldata;
 Run;
 %ErrorCheck;
@@ -814,7 +840,7 @@ Run;
 *=====================================================================================================================================================
 --- Remove the value data- from the Hierarchy value ---
 ======================================================================================================================================================;
-Data Work.&Bank._API(Drop = Hierarchy_X Find);
+Data Work.&Bank._API(Drop = Hierarchy_X Find) Work.X2;
 	Set Work.&Bank._API;
 
 *--- Remove the Data- value from Hierarchy as the schema spec does not have the value in Hierarchy ---;
@@ -1734,12 +1760,18 @@ Proc Export Data = Work.No_Mismatches
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._NO_MISMATCHES.csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._NO_MISMATCHES._%sysfunc(datetime(),datetime13.).csv);
 
 %Macro SendMail();
-	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._NO_MISMATCHES.csv"
+/*
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches.csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName..csv"
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName..csv";
+	*/
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches_%sysfunc(datetime(),datetime13.).csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(datetime(),datetime13.).csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(datetime(),datetime13.).csv";
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail_%sysfunc(datetime(),datetime13.).csv";
 %Mend;
 
 %End;
@@ -1826,7 +1858,7 @@ Proc Export Data = Work.Matches
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches.csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches_%sysfunc(today(),date9.).csv);
 
 %End;
 
@@ -1993,7 +2025,7 @@ Proc Export Data = Work.Fail
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail.csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail_%sysfunc(today(),date9.).csv);
 
 %End;
 
@@ -2081,13 +2113,19 @@ Proc Export Data = Work._API_&Bank._API(Keep = Hierarchy &Bank._Value Table)
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName..csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
 
 
 %Macro SendMail();
+/*
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches.csv"
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName..csv"
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName..csv";
+	*/
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches_%sysfunc(today(),date9.).csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(today(),date9.).csv"
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv";
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail_%sysfunc(datetime(),datetime13.).csv";
 %Mend;
 
 
@@ -2208,7 +2246,7 @@ Proc Export Data = Work._SCH_&Bank._API(Keep = Hierarchy Table Flag &Bank._Value
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName..csv);
+%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
 
 %End;
 
@@ -2358,43 +2396,111 @@ Filename Myemail Clear;
 *--- BOI - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOI" %Then
 %Do;
-	%API(&API_Path/&Main_API..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
-
+*--- NBS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "NBS" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+/*
 %Put _VersionNo = &_VersionNo;
 %Put BankName_C = &BankName_C;
+*/
 *--- HSBC - For json files end point - remove *.json* in %API(&API_Path/&Main_API) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "HSBC" %Then
 %Do;
-	%API(&API_Link/&API_JSON,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 *--- Santander - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Santander" %Then
 %Do;
 	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
 %End;
 *--- BARCLAYS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Barclays" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- LLOYDS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Lloyds" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- BOS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOS" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- HALIFAX - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Halifax" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+
+*--- Danske - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Danske" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+
+*--- RBS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "RBS" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+*--- NATWEST - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Natwest" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+*--- Ulster - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Ulster" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+*--- Adam & Co - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "AdamCo" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+*--- ESME - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "ESME" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+*--- Coutts - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Coutts" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+*--- AIB - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "AIB" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+*--- First Trust Bank - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Firsttrust" %Then
+%Do;
+/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *=================================================================================================

@@ -1,9 +1,7 @@
-/*Options MPrint MLogic Symbolgen Source Source2;*/
+Options MPrint MLogic Symbolgen Source Source2;
 
-/*
 *--- Assign Permanent library path to save perm datasets ---;
 Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
-*/
 
 *--- Assign Global macro variables to use in the scripts below ---;
 %Global Start;
@@ -14,7 +12,6 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 %Global CCC_Data_Element_Total;
 %Global SME_Data_Element_Total;
 %Global DataSetName;
-/*%Global _APIVisual;*/
 
 *--- Assign Global maro variables to save total number of banks per product type ---;
 %Global ATM_Bank_Name_Total;
@@ -28,10 +25,11 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 %Macro Main();
 
 *--- Uncomment this line to run program locally ---;
-/*
-%Let _APIVisual = CCC;
+
+%Global _APIVisual;
+%Let _APIVisual = BCH;
 %Put _APIVisual = &_APIVisual;
-*/
+
 *--- Assign Global Macro variables for storing data values and process in other data/proc steps ---;
 %Macro Global_Banks(API);
 *--- Create Global macro variables to save the bank names in each macro variable ---;
@@ -84,10 +82,15 @@ Run;
 
 *--- Create a dataset with only the Bank names in the tables ---;
 Proc Contents Data = &API_Dsn
-	(Drop = Hierarchy Bank_API Data_Element _Record_ID Rowcnt P Count) Noprint
+	(Drop = Hierarchy Bank_API Data_Element Rowcnt P Count) Noprint
      out = Work.Names(keep = Name Rename=(Name=Bank_Name));
 Run;
 Quit;
+*--- Delete any P values Bank names i.e. P8-P9 etc ---;
+Data Work.Names;
+	Set Work.Names;
+	If Length(Bank_Name) < 3 or Substr(Bank_Name,1,1) = '_' then delete;
+Run;
 
 *--- The LiastAll macro will list all the Bank_Names and Data_Element names and save into the Global 
 	Macro variables created in rows 7-17 ---;
@@ -278,8 +281,6 @@ Run;
 
 %Mend Main;
 %Main();
-
-
 
 
 ******************************************************************************************
@@ -504,7 +505,7 @@ Data WORK.PCA_TEST1;
          Count best32. 
          PCA_Count best32. 
          APRAERRate $10. 
-         Bank $50. 
+         Bank $25. 
          AccessChannels1 $100. 
          AccessChannels2 $100. 
          AccessChannels3 $100. 
@@ -571,7 +572,6 @@ Data OBData.PCA_Geographic;
 Run;
 
 
-
 ******************************************************************************************
 *	OPEN DATA: ATM
 *   PRODUCT:   SAS
@@ -583,68 +583,64 @@ Run;
 ******************************************************************************************;
 *--- Create Blank dataset and set variable lenghts ---;
  Data WORK.ATM_TEST1;
- 	Input Data_Element $31. 
-         RowCnt best32. 
-         Count best32. 
-         ATM_Count best32. 
-         APRAERRate best32. 
-         Bank $50. 
-         AccessChannels1 $25. 
-         AccessChannels2 $25. 
-         AccessChannels3 $25. 
-         AccessChannels4 $25. 
-         AccessChannels5 $25. 
-         AccessChannels6 $25. 
-         AccessChannels7 $25. 
-         AccessChannels8 $25. 
-         AccessChannels9 $25. 
-         AgeRestricted $10.
-         Agreement $150.
-         AnnualBusinessTurnoverCurrency $10.
-		 AnnualRenewalFee $10.
-         ArrangedOverdraftInterestTier $10.
-         ArrangementType $25.
-         BIC $50.
-         Benefit $25.
-         BenefitDescription $50.
-         BenefitName $25.
-         BenefitSubType $25.
-         BenefitType $25.
-         BenefitValue $10.
-         BufferAmount $10.
-         CMADefinedIndicator $25.
-         CalculationFrequency $25.
-         CalculationMethod $25.
-         CardNotes $150.
-         CardType1 $25.
-         CardType2 $25. 
-         CardType3 $25. 
-         CardType4 $25. 
-         CardWithdrawalLimit $10. 
-         ChequeBookAvailable $10. 
-         Contactless $10.
-         Counter $10.
-         CreditCharged $10.
-         CreditScoringPartOfAccountOpe38 $25.
-         CreditScoringPartOfAccountOpe39 $25.
-         CreditScoringPartOfAccountOpe40 $25.
-         CreditScoringPartOfAccountOpe41 $25.
-         CreditScoringPartOfAccountOpe42 $25.
-         CreditScoringPartOfAccountOpe43 $25.
-         CriteriaType $10.
-         CriteriaType1 $10.
-         CriteriaType2 $10.
-         Currency1 $10.
-         DailyCharge $10.
-         DefaultToAccounts $10.
-         Description $150.
-         EAR $10.
-         EligibilityName $25.
-         EligibilityNotes $150.
-         EligibilityType $10.
-         ExchangeRateAdjustment best32.
-         ExistingFeature $10.
-         FeatureDescription $50.;
+ 	Input Data_Element $100. 
+		RowCnt best12. 
+		Count best12. 
+		_Record_ID best12. 
+		ATMServices1 $25. 
+		Bank $25. 
+		ATMServices10 $25. 
+		ATMServices11 $25. 
+		ATMServices2 $25. 
+		ATMServices3 $25. 
+		ATMServices4 $25. 
+		ATMServices5 $25. 
+		ATMServices6 $25. 
+		ATMServices7 $25. 
+		ATMServices8 $25. 
+		ATMServices9 $25. 
+		Access24HoursIndicator $10. 
+		Accessibility1 $25. 
+		Accessibility2 $25. 
+		Accessibility3 $25. 
+		Accessibility4 $25. 
+		Accessibility5 $25. 
+		Accessibility6 $25. 
+		Accessibility7 $25. 
+		AddressLine1 $50. 
+		AddressLine2 $50. 
+		AddressLine3 $50. 
+		AddressLine4 $10. 
+		Agreement $300. 
+		BrandName $30. 
+		BuildingNumber $30. 
+		Code $10. 
+		Country $3. 
+		CountrySubDivision1 $50. 
+		Description $100. 
+		Identification $30. 
+		LastUpdated $30. 
+		Latitude $15. 
+		License $100. 
+		LocationCategory $25. 
+		LocationCategory1 $25. 
+		Longitude $15. 
+		MinimumPossibleAmount $10. 
+		Name $30. 
+		Note $30. 
+		PostCode $10. 
+		StreetName $50. 
+		SupportedCurrencies1 $3. 
+		SupportedCurrencies2 $3. 
+		SupportedLanguages1 $3. 
+		SupportedLanguages2 $3. 
+		SupportedLanguages3 $3. 
+		SupportedLanguages4 $3. 
+		SupportedLanguages5 $3. 
+		TermsOfUse $100. 
+		TotalResults $10. 
+		TownName $50. 
+		Record_Count best12. ;
 		Datalines;
 ;
 Run;
@@ -666,77 +662,72 @@ Run;
 ******************************************************************************************;
 *--- Create Blank dataset and set variable lenghts ---;
 Data WORK.BCH_TEST1;
-	Input Data_Element $31.
-         RowCnt best32.
-         Count best32.
-         _Record_ID best32.
-         ATMAtBranch $10.
-         Bank $50.
-         AccessibilityTypes $25.
-         Agreement $150.
-         ArrivalTime $10.
-         BIC $50.
-         BranchDescription $50.
-         BranchFacilitiesName1 $10.
-         BranchFacilitiesName2 $10.
-         BranchIdentification $25.
-         BranchMediatedServiceName1 $25.
-         BranchMediatedServiceName2 $25.
-         BranchMediatedServiceName3 $25.
-         BranchMediatedServiceName4 $25.
-         BranchMediatedServiceName5 $25.
-         BranchName $50.
-         BranchOtherMediatedServices1 $10.
-         BranchOtherMediatedServices2 $10.
-         BranchOtherSelfServices1 $10.
-         BranchPhoto $300.
-         BranchSelfServeServiceName1 $25.
-         BranchSelfServeServiceName2 $25.
-         BranchSelfServeServiceName3 $25.
-         BranchSelfServeServiceName4 $25.
-         BranchSelfServeServiceName5 $10.
-         BranchSelfServeServiceName6 $10.
-         BranchSelfServeServiceName7 $10.
-         BranchType $25.
-         BuildingNumberOrName $10.
-         ClosingTime $25.
-         Country $10.
-         CountrySubDivision $10.
-         CustomerSegment1 $10.
-         CustomerSegment2 $10.
-         CustomerSegment3 $10.
-         CustomerSegment4 $10.
-         CustomerSegment5 $10.
-         CustomerSegment6 $10.
-         CustomerSegment7 $10.
-         CustomerSegment8 $10.
-         DaysOfTheWeek $10.
-         DepartureTime $10.
-         EndDate $10.
-         FaxNumber1 $25.
-         LEI $10.
-         LastUpdated $25.
-         Latitude $10.
-         LegalName $50.
-         License $50.
-         Longitude $10.
-         OpeningDay $10.
-         OpeningTime $25.
-         OptionalAddressField $25.
-         ParkingLocation $10.
-         PostCode $10.
-         StartDate $10.
-         StopName $10.
-         StreetName $10.
-         TelephoneNumber $25.
-         TermsOfUse $50.
-         TotalResults $10.
-         TownName $25.
-         TrademarkID $25.
-         TrademarkIPOCode $10.
-         UnavailableFinishTime $25.
-         UnavailableStartTime $25.
-         Record_Count best32.;
+	Input Data_Element $31. 
+		RowCnt best12. 
+		Count best12. 
+		_Record_ID best12. 
+		Accessibility1 $30. 
+		Bank $25. 
+		Accessibility2 $30. 
+		Accessibility3 $30. 
+		Accessibility4 $30. 
+		Accessibility5 $30. 
+		Accessibility6 $30. 
+		Accessibility7 $30. 
+		AddressLine1 $50. 
+		AddressLine2 $50. 
+		AddressLine3 $50. 
+		AddressLine4 $50. 
+		Agreement $300. 
+		BrandName $30. 
+		BuildingNumber $30. 
+		ClosingTime $30. 
+		Code $300. 
+		ContactContent $300. 
+		ContactDescription $100. 
+		ContactType $15. 
+		Country $3. 
+		CountrySubDivision1 $50. 
+		CustomerSegment1 $30. 
+		CustomerSegment2 $30. 
+		CustomerSegment3 $30. 
+		CustomerSegment4 $30. 
+		CustomerSegment5 $30. 
+		CustomerSegment6 $30. 
+		CustomerSegment7 $30. 
+		CustomerSegment8 $30. 
+		CustomerSegment9 $30. 
+		Description $100. 
+		Identification $30. 
+		LastUpdated $30. 
+		Latitude $15. 
+		License $100. 
+		Longitude $15. 
+		Name $50. 
+		Notes $100. 
+		OpeningTime $30. 
+		Photo $100. 
+		PostCode $10. 
+		SequenceNumber $10. 
+		ServiceAndFacility1 $30. 
+		ServiceAndFacility10 $30. 
+		ServiceAndFacility11 $30. 
+		ServiceAndFacility12 $30. 
+		ServiceAndFacility2 $30. 
+		ServiceAndFacility3 $30. 
+		ServiceAndFacility4 $30. 
+		ServiceAndFacility5 $30. 
+		ServiceAndFacility6 $30. 
+		ServiceAndFacility7 $30. 
+		ServiceAndFacility8 $30. 
+		ServiceAndFacility9 $30. 
+		StartDate $30. 
+		StreetName $30. 
+		TermsOfUse $100. 
+		TotalResults $10. 
+		TownName $50. 
+		Type $10. 
+		Record_Count best12.; 
 		Datalines;
 		;
      run;
@@ -758,112 +749,112 @@ Run;
 *--- Create Blank dataset and set variable lenghts ---;
 Data WORK.SME_TEST1; 
 	Input Data_Element $31. 
-         RowCnt best32. 
-         Count best32. 
-         SME_Count best32. 
-         AgeRestricted $10. 
-         Bank $50. 
-         Agreement $150. 
-         AnnualBusinessTurnover $10. 
-         AnnualBusinessTurnoverCurrency $10. 
-         ArrearsTreatment $10. 
-         BIC $50. 
-         Benefit $10. 
-         BenefitDescription $150. 
-         BenefitName $25. 
-         BenefitSubType $25. 
-         BenefitType $10. 
-         CCARegulatedEntity $10. 
-         Currency1 $10. 
-         CustomerAccessChannels1 $25. 
-         CustomerAccessChannels2 $25. 
-         CustomerAccessChannels3 $25. 
-         CustomerAccessChannels4 $25. 
-         CustomerAccessChannels5 $25. 
-         CustomerAccessChannels6 $25. 
-         DefaultToAccounts $10. 
-         Description $25. 
-         EligibilityName $25. 
-         EligibilityNotes $150. 
-         EligibilityType $25. 
-         FeeAmount $10. 
-         FeeFrequency $25. 
-         FeeMax $10. 
-         FeeMin $10. 
-         FeeRate $10. 
-         FeeSubType $25. 
-         FeeType $25. 
-         FeesAndChargesNotes $300. 
-         IncomeCondition $10. 
-         IncomeTurnoverRelated $25. 
-         IndicativeRate $150. 
-         IsALowInterestRepaymentStartP36 $10. 
-         IsThisAnInterestOnlyLoan $10. 
-         LEI $25. 
-         LastUpdated $10. 
-         LegalName $50. 
-         License $50. 
-         LoanLengthIncrement $10. 
-         LoanLengthIncrementLower $10. 
-         LoanLengthIncrementUpper $10. 
-         LoanSizeBandLower $10. 
-         LoanSizeBandUpper $10. 
-         MarketingEligibility1 $10. 
-         MaxNumberOfAccounts $10. 
-         MaximumAge $10. 
-         MaximumAgeToOpen $10. 
-         MaximumLoanAmount $10. 
-         MaximumLoanTerm $10. 
-         MaximumOpeningAmount $10. 
-         MinimumAge $10. 
-         MinimumDeposit $10. 
-         MinimumIncomeTurnoverAmount $10. 
-         MinimumIncomeTurnoverCurrency $10. 
-         MinimumLoanAmount $10. 
-         MinimumLoanTerm $10. 
-         MinimumOperatingBalanceExists $10. 
-         Negotiable $10. 
-         OpeningDepositMaximumAmount $10. 
-         OpeningDepositMaximumCurrency $10. 
-         OpeningDepositMinimum $10. 
-         OpeningDepositMinimumCurrency $10. 
-         Other $10. 
-         OtherFinancialHoldingRequired $10. 
-         PaymentHoliday $10. 
-         PreviousBankruptcy $10. 
-         ProductDescription $150. 
-         ProductIdentifier $10. 
-         ProductName $50. 
-         ProductSegment1 $10. 
-         ProductSegment2 $10. 
-         ProductSegment3 $10. 
-         ProductSegment4 $10. 
-         ProductSegment5 $10. 
-         ProductSegment6 $10. 
-         ProductSegment7 $10. 
-         ProductState $10. 
-         ProductSubType $25. 
-         ProductTypeName $25. 
-         ProductURL1 $300. 
-         RateComaprisonType $25. 
-         RateComparisonType $25. 
-         RepaymentFrequency1 $10. 
-         RepaymentFrequency2 $10. 
-         RepaymentFrequency3 $10. 
-         RepaymentFrequency4 $10. 
-         RepaymentFrequency5 $10. 
-         ResidencyRestricted $10. 
-         ResidencyRestrictedRegion $10. 
-         SizeIncrement $10. 
-         TermsOfUse $50. 
-         ThirdSectorOrganisations $10. 
-         TotalResults $10. 
-         TrademarkID $10. 
-         TrademarkIPOCode $25. 
-         TsandCs1 $150. 
-         WillTheLoanBePaidInTrancheDra100 $10. 
-         Record_Count best32.;
-		Datalines;
+		RowCnt best12. 
+		Count best12. 
+		SME_Count best12. 
+		AgeRestricted $10. 
+		Bank $25. 
+		Agreement $300. 
+		AnnualBusinessTurnover $15. 
+		AnnualBusinessTurnoverCurrency $3. 
+		ArrearsTreatment $100. 
+		BIC $25. 
+		Benefit $5. 
+		BenefitDescription $300. 
+		BenefitName $25. 
+		BenefitSubType $25. 
+		BenefitType $10. 
+		CCARegulatedEntity $10. 
+		Currency1 $10. 
+		CustomerAccessChannels1 $25. 
+		CustomerAccessChannels2 $25. 
+		CustomerAccessChannels3 $25. 
+		CustomerAccessChannels4 $25. 
+		CustomerAccessChannels5 $25. 
+		CustomerAccessChannels6 $25. 
+		DefaultToAccounts $10. 
+		Description $25. 
+		EligibilityName $25. 
+		EligibilityNotes $150. 
+		EligibilityType $25. 
+		FeeAmount $10. 
+		FeeFrequency $25. 
+		FeeMax $10. 
+		FeeMin $10. 
+		FeeRate $10. 
+		FeeSubType $25. 
+		FeeType $25. 
+		FeesAndChargesNotes $300. 
+		IncomeCondition $10. 
+		IncomeTurnoverRelated $25. 
+		IndicativeRate $150. 
+		IsALowInterestRepaymentStartP36 $10. 
+		IsThisAnInterestOnlyLoan $10. 
+		LEI $25. 
+		LastUpdated $10. 
+		LegalName $50. 
+		License $50. 
+		LoanLengthIncrement $10. 
+		LoanLengthIncrementLower $10. 
+		LoanLengthIncrementUpper $10. 
+		LoanSizeBandLower $10. 
+		LoanSizeBandUpper $10. 
+		MarketingEligibility1 $10. 
+		MaxNumberOfAccounts $10. 
+		MaximumAge $10. 
+		MaximumAgeToOpen $10. 
+		MaximumLoanAmount $10. 
+		MaximumLoanTerm $10. 
+		MaximumOpeningAmount $10. 
+		MinimumAge $10. 
+		MinimumDeposit $10. 
+		MinimumIncomeTurnoverAmount $10. 
+		MinimumIncomeTurnoverCurrency $10. 
+		MinimumLoanAmount $10. 
+		MinimumLoanTerm $10. 
+		MinimumOperatingBalanceExists $10. 
+		Negotiable $10. 
+		OpeningDepositMaximumAmount $10. 
+		OpeningDepositMaximumCurrency $10. 
+		OpeningDepositMinimum $10. 
+		OpeningDepositMinimumCurrency $10. 
+		Other $10. 
+		OtherFinancialHoldingRequired $10. 
+		PaymentHoliday $10. 
+		PreviousBankruptcy $10. 
+		ProductDescription $150. 
+		ProductIdentifier $10. 
+		ProductName $50. 
+		ProductSegment1 $10. 
+		ProductSegment2 $10. 
+		ProductSegment3 $10. 
+		ProductSegment4 $10. 
+		ProductSegment5 $10. 
+		ProductSegment6 $10. 
+		ProductSegment7 $10. 
+		ProductState $10. 
+		ProductSubType $25. 
+		ProductTypeName $25. 
+		ProductURL1 $300. 
+		RateComaprisonType $25. 
+		RateComparisonType $25. 
+		RepaymentFrequency1 $10. 
+		RepaymentFrequency2 $10. 
+		RepaymentFrequency3 $10. 
+		RepaymentFrequency4 $10. 
+		RepaymentFrequency5 $10. 
+		ResidencyRestricted $10. 
+		ResidencyRestrictedRegion $10. 
+		SizeIncrement $10. 
+		TermsOfUse $50. 
+		ThirdSectorOrganisations $10. 
+		TotalResults $10. 
+		TrademarkID $10. 
+		TrademarkIPOCode $25. 
+		TsandCs1 $150. 
+		WillTheLoanBePaidInTrancheDra100 $10. 
+		Record_Count best12.;
+
 		;
  Run;
 *--- Write permanent dataset variable values to blank dataset with preset variable lengths ---;
@@ -987,13 +978,14 @@ Data OBData.CCC_Geographic;
 	OBData.CCC_Geographic;
 Run;
 
-
+*/
 
 
 
 *****************************************************************************************************
 		CREATE THE CMA9_LAST UPDATED DATASET
 *****************************************************************************************************;
+
 *--- Extract Last Updated Date from each API and create Perm Datasets ---;
 %Macro LastUpDate(Dsn);
 Data Work.&Dsn._LastUpdated;
@@ -1022,3 +1014,4 @@ Data OBData.CMA9_LastUpdated;
 	By Bank;
 
 Run;
+

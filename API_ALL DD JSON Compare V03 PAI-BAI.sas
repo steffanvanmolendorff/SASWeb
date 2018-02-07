@@ -1,5 +1,16 @@
+*--- Uncomment to run locally on laptop ---;
+
 %Global _APINamme;
-/*%Let _APIName = BCA;*/
+%Global _APIVersion;
+%Global _SRVNAME;
+%GLOBAL _Host;
+
+%Let _SRVNAME = localhost;
+%Let _Host = &_SRVNAME;
+%Put _Host = &_Host;
+
+%Let _APIName = PAI;
+%Let _APIVersion = V2_2;
 
 %Global _Host;
 %Global _Path;
@@ -11,10 +22,10 @@
 %Put _Path = &_Path;
 
 %Macro Main(API_DSN,File);
-/*
+
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 Options MPrint MLogic Source Source2 Symbolgen;
-*/
+
 %Macro Import(Filename,Dsn);
 /**********************************************************************
 *   PRODUCT:   SAS
@@ -101,7 +112,7 @@ Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy
 		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),21),'/','-');
 	End;
 
-	&DSN._Lev1 = Hierarchy;
+	&DSN._Lev1 = Compress(/*'Brand-'||*/Hierarchy);
 
 *--- Delete the Hierarchy records which list the Mnemonics codes as the Swagger file does not have the Hierarchy values with Mnemonics ---;
 	Mnemonics = Substr(Reverse(Trim(Left(Hierarchy))),5,1);
@@ -127,6 +138,17 @@ Run;
 		
 	Run;
 
+*--- Extract the data structure for PCA only from PCA- onwards to match Schema structure ---;
+	Data OBData.&Dsn;
+	Set OBData.&Dsn;
+		If Find(Hierarchy,'PCA') > 0 Then
+		Do;
+			Hierarchy = Substr(Hierarchy,Find(Hierarchy,'PCA'));
+		End;
+		Else Do;
+			If Find(Hierarchy,'PCA') = 0 Then Delete;
+		End;
+Run;
 
 Proc Sort Data = OBData.&Dsn
 	Out = OBData.API_&Dsn.;
@@ -135,7 +157,6 @@ Run;
 
 %Mend Import;
 %Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\&_APIVersion\&API_DSN.l_001_001_01DD.csv,&API_DSN);
-/*%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\UML\pcal_001_001_01DD.csv,PCA);*/
 
 
 *====================================================================================================
@@ -237,7 +258,7 @@ Data Work.&JSON
 Run;
 
 
-Data Work.&JSON Work.X2;
+Data Work.&JSON OBData.X2;
 	Set Work.&JSON;
 
 	Length New_Data_Element1 $ 1000;
@@ -254,21 +275,16 @@ Data Work.&JSON Work.X2;
 			New_Data_Element = Compress(Trim(Left(Data_Element))||'-'||Trim(Left(Col{i})));
 *--- Remove properties- from the Data_Element variable ---;
 			New_Data_Element1 = Trim(Left(Tranwrd(New_Data_Element,'properties-','')));
-/*			New_Data_Element2 = Trim(Left(Tranwrd(New_Data_Element1,'items-','')));*/
-*--- Remove items- from the Data_Element variable ---;
-/*			New_Data_Element = New_Data_Element2;*/
 		End;
 
 	End;
-
-/*	Data_Element = Compress(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Hierarchy,'data-',''),'properties-',''),'-enum',''),'-items',''),'-required',''),'items-',''));*/
 
 	Data_Element = Compress(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Tranwrd(Hierarchy,'data-',''),'properties-',''),'-enum',''),'-items',''),'-required',''));
 
 Run;
 
 
-Data Work.&JSON Work.X3(Drop = Word New_Word1 New_Word2 New_Data_Element3 New_Data_Element4 New_Data_Element6);
+Data Work.&JSON OBData.X3(Drop = Word New_Word1 New_Word2 New_Data_Element3 New_Data_Element4 New_Data_Element6);
 	Set Work.&JSON;
 
 	Length New_Data_Element1 New_Data_Element2 New_Data_Element3 New_Data_Element4 New_Data_Element6 $ 1000;
@@ -283,7 +299,6 @@ Data Work.&JSON Work.X3(Drop = Word New_Word1 New_Word2 New_Data_Element3 New_Da
 	End;
 	Else If New_Data_Element3 EQ 'items' Then
 	Do;
-/*		New_Data_Element5 = Scan(Trim(Left(Reverse(New_Data_Element2))),1,'-');*/
 		NWords = CountW(New_Data_Element2,'-');
 		Length New_Word1 New_Word2 $ 500;
 		Do i = 1 to NWords-2;
@@ -318,7 +333,7 @@ Run;
 
 
 
-Data Work.&JSON/*(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy))*/ Work.X4;
+Data Work.&JSON/*(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy))*/ OBData.X4;
 	Set Work.&JSON;
 	By Hierarchy;
 
@@ -334,16 +349,6 @@ Data Work.&JSON/*(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy))*/ Work.X4;
 		Do;
 			Attribute = Reverse(Scan(Reverse(Hierarchy),2,'-'));
 		End;
-/*
-		If Attribute = 'required' then 
-		Do;
-			Hierarchy_1 = Compress(Tranwrd(Hierarchy,'required',Value));
-			Data_Element_1 = Compress(Data_Element||'-'||Value);
-		End;
-		Else Do;
-			Data_Element_1 = Data_Element;
-		End;
-*/
 	End;
 	If not First.Hierarchy then
 	Do;
@@ -356,16 +361,6 @@ Data Work.&JSON/*(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy))*/ Work.X4;
 			Attribute = Reverse(Scan(Reverse(Hierarchy),2,'-'));
 		End;
 
-/*
-		If Attribute = 'required' then 
-		Do;
-			Hierarchy_1 = Compress(Tranwrd(Hierarchy,'required',Value));
-			Data_Element_1 = Compress(Data_Element||'-'||Value);
-		End;
-		Else Do;
-			Data_Element_1 = Data_Element;
-		End;
-*/
 	End;
 
 Run;
@@ -377,7 +372,7 @@ Proc Sort Data = Work.&JSON
 Run;
 
 
-Data Work.&JSON Work.X5;
+Data Work.&JSON OBData.X5;
 	Set Work.&JSON;
 
 	By Hierarchy;
@@ -437,7 +432,7 @@ Proc Sort Data = Work.&JSON
 	By Hierarchy Attribute;
 Run;
 
-Data Work.&JSON Work.X6;
+Data Work.&JSON OBData.X6;
 	Set Work.&JSON;
 	By Hierarchy Attribute;
 
@@ -457,7 +452,7 @@ Proc Sort Data = Work.&JSON
 	By Data_Element;
 Run;
 
-Data Work.&JSON._1 Work.X7;
+Data Work.&JSON._1 OBData.X7;
 	Set Work.&JSON;
 	By Data_Element;
 
@@ -482,14 +477,12 @@ Run;
 %Macro VarVal();
 
 *--- TBC ---;
-Data Work.&JSON._2 Work.X8;
+Data Work.&JSON._2 OBData.X8;
 	Set Work.&JSON._1(Where=(Columns NE ''));
 	By HierCnt Counter;
 
 		Call Symput(Compress('Variable_Name'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Trim(Left(Columns)));
 		Call Symput(Compress('Variable_Value'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Tranwrd(Trim(Left(Value)),'"',''));
-
-/*		Call Symput(Compress('Variable_Value'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Trim(Left(Value)));*/
 
 	If Last.HierCnt and Last.Counter then
 	Do;
@@ -529,14 +522,7 @@ Run;
 				%Put j = &j;
 
 /**--- Set the length of the description variable to $1000, all other $250 else a runtime error is emcounterred ---;*/
-/*				%If &&Variable_Name_&i._&j NE 'description' %Then*/
-/*				%Do;*/
-					Length &&Variable_Name_&i._&j  $ 250;
-/*				%End;*/
-/*				%Else %Do;*/
-/*					Length &&Variable_Name_&i._&j  $ 1000;*/
-/*				%End;*/
-/*				%Let Varname = %Sysfunc(Translate(&&Variable_Name_&i._&j.,' ','_'));*/
+				Length &&Variable_Name_&i._&j  $ 250;
 				%Let Varname = &&Variable_Name_&i._&j.;
 
 				&Varname = "&&Variable_Value_&i._&j.";
@@ -544,79 +530,34 @@ Run;
 	Run;
 
 
-	Data Work.Schema_Columns
-		/*(Keep = Hierarchy 
-		Type
-		Items
-		Description
-		minLength
-		maxLength
-		format
-		additionalProperties
-		title
-		uniqueItems
-		pattern
-		minItems
-		Flag
-		enum1 - enum33
-		Hierarchy1
-		Table)*/ Work.X9;
+	Data Work.Schema_Columns(Drop = Hierarchy Rename=(Hier = Hierarchy))OBData.X9;
 		Length Table $ 16 Swagger_&API_DSN._Lev1 $ 1000;
 		Set Work.Schema_Columns
 			Work.Unique_Columns&i;
 
-/*			Hierarchy = (Tranwrd(Trim(Left(Hierarchy)),'items-',''));*/
-
-		If Hierarchy EQ '' then Delete;
-
-/*		Hierarchy1 = Trim(Left(Substr(Hierarchy, index(Hierarchy, '-D') + 1)));*/
 		Table  = 'Swagger_Sch';
 
-		Hier = Substr(Hierarchy,find(Hierarchy,'Brand'));
-
+*--- Select the data structure from Brand ---;
+		Hier = Substr(Hierarchy,find(Hierarchy,'PCA'));
+*--- Select the data structure from PCA ---;
 		If Reverse(Substr(Reverse(Trim(Left(Hier))),1,11)) = '-items-type' then
 		Do;
 			Hier = Reverse(Substr(Reverse(Trim(Left(Hier))),12));
 		End;
 
-		If Hier NE '';
-		Drop Hierarchy;
-		Rename Hier = Hierarchy;
-
 	Run;
 
-/*
-	Data Work.Schema_Columns(Drop = Pattern Rename=(Pattern1 = Pattern));
-		Set Work.Schema_Columns;
-	
-		If Trim(Left(Pattern)) NE '' Then
-		Do;
-			Pattern1 = Tranwrd(Trim(Left(Pattern)),"\\","\");
-		End;
-		Else Do;
-			Pattern1 = Pattern;
-		End;
-	Run;
-*/
 %End;
 
 
 	Proc Sort Data = Work.Schema_Columns
-		Out = OBData.&API_SCH/*(Rename=(Hierarchy = Hierarchy_Full Data_Element = Hierarchy))*/;
-/*		By Data_Element;*/
+		Out = OBData.&API_SCH;
 		By Hierarchy;
 	Run;
 
 
 %Mend VarVal;
 %VarVal();
-
-/*
-Proc JSON Out = "C:\inetpub\wwwroot\sasweb\data\results\Compare_&API_DSN..json";
-	Export OBData.Compare_&API_DSN;
-Run;
-*/
-
 
 Data OBData.Compare_&API_DSN(Keep = Hierarchy 
 	&API_DSN._Lev1
@@ -700,10 +641,6 @@ Data OBData.Compare_&API_DSN(Keep = Hierarchy
 *--- Find mismatches between EhancedDefinition and Description variables ---;
 If Substr(Reverse(Trim(Left(Hierarchy))),5,1) NE ':' Then
 Do;
-/*
-	EnhancedDefinition = TRANSLATE(Trim(Left(EnhancedDefinition)),"",'0A'x);
-	Description = TRANSLATE(Trim(Left(Description)),"",'0A'x);
-*/
 	If EnhancedDefinition NE Description then 
 	Do;
 		Desc_Flag = 'Mismatch';
@@ -797,18 +734,6 @@ Do;
 	End;
 End;
 
-/*
-If Name NE '' or Code_Name NE '' Then
-Do;
-	If Name NE Code_Name Then
-	Do;
-		CodeName_Flag = 'Mismatch';
-	End;
-	Else Do;
-		CodeName_Flag = 'Match';
-	End;
-End;
-*/
 	CountRows = _N_;
 Run;
 
@@ -950,17 +875,10 @@ ods tagsets.tableeditor file=_Webout
             ) ; 
 
 
-Proc Report Data = OBData.Compare_&API_DSN nowd
-	/*style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]
-	Style(Report) = OBSTyle
-	Style(Header) = OBStyle
-	Style(Column) = OBStyle*/;
+Proc Report Data = OBData.Compare_&API_DSN nowd;
 
-	Title1 "Open Banking - &API_DSN";
-	Title2 "&API_DSN &_APIVersion Comparison Report - %Sysfunc(UPCASE(&Fdate))";
+	Title1 "Open Banking - &_APIName";
+	Title2 "&_APIName &_APIVersion Comparison Report - %Sysfunc(UPCASE(&Fdate))";
 	Title3 "&File";
 
 
@@ -1124,8 +1042,7 @@ Proc Export Data = OBData.Compare_&API_DSN
 	&API_DSN._Pattern
 	Pattern_Flag)
 
-/* 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&_APIName._DD_SWAGGER_Comparison_Final.csv"*/
-	 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&File._DD_Comparison_Final.csv"
+	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&File._DD_Comparison_Final.csv"
 
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
@@ -1141,8 +1058,6 @@ ods listing;
 
 
 %Mend Main;
-
-/*	%Main(&_APIName,sme_loan);*/
 
 %Macro SelectAPI();
 %If "&_Swagger" EQ "SWAGGER" %Then
@@ -1171,6 +1086,17 @@ ods listing;
 	%Do;
 		%Main(&_APIName,ccc_swagger);
 	%End;
+	%Else %If "&_APIName" EQ "PAI" %Then
+	%Do;
+		%Let _APIName = PCA;
+		%Main(&_APIName,pca_swagger);
+	%End;
+	%Else %If "&_APIName" EQ "BAI" %Then
+	%Do;
+		%Let _APIName = BCA;
+		%Main(&_APIName,bca_swagger);
+	%End;
+
 %End;
 %Else %Do;
 	%If "&_APIName" EQ "BCA" %Then
@@ -1196,6 +1122,16 @@ ods listing;
 	%Else %If "&_APIName" EQ "CCC" %Then
 	%Do;
 		%Main(&_APIName,commercial_credit_card);
+	%End;
+	%Else %If "&_APIName" EQ "PAI" %Then
+	%Do;
+		%Let _APIName = PCA;
+		%Main(&_APIName,personal_current_account);
+	%End;
+	%Else %If "&_APIName" EQ "BAI" %Then
+	%Do;
+		%Let _APIName = BCA;
+		%Main(&_APIName,business_current_account);
 	%End;
 %End;
 %Mend SelectAPI;
