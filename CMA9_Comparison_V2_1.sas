@@ -217,7 +217,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 /*
@@ -234,7 +234,7 @@ Run;
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 
@@ -333,7 +333,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 /*
@@ -350,7 +350,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 
@@ -450,7 +450,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 
@@ -468,7 +468,7 @@ Run;
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
@@ -515,8 +515,7 @@ Run;
 /*%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v2.1/business-current-accounts,Bank_of_Ireland,BCA);
 /*%End;*/
-/*	%Main(https://openapi.aibgb.co.uk/open-banking/v2.1/business-current-accounts,AIB_Group,BCA);*/
-	%Main(http://localhost/sasweb/data/temp/od/aib/v2_1/json/business-current-accounts.json,AIB_Group,BCA);
+	%Main(https://openapi.aibgb.co.uk/open-banking/v2.1/business-current-accounts,AIB_Group,BCA);
 	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/business-current-accounts,Bank_of_Scotland,BCA);
 	%Main(https://atlas.api.barclays/open-banking/v2.1/business-current-accounts,Barclays,BCA);
 	%Main(https://obp-data.danskebank.com/open-banking/v2.1/business-current-accounts,Danske_Bank,BCA);
@@ -562,7 +561,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 
@@ -581,7 +580,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.Santander_&API
 		Work.Ulster_Bank_&API
 		;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 
@@ -632,7 +631,6 @@ Run;
 	%Main(https://openapi.bankofireland.com/open-banking/v2.1/unsecured-sme-loans,Bank_of_Ireland,SME);
 /*	%End;*/
 	%Main(https://openapi.aibgb.co.uk/open-banking/v2.1/unsecured-sme-loans,AIB_Group, SME);
-	%Main(http://localhost/sasweb/data/temp/od/aib/v2_1/json/unsecured-sme-loans.json,AIB_Group, SME);
 	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/unsecured-sme-loans,Bank_of_Scotland,SME);
 	%Main(https://atlas.api.barclays/open-banking/v2.1/unsecured-sme-loans,Barclays,SME);
 	%Main(https://obp-data.danskebank.com/open-banking/v2.1/unsecured-sme-loans,Danske_Bank,SME);
@@ -676,7 +674,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 /*
@@ -693,7 +691,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
-	By P1-P7;
+	By P1-P&_P_Val;
 Run;
 */
 
@@ -775,7 +773,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 /*
@@ -787,7 +785,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.Natwest_CCC
 		Work.RBS_CCC
 		Work.Santander_CCC;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 

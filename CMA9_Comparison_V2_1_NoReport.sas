@@ -103,19 +103,19 @@ Proc Datasets Lib = LibAPIs;
 %ErrorCheck;
 
 Data Work.&Bank._&API
-	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P7 Value 
+	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P&_P_Val Value 
 	Rename=(Var3 = Data_Element Var2 = Hierarchy Value = &Bank));
 
-	Length Bank_API $ 8 Var2 Value1 Value2 $ 250 Var3 $ 100 P1 - P7 Value $ 300;
+	Length Bank_API $ 8 Var2 Value1 Value2 $ 250 Var3 $ 100 P1 - P&_P_Val Value $ 300;
 
 	RowCnt = _N_;
 
 *--- The variable V contains the first level of the Hierarchy which has no Bank information ---;
 	Set LibAPIs.Alldata(Where=(V NE 0));
-*--- Create Array concatenate variables P1 to P7 which will create the Hierarchy ---;
-	Array Cat{7} P1 - P7;
+*--- Create Array concatenate variables P1 to P&_P_Val which will create the Hierarchy ---;
+	Array Cat{&_P_Val} P1 - P&_P_Val;
 
-*--- The Do-Loop will create the Hierarchy of Level 1 to 7 (P1 - P7) ---;
+*--- The Do-Loop will create the Hierarchy of Level 1 to 7 (P1 - P&_P_Val) ---;
 	Do i = 1 to P;
 		If i = 1 Then 
 		Do;
@@ -144,12 +144,10 @@ Var3 = Reverse(Scan(Left(Trim(Reverse(Var2))),1,'-',' '));
 		Value = Value2;
 		Test = 1; 
 	End;
-
 %ErrorCheck;
 
-*--- Sort data by Data_Element ---;
 Proc Sort Data = Work.&Bank._&API;
- By P1 - P7;
+	By P1-P&_P_Val;
 %ErrorCheck;
 
 /*Proc Print Data = Work.&Bank._&API;*/
@@ -212,7 +210,7 @@ Proc Sort Data = Work.&Bank._&API;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 /*
@@ -229,7 +227,7 @@ Proc Sort Data = Work.&Bank._&API;
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 
@@ -328,7 +326,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 /*
@@ -345,7 +343,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 
@@ -445,7 +443,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 
@@ -463,7 +461,7 @@ Run;
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
@@ -511,7 +509,6 @@ Run;
 	%Main(https://openapi.bankofireland.com/open-banking/v2.1/business-current-accounts,Bank_of_Ireland,BCA);
 /*%End;*/
 	%Main(https://openapi.aibgb.co.uk/open-banking/v2.1/business-current-accounts,AIB_Group,BCA);
-	%Main(http://localhost/sasweb/data/temp/od/aib/v2_1/json/business-current-accounts.json,AIB_Group,BCA);
 	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/business-current-accounts,Bank_of_Scotland,BCA);
 	%Main(https://atlas.api.barclays/open-banking/v2.1/business-current-accounts,Barclays,BCA);
 	%Main(https://obp-data.danskebank.com/open-banking/v2.1/business-current-accounts,Danske_Bank,BCA);
@@ -557,7 +554,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 
@@ -576,7 +573,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.Santander_&API
 		Work.Ulster_Bank_&API
 		;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 
@@ -669,7 +666,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 /*
@@ -686,7 +683,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.RBS_&API
 		Work.Santander_&API
 		Work.Ulster_Bank_&API;
-	By P1-P7;
+	By P1-P&_P_Val;
 Run;
 */
 
@@ -768,7 +765,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P7;
+		By P1-P&_P_Val;
 	Run;
 
 /*
@@ -780,7 +777,7 @@ Data Work.NoDUP_CMA9_&API;
 		Work.Natwest_CCC
 		Work.RBS_CCC
 		Work.Santander_CCC;
-	By P1-P7;
+	By P1-P&_P_Val;
 	Run;
 */
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
