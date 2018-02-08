@@ -4,14 +4,14 @@
 %Global _APIVersion;
 %Global _SRVNAME;
 %GLOBAL _Host;
-
+/*
 %Let _SRVNAME = localhost;
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
 
 %Let _APIName = PAI;
 %Let _APIVersion = V2_2;
-
+*/
 %Global _Host;
 %Global _Path;
 
@@ -140,15 +140,15 @@ Run;
 
 *--- Extract the data structure for PCA only from PCA- onwards to match Schema structure ---;
 	Data OBData.&Dsn;
-	Set OBData.&Dsn;
-		If Find(Hierarchy,'PCA') > 0 Then
+		Set OBData.&Dsn;
+		If Find(Hierarchy,"&API_DSN") > 0 Then
 		Do;
-			Hierarchy = Substr(Hierarchy,Find(Hierarchy,'PCA'));
+			Hierarchy = Substr(Hierarchy,Find(Hierarchy,"&API_DSN"));
 		End;
 		Else Do;
-			If Find(Hierarchy,'PCA') = 0 Then Delete;
+			If Find(Hierarchy,"&API_DSN") = 0 Then Delete;
 		End;
-Run;
+	Run;
 
 Proc Sort Data = OBData.&Dsn
 	Out = OBData.API_&Dsn.;
@@ -538,7 +538,7 @@ Run;
 		Table  = 'Swagger_Sch';
 
 *--- Select the data structure from Brand ---;
-		Hier = Substr(Hierarchy,find(Hierarchy,'PCA'));
+		Hier = Substr(Hierarchy,find(Hierarchy,"&API_DSN"));
 *--- Select the data structure from PCA ---;
 		If Reverse(Substr(Reverse(Trim(Left(Hier))),1,11)) = '-items-type' then
 		Do;

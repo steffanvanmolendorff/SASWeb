@@ -34,6 +34,7 @@ Options NOERRORABEND;
 %Global ErrorCode;
 %Global ErrorDesc;
 %Global Datasets;
+%Global _P_Val;
 
 /*%Let _SRVNAME = localhost;*/
 %Let _Host = &_SRVNAME;
@@ -217,26 +218,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P&_P_Val;
 	Run;
-
-/*
-	Data Work.NoDUP_CMA9_&API;
-	Set Work.Bank_of_Ireland_&API
-		Work.Bank_of_Scotland_&API
-		Work.Barclays_&API
-		Work.Danske_Bank_&API
-		Work.Halifax_&API
-		Work.HSBC_&API
-		Work.Lloyds_Bank_&API
-		Work.Nationwide_&API
-		Work.Natwest_&API
-		Work.RBS_&API
-		Work.Santander_&API
-		Work.Ulster_Bank_&API;
-	By P1-P&_P_Val;
-	Run;
-*/
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OBData.NoDUP_CMA9_&API NoDupKey;
@@ -258,21 +240,6 @@ Data OBData.CMA9_ATM(Drop = P1-P7);
 	Merge OBData.NoDUP_CMA9_ATM
 	&Datasets;
 
-/*	
-	Merge OBData.NoDUP_CMA9_ATM
-	Bank_of_Ireland_ATM
-	Bank_of_Scotland_ATM
-	Barclays_ATM
-	Danske_Bank_ATM
-	Halifax_ATM
-	HSBC_ATM
-	Lloyds_Bank_ATM
-	Nationwide_ATM
-	Natwest_ATM
-	RBS_ATM
-	Santander_ATM
-	Ulster_Bank_ATM;
-*/
 	By Hierarchy;
 
 *--- Call the macro in the Where statement to filter the required data elements ---;
@@ -333,26 +300,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P&_P_Val;
 	Run;
-
-/*
-Data Work.NoDUP_CMA9_&API;
-	Set Work.Bank_of_Ireland_&API
-		Work.Bank_of_Scotland_&API
-		Work.Barclays_&API
-		Work.Danske_Bank_&API
-		Work.Halifax_&API
-		Work.HSBC_&API
-		Work.Lloyds_Bank_&API
-		Work.Nationwide_&API
-		Work.Natwest_&API
-		Work.RBS_&API
-		Work.Santander_&API
-		Work.Ulster_Bank_&API;
-	By P1-P&_P_Val;
-	Run;
-*/
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OBData.NoDUP_CMA9_&API NoDupKey;
@@ -373,23 +321,6 @@ Data Work.NoDUP_CMA9_&API;
 Data OBData.CMA9_BCH(Drop = P1-P7);
 	Merge OBData.NoDUP_CMA9_BCH
 	&Datasets;
-
-
-/*
-	Work.Bank_of_Ireland_BCH
-	Work.Bank_of_Scotland_BCH
-	Work.Barclays_BCH
-	Work.Danske_Bank_BCH
-	Work.Halifax_BCH
-	Work.HSBC_BCH
-	Work.Lloyds_Bank_BCH
-	Work.Nationwide_BCH
-	Work.Natwest_BCH
-	Work.RBS_BCH
-	Work.Santander_BCH
-	Work.Ulster_Bank_BCH;
-*/
-
 	By Hierarchy;
 
 *--- Call the macro in the Where statement to filter the required data elements ---;
@@ -450,27 +381,8 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P&_P_Val;
 	Run;
 
-
-/*
-	Data Work.NoDUP_CMA9_&API;
-	Set Work.Bank_of_Ireland_&API
-		Work.Bank_of_Scotland_&API
-		Work.Barclays_&API
-		Work.First_Trust_Bank_&API
-		Work.Halifax_&API
-		Work.HSBC_&API
-		Work.Lloyds_Bank_&API
-		Work.Nationwide_&API
-		Work.Natwest_&API
-		Work.RBS_&API
-		Work.Santander_&API
-		Work.Ulster_Bank_&API;
-	By P1-P&_P_Val;
-	Run;
-*/
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OBData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
@@ -488,20 +400,6 @@ Run;
 Data OBData.CMA9_PCA(Drop = P1-P7);
 	Merge OBData.NoDUP_CMA9_PCA
 	&Datasets;
-/*
-	Work.Bank_of_Ireland_PCA
-	Work.Bank_of_Scotland_PCA
-	Work.Barclays_PCA
-	Work.First_Trust_Bank_PCA
-	Work.Halifax_PCA
-	Work.HSBC_PCA
-	Work.Lloyds_Bank_PCA
-	Work.Nationwide_PCA
-	Work.Natwest_PCA
-	Work.RBS_PCA
-	Work.Santander_PCA
-	Work.Ulster_Bank_PCA;
-*/
 	By Hierarchy;
 Run;
 
@@ -561,28 +459,8 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P&_P_Val;
+/*		By P1-P&_P_Val;*/
 	Run;
-
-
-/*
-Data Work.NoDUP_CMA9_&API;
-	Set Work.AIB_Group_&API
-		Work.Bank_of_Ireland_&API
-		Work.Bank_of_Scotland_&API
-		Work.Barclays_&API
-		Work.Danske_Bank_&API
-		Work.First_Trust_Bank_&API
-		Work.HSBC_&API
-		Work.Lloyds_Bank_&API
-		Work.Natwest_&API
-		Work.RBS_&API
-		Work.Santander_&API
-		Work.Ulster_Bank_&API
-		;
-	By P1-P&_P_Val;
-	Run;
-*/
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OBData.NoDUP_CMA9_&API NoDupKey;
@@ -602,21 +480,6 @@ Data OBData.CMA9_BCA(Drop = P1-P7);
 	Merge OBData.NoDUP_CMA9_BCA
 	&Datasets;
 
-/*
-	Work.AIB_Group_BCA
-	Work.Bank_of_Ireland_BCA
-	Work.Bank_of_Scotland_BCA
-	Work.Barclays_BCA
-	Work.Danske_Bank_BCA
-	Work.First_Trust_Bank_BCA
-	Work.HSBC_BCA
-	Work.Lloyds_Bank_BCA
-	Work.Natwest_BCA
-	Work.RBS_BCA
-	Work.Santander_BCA
-	Work.Ulster_Bank_BCA
-	;
-*/
 	By Hierarchy;
 Run;
 
@@ -674,26 +537,7 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P&_P_Val;
 	Run;
-
-/*
-Data Work.NoDUP_CMA9_&API;
-	Set Work.AIB_Group_&API
-		Work.Bank_of_Ireland_&API
-		Work.Bank_of_Scotland_&API
-		Work.Barclays_&API
-		Work.Danske_Bank_&API
-		Work.First_Trust_Bank_&API
-		Work.HSBC_&API
-		Work.Lloyds_Bank_&API
-		Work.Natwest_&API
-		Work.RBS_&API
-		Work.Santander_&API
-		Work.Ulster_Bank_&API;
-	By P1-P&_P_Val;
-Run;
-*/
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OBData.NoDUP_CMA9_&API NoDupKey;
@@ -712,21 +556,6 @@ Run;
 Data OBData.CMA9_SME(Drop = P1-P7);
 	Merge OBData.NoDUP_CMA9_SME
 	&Datasets;
-
-/*
-	Work.AIB_Group_SME
-	Work.Bank_of_Ireland_SME
-	Work.Bank_of_Scotland_SME
-	Work.Barclays_SME
-	Work.Danske_Bank_SME
-	Work.First_Trust_Bank_SME
-	Work.HSBC_SME
-	Work.Lloyds_Bank_SME
-	Work.Natwest_SME
-	Work.RBS_SME
-	Work.Santander_SME
-	Work.Ulster_Bank_SME;
-*/
 	By Hierarchy;
 Run;
 
@@ -773,21 +602,8 @@ Run;
 
 	Data Work.NoDUP_CMA9_&API;
 		Set &Datasets;
-		By P1-P&_P_Val;
 	Run;
 
-/*
-Data Work.NoDUP_CMA9_&API;
-	Set Work.Bank_of_Ireland_CCC
-		Work.Barclays_CCC
-		Work.HSBC_CCC
-		Work.Lloyds_Bank_CCC
-		Work.Natwest_CCC
-		Work.RBS_CCC
-		Work.Santander_CCC;
-	By P1-P&_P_Val;
-	Run;
-*/
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
 		Out = OBData.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
@@ -805,15 +621,6 @@ Data Work.NoDUP_CMA9_&API;
 Data OBData.CMA9_CCC(Drop = P1-P7);
 	Merge OBData.NoDUP_CMA9_CCC
 	&Datasets;
-/*
-	Work.Bank_of_Ireland_CCC
-	Work.Barclays_CCC
-	Work.HSBC_CCC
-	Work.Lloyds_Bank_CCC
-	Work.Natwest_CCC
-	Work.RBS_CCC
-	Work.Santander_CCC;
-*/
 	By Hierarchy;
 Run;
 
@@ -1251,10 +1058,6 @@ ods tagsets.tableeditor close;
 ods listing; 
 
 %Mend CMA9_Reports;
-/*
-%CMA9_Reports(ATMS);
-%CMA9_Reports(BRANCHES);
-*/
 
 %Macro APIReport;
 %If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
