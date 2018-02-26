@@ -138,37 +138,44 @@ Options Source Source2 Symbolgen MLogic MPrint;
 */
 %Else %If "&_action" EQ "ATM CODELIST COMPARISON" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\ATM CodeList Comparison.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\ATM CodeList Comparison.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
 
 %Else %If "&_action" EQ "BCH CODELIST COMPARISON" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\BCH CodeList Comparison.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\BCH CodeList Comparison.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
 
 %Else %If "&_action" EQ "PCA CODELIST COMPARISON" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\PCA CodeList Comparison.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\PCA CodeList Comparison.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
 
 %Else %If "&_action" EQ "BCA CODELIST COMPARISON" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\BCA CodeList Comparison.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\BCA CodeList Comparison.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
 
 %Else %If "&_action" EQ "CCC CODELIST COMPARISON" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CCC CodeList Comparison.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\CCC CodeList Comparison.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
 
 %Else %If "&_action" EQ "SME CODELIST COMPARISON" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\SME CodeList Comparison.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\SME CodeList Comparison.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
 
-%Else %If "&_action" EQ "API_ALL CODELIST COMPARISON" %Then
+%Else %If "&_action" EQ "API CODELIST COMPARISON" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\API_ALL CodeList Comparison.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\API_ALL CodeList Comparison.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
 
 %Else %If "&_action" EQ "API_ALL DD JSON COMPARE" %Then

@@ -1,4 +1,4 @@
-%Macro Valid();
+﻿%Macro Valid();
 		File _Webout;
 
 		Put '<HTML>';
@@ -178,7 +178,7 @@ Run;
 
 Data WORK.ATM_CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\ATM_CodeList_Fees.csv' 
+    infile "C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\&Version\ATM_CodeList_Fees.csv" 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
@@ -343,7 +343,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\ATMl_001_001_01DD.csv,ATM);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\&Version\ATMl_001_001_01DD.csv,ATM);
 
 Proc Sort Data = OBData.API_ATM
 	Out = Work.API_ATM(Keep = Hierarchy DataType CodeName CodeDescription
@@ -473,14 +473,10 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.ATM_Code_Compare nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.ATM_Code_Compare nowd;
 
 	Title1 "Open Banking - &_action";
-	Title2 "Data Dictionary vs. CodeList Comparison Reports - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "Data Dictionary vs. CodeList Comparison Reports - &Version - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
 	Hierarchy 
@@ -515,7 +511,7 @@ Proc Report Data = OBData.ATM_Code_Compare nowd/*
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display 'Inversion V2.0' left style(column)=[width=5%];
+	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -564,7 +560,7 @@ Proc Report Data = OBData.ATM_Code_Compare nowd/*
 Run; 
 
 Proc Export Data = OBData.ATM_Code_Compare
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\ATM_CodeList_DD_Comparison_Final.csv"
+ 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\ATM_CodeList_DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate)).csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
@@ -589,14 +585,10 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='Both')) nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='Both')) nowd;
 
 	Title1 "Open Banking - &_action";
-	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - &Version - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
 	Hierarchy 
@@ -631,7 +623,7 @@ Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='Both')) nowd/*
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display 'Inversion V2.0' left style(column)=[width=5%];
+	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -700,14 +692,10 @@ ods tagsets.tableeditor file=_Webout
 
 /*	ODS HTML File="C:\inetpub\wwwroot\sasweb\data\Results\CodeList Results.xls";*/
 
-Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='CodeList')) nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='CodeList')) nowd;
 
 	Title1 "Open Banking - &_action";
-	Title2 "Records only in the CodeList Excel Reports - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "Records only in the CodeList Excel Reports - &Version - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
 	Hierarchy 
@@ -742,7 +730,7 @@ Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display 'Inversion V2.0' left style(column)=[width=5%];
+	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -790,12 +778,13 @@ Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='CodeList')) nowd/*
 
 Run; 
 
+/*
 Proc Export Data = OBData.ATM_Code_Compare(Where=(Infile='CodeList'))
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\ATM_CodeList_DD_Comparison.csv"
+ 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\ATM_CodeList_DD_Comparison_%Sysfunc(UPCASE(&Fdate)).csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
-
+*/
 ods tagsets.tableeditor close; 
 ods listing; 
 
@@ -815,14 +804,10 @@ ods tagsets.tableeditor file=_Webout
             frozen_rowheaders="0" 
             ); 
 
-Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='DD')) nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='DD')) nowd;
 
 	Title1 "Open Banking - &_action";
-	Title2 "Records only in the Data Dictionary (DD) Excel Reports - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "Records only in the Data Dictionary (DD) Excel Reports - &Version - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
 	Hierarchy 
@@ -857,7 +842,7 @@ Proc Report Data = OBData.ATM_Code_Compare(Where=(Infile='DD')) nowd/*
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display 'Inversion V2.0' left style(column)=[width=5%];
+	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;

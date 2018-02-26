@@ -1,6 +1,9 @@
 %Global _APINamme;
-/*%Let _APIName = BCA;*/
-
+%Global _APIVersion;
+/*
+%Let _APIName = ATM;
+%Let _APIVersion = v2_2;
+*/
 %Global _Host;
 %Global _Path;
 
@@ -11,10 +14,10 @@
 %Put _Path = &_Path;
 
 %Macro Main(API_DSN,File);
-/*
+
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 Options MPrint MLogic Source Source2 Symbolgen;
-*/
+
 %Macro Import(Filename,Dsn);
 /**********************************************************************
 *   PRODUCT:   SAS
@@ -82,7 +85,7 @@ Options MPrint MLogic Source Source2 Symbolgen;
      run;
 
 
-Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/;
+Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/ Work.X1;
 	Length Pattern Hierarchy $ 1000 &DSN._Lev1 $ 1000;
 	Set OBData.&Dsn;
 
@@ -98,7 +101,7 @@ Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy
 	End;
 	Else If "&Dsn" EQ "&_APIName" Then 
 	Do;
-		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),21),'/','-');
+		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),16),'/','-');
 	End;
 
 	&DSN._Lev1 = Hierarchy;
@@ -1125,11 +1128,15 @@ Proc Export Data = OBData.Compare_&API_DSN
 	Pattern_Flag)
 
 /* 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&_APIName._DD_SWAGGER_Comparison_Final.csv"*/
-	 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&File._DD_Comparison_Final.csv"
+	 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&File._DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate)).csv"
 
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
+/*
+ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\&File._DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate)).csv";
+ODS CSV Close;
+*/
 
 %ReturnButton;
 

@@ -1042,7 +1042,7 @@ Proc Export Data = OBData.Compare_&API_DSN
 	&API_DSN._Pattern
 	Pattern_Flag)
 
-	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&File._DD_Comparison_Final.csv"
+	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&_APIName._DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate.)).csv"
 
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;

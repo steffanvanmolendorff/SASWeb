@@ -1,4 +1,4 @@
-%Global _WebUser;
+﻿%Global _WebUser;
 %Global _WebPass;
 %Global _RegUser;
 %Global _RegPass;
@@ -82,16 +82,21 @@ Data _Null_;
 
 		Put '<H2>OPEN DATA INTERNAL JSON VALIDATION</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
-		Put '<SELECT NAME="_action" size="8" onchange="this.form.submit()"</option>';
+		Put '<SELECT NAME="_action" size="5" onchange="this.form.submit()"</option>';
+/*--- This section was automated to read from the Parameters_API_Ver script 
+			and replaced by the value API CODELIST COMARISON just below ---
 		Put '<OPTION VALUE="ATM CODELIST COMPARISON"> 1. ATM CODELIST COMPARISON </option>';
 		Put '<OPTION VALUE="BCH CODELIST COMPARISON"> 2. BCH CODELIST COMPARISON </option>';
 		Put '<OPTION VALUE="PCA CODELIST COMPARISON"> 3. PCA CODELIST COMPARISON </option>';
 		Put '<OPTION VALUE="BCA CODELIST COMPARISON"> 4. BCA CODELIST COMPARISON </option>';
 		Put '<OPTION VALUE="CCC CODELIST COMPARISON"> 5. CCC CODELIST COMPARISON </option>';
 		Put '<OPTION VALUE="SME CODELIST COMPARISON"> 6. SME CODELIST COMPARISON </option>';
-		Put '<OPTION VALUE="API_ALL DD JSON COMPARE"> 7. API ALL DD JSON COMPARE </option>';
-		Put '<OPTION VALUE="API_PAI_BAI DD JSON COMPARE"> 8. API PAI BAI DD JSON COMPARE </option>';
-		Put '<OPTION VALUE="API_ALL DD SWAGGER COMPARE"> 9. API ALL DD SWAGGER COMPARE </option>';
+*/
+		Put '<OPTION VALUE="API CODELIST COMPARISON"> 1. API CODELIST COMPARISON </option>';
+
+		Put '<OPTION VALUE="API_ALL DD JSON COMPARE"> 2. API ALL DD JSON COMPARE </option>';
+		Put '<OPTION VALUE="API_PAI_BAI DD JSON COMPARE"> 3. API PAI BAI DD JSON COMPARE </option>';
+		Put '<OPTION VALUE="API_ALL DD SWAGGER COMPARE"> 4. API ALL DD SWAGGER COMPARE </option>';
 		Put '</SELECT>';
 		Put '</div>';
 

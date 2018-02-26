@@ -178,7 +178,7 @@ Run;
 
 Data WORK.CCC_CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\CCC_CodeList_Fees.csv' 
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_2\CCC_CodeList_Fees.csv' 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
@@ -346,7 +346,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\CCCl_001_001_01DD.csv,CCC);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_2\CCCl_001_001_01DD.csv,CCC);
 
 Proc Sort Data = OBData.API_CCC
 	Out = Work.API_CCC(Keep = Hierarchy DataType CodeName CodeDescription
@@ -478,11 +478,7 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.CCC_Code_Compare nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.CCC_Code_Compare nowd;
 
 	Title1 "Open Banking - CodeList Comparison";
 	Title2 "Data Dictionary vs. CodeList Comparison Reports - %Sysfunc(UPCASE(&Fdate))";
@@ -569,7 +565,7 @@ Proc Report Data = OBData.CCC_Code_Compare nowd/*
 Run; 
 
 Proc Export Data = OBData.CCC_Code_Compare
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\CCC_CodeList_DD_Comparison_Final.csv"
+ 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\CCC_CodeList_DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate)).csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
@@ -595,11 +591,7 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='Both')) nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='Both')) nowd;
 
 	Title1 "Open Banking - CodeList Comparison";
 	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - %Sysfunc(UPCASE(&Fdate))";
@@ -795,13 +787,13 @@ Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	Endcomp;
 
 Run; 
-
+/*
 Proc Export Data = OBData.CCC_Code_Compare(Where=(Infile='CodeList'))
  	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\CCC_CodeList_DD_Comparison.csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
-
+*/
 ods tagsets.tableeditor close; 
 ods listing; 
 

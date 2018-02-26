@@ -1,5 +1,4 @@
 %Global _action;
-%Global _APIVisual;
 %Global _SRVNAME;
 %Global _Host;
 
@@ -82,9 +81,9 @@ Data OBData.&Dsn;
 	*/
 Run;
 %Mend BankName;
-*%BankName(ATM_Geographic);
+%BankName(ATM_Geographic);
 %BankName(BCH_Geographic);
-*%BankName(BCA_Geographic);
-*%BankName(PCA_Geographic);
-*%BankName(CCC_Geographic);
-*%BankName(SME_Geographic);
+%BankName(BCA_Geographic);
+%BankName(PCA_Geographic);
+%BankName(CCC_Geographic);
+%BankName(SME_Geographic);

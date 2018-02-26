@@ -1,4 +1,4 @@
-%Macro Valid();
+﻿%Macro Valid();
 		File _Webout;
 
 		Put '<HTML>';
@@ -59,7 +59,7 @@
 		Put '<INPUT TYPE=submit NAME=_action VALUE="PARAMETERS">';
 		Put '<INPUT TYPE=submit NAME=_action VALUE="STATISTICS">';
 		Put '<INPUT TYPE=submit NAME=_action VALUE="OBPaySet JSON COMPARE">';
-		Put '<INPUT TYPE=submit NAME=_action VALUE="ATM BRA JSON COMPARE">';
+		Put '<INPUT TYPE=submit NAME=_action VALUE="&APIName BRA JSON COMPARE">';
 		Put '<INPUT TYPE=submit NAME=_action VALUE="CODELIST COMPARISON">';
 		Put '<p><br></p>';
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SelectSASProgram.sas">';
@@ -173,12 +173,12 @@ Run;
 
 
 
-%Macro CodeList();
+%Macro CodeList(APIName,Version);
 /*Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Temp";*/
 
-Data WORK.BCH_CODELIST_FEES;
+Data WORK.&APIName._CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\BCH_CodeList_Fees.csv' 
+    infile "C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\&Version.\&APIName._CodeList_Fees.csv" 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
@@ -215,17 +215,17 @@ Data WORK.BCH_CODELIST_FEES;
 run;
 
 
-Data Work.BCH_CodeList_Fees1(Drop = Description);
-	Set Work.BCH_CodeList_Fees;
+Data Work.&APIName._CodeList_Fees1(Drop = Description);
+	Set Work.&APIName._CodeList_Fees;
 	CodeDescription = Description;
 	If Include_in_v2_0_ EQ 'N' or CodeName EQ '' then Delete;
 /*	Where CodeListName = 'OB_CardType1Code';*/
 Run;
 
 
-Data OBData.BCH_CodeList;
+Data OBData.&APIName._CodeList;
 	Length CodelistName $ 50 CodeName CodeDescription $ 1000;
-	Set Work.BCH_CodeList_Fees1(In=a Drop = Notes);
+	Set Work.&APIName._CodeList_Fees1(In=a Drop = Notes);
 	Length Infile $ 8;
 	If a then InFile = 'Fees';
 
@@ -244,14 +244,14 @@ Data OBData.BCH_CodeList;
 /*	Where CodeListName = 'OB_CardType1Code';*/
 Run;
 
-Proc Sort Data = OBData.BCH_CodeList(Keep = CodeName CodeListName CodeDescription
+Proc Sort Data = OBData.&APIName._CodeList(Keep = CodeName CodeListName CodeDescription
 	CodeName_CL CodeListName_CL CodeDescription_CL Include_in_v2_0_) ;
 	By CodeListName CodeName CodeDescription;
 Run;
 
 
 
-*--- Get data from API_BCH Data Dictionary data ---;
+*--- Get data from API_&APIName Data Dictionary data ---;
 
 Options MLOGIC MPRINT SOURCE SOURCE2 SYMBOLGEN;
 /*Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Temp";*/
@@ -329,9 +329,9 @@ Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy
 
 	If XPath NE '';
 
-	If "&Dsn" EQ 'BCH' Then 
+	If "&Dsn" EQ "&APIName" Then 
 	Do;
-		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),19),'/','-');
+		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),16),'/','-');
 	End;
 
 	&DSN._Lev1 = Hierarchy;
@@ -343,18 +343,18 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\BCHl_001_001_01DD.csv,BCH);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\&Version.\&APIName.l_001_001_01DD.csv,&APIName);
 
-Proc Sort Data = OBData.API_BCH
-	Out = Work.API_BCH(Keep = Hierarchy DataType CodeName CodeDescription
+Proc Sort Data = OBData.API_&APIName
+	Out = Work.API_&APIName(Keep = Hierarchy DataType CodeName CodeDescription
 	Rename = (DataType = CodeListName)) NoDupKey;
 	By Hierarchy DataType CodeName CodeDescription;
 /*	Where DataType EQ 'OB_CardType1Code';*/
 Run;
 
 
-Data Work.API_BCH1(Drop = CodeListName Rename = (NewVar = CodeListName));
-	Set Work.API_BCH;
+Data Work.API_&APIName.1(Drop = CodeListName Rename = (NewVar = CodeListName));
+	Set Work.API_&APIName;
 	By Hierarchy CodeListName CodeName CodeDescription;
 
 	Retain NewVar;	
@@ -372,13 +372,13 @@ Data Work.API_BCH1(Drop = CodeListName Rename = (NewVar = CodeListName));
 
 Run;
 
-Proc Sort Data = Work.API_BCH1
-		Out = OBData.API_BCH2 NoDupKey;
+Proc Sort Data = Work.API_&APIName.1
+		Out = OBData.API_&APIName.2 NoDupKey;
 	By CodeListName CodeName CodeDescription;
 Run;
 
-Data OBData.API_BCH2;
-	Set OBData.API_BCH2;
+Data OBData.API_&APIName.2;
+	Set OBData.API_&APIName.2;
 
 	CodeDescription = Tranwrd(CodeDescription,'0A'x,' ');
 	CodeListName_DD = CodeListName;
@@ -393,13 +393,13 @@ Run;
 
 %Macro Validate();
 Options Symbolgen MLogic MPrint Source Source2;
-Data OBData.BCH_Code_Compare Work.BCH_Code_Compare;
+Data OBData.&APIName._Code_Compare Work.&APIName._Code_Compare;
 	Length Count 4 Hierarchy $ 1000 CodeListName $ 50 CodeName CodeDescription $ 1000;
 
-	Merge OBData.API_BCH2(In=b Keep = Hierarchy CodeListName CodeName CodeDescription
+	Merge OBData.API_&APIName.2(In=b Keep = Hierarchy CodeListName CodeName CodeDescription
 	CodeListName_DD CodeName_DD CodeDescription_DD)
 
-	OBData.BCH_CodeList(In=a Keep = CodeListName CodeName CodeDescription
+	OBData.&APIName._CodeList(In=a Keep = CodeListName CodeName CodeDescription
 	CodeListName_CL CodeName_CL CodeDescription_CL Include_in_v2_0_);
 
 	By CodeListName CodeName CodeDescription;
@@ -473,14 +473,10 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.BCH_Code_Compare nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.&APIName._Code_Compare nowd;
 
 	Title1 "Open Banking - &_action";
-	Title2 "Data Dictionary vs. CodeList Comparison Reports - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "Data Dictionary vs. CodeList Comparison Reports - &Version - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
 	Hierarchy 
@@ -515,7 +511,7 @@ Proc Report Data = OBData.BCH_Code_Compare nowd/*
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display 'Inversion V2.0' left style(column)=[width=5%];
+	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -563,8 +559,8 @@ Proc Report Data = OBData.BCH_Code_Compare nowd/*
 
 Run; 
 
-Proc Export Data = OBData.BCH_Code_Compare
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\BCH_CodeList_DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate)).csv"
+Proc Export Data = OBData.&APIName._Code_Compare
+ 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&APIName._CodeList_DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate)).csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
@@ -589,14 +585,10 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.BCH_Code_Compare(Where=(Infile='Both')) nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='Both')) nowd;
 
 	Title1 "Open Banking - &_action";
-	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - &Version - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
 	Hierarchy 
@@ -631,7 +623,7 @@ Proc Report Data = OBData.BCH_Code_Compare(Where=(Infile='Both')) nowd/*
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display 'Inversion V2.0' left style(column)=[width=5%];
+	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -700,14 +692,10 @@ ods tagsets.tableeditor file=_Webout
 
 /*	ODS HTML File="C:\inetpub\wwwroot\sasweb\data\Results\CodeList Results.xls";*/
 
-Proc Report Data = OBData.BCH_Code_Compare(Where=(Infile='CodeList')) nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='CodeList')) nowd;
 
 	Title1 "Open Banking - &_action";
-	Title2 "Records only in the CodeList Excel Reports - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "Records only in the CodeList Excel Reports - &Version - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
 	Hierarchy 
@@ -742,7 +730,7 @@ Proc Report Data = OBData.BCH_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display 'Inversion V2.0' left style(column)=[width=5%];
+	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -789,9 +777,10 @@ Proc Report Data = OBData.BCH_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	Endcomp;
 
 Run; 
+
 /*
-Proc Export Data = OBData.BCH_Code_Compare(Where=(Infile='CodeList'))
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\BCH_CodeList_DD_Comparison.csv"
+Proc Export Data = OBData.&APIName._Code_Compare(Where=(Infile='CodeList'))
+ 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\&APIName._CodeList_DD_Comparison_%Sysfunc(UPCASE(&Fdate)).csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
@@ -815,14 +804,10 @@ ods tagsets.tableeditor file=_Webout
             frozen_rowheaders="0" 
             ); 
 
-Proc Report Data = OBData.BCH_Code_Compare(Where=(Infile='DD')) nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='DD')) nowd;
 
 	Title1 "Open Banking - &_action";
-	Title2 "Records only in the Data Dictionary (DD) Excel Reports - %Sysfunc(UPCASE(&Fdate))";
+	Title2 "Records only in the Data Dictionary (DD) Excel Reports - &Version - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
 	Hierarchy 
@@ -857,7 +842,7 @@ Proc Report Data = OBData.BCH_Code_Compare(Where=(Infile='DD')) nowd/*
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display 'Inversion V2.0' left style(column)=[width=5%];
+	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -913,4 +898,4 @@ ods tagsets.tableeditor close;
 ods listing; 
 
 %Mend CodeList;
-%CodeList();
+%CodeList(&_APIName,&_APIVersion);

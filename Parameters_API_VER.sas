@@ -1,4 +1,4 @@
-Options MPrint MLogic Source Source2 Symbolgen;
+﻿Options MPrint MLogic Source Source2 Symbolgen;
 
 *--- Set a Gloabl macro variable to determine if DD vs JSON or SWAGGER file will be executed ---;
 %Global _Swagger;
@@ -151,6 +151,16 @@ File _Webout;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 	%End;
 *=============================================================================================================================
+			Read Dataset for the CodeList Comparison
+=============================================================================================================================;
+	%If "&_action" EQ "API CODELIST COMPARISON" %then
+	%Do;
+				*--- Read Dataset UniqueNames ---;
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('ATM','BCH','PCA','BCA','SME','CCC')))));
+				*--- Count Observations ---;
+				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
+	%End;
+*=============================================================================================================================
 			Read Dataset for the JSON Comparison
 =============================================================================================================================;
 	%If "&_action" EQ "API_PAI_BAI DD JSON COMPARE" %then
@@ -238,7 +248,26 @@ File _Webout;
 	Put '<Table align="center" style="width: 100%; height: 10%" border="1">';
 	Put '<tr>';
 /*	Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';*/
-
+*=============================================================================================================================
+			Call SAS program for the ATM BCH PCA BCA SME CCC CodeList Comparison
+=============================================================================================================================;
+	%If "&_action" EQ "API CODELIST COMPARISON" or
+	"&_action" EQ "ATM CODELIST COMPARISON" %Then
+	%Do;
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API CodeList Comparison.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+	%End;
 	%If "&_action" EQ "API_ALL DD JSON COMPARE" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';

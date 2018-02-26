@@ -178,7 +178,7 @@ Run;
 
 Data WORK.SME_CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\SME_CodeList_Fees.csv' 
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_2\SME_CodeList_Fees.csv' 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
@@ -346,7 +346,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\SMEl_001_001_01DD.csv,SME);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_2\SMEl_001_001_01DD.csv,SME);
 
 Proc Sort Data = OBData.API_SME
 	Out = Work.API_SME(Keep = Hierarchy DataType CodeName CodeDescription
@@ -567,7 +567,7 @@ Proc Report Data = OBData.SME_Code_Compare nowd/*
 Run; 
 
 Proc Export Data = OBData.SME_Code_Compare
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\SME_CodeList_DD_Comparison_Final.csv"
+ 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\SME_CodeList_DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate)).csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
@@ -792,13 +792,13 @@ Proc Report Data = OBData.SME_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	Endcomp;
 
 Run; 
-
+/*
 Proc Export Data = OBData.SME_Code_Compare(Where=(Infile='CodeList'))
  	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\SME_CodeList_DD_Comparison.csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
-
+*/
 ods tagsets.tableeditor close; 
 ods listing; 
 

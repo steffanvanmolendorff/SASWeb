@@ -193,7 +193,7 @@ RUN;
 
     data WORK.PCA_CODELIST_NONFEES    ;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\PCA_CodeList_NonFees.csv'
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_2\PCA_CodeList_NonFees.csv'
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat Endpoint_CodeName $50. ;
@@ -239,7 +239,7 @@ RUN;
 
 data WORK.PCA_CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
-    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\V2_2\UML\PCA_CodeList_Fees.csv' 
+    infile 'C:\inetpub\wwwroot\sasweb\Data\Temp\OD\OB\V2_2\PCA_CodeList_Fees.csv' 
 	delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 TermStr = CRLF;
        informat CodelistName $50. ;
        informat CodeName $50. ;
@@ -421,7 +421,7 @@ Proc Sort Data = OBData.&Dsn
 Run;
 
 %Mend Import;
-%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_1\PCAl_001_001_01DD.csv,PCA);
+%Import(C:\inetpub\wwwroot\sasweb\Data\Temp\od\ob\V2_2\PCAl_001_001_01DD.csv,PCA);
 
 Proc Sort Data = OBData.API_PCA
 	Out = Work.API_PCA(Keep = Hierarchy DataType CodeName CodeDescription
@@ -551,11 +551,7 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 
-Proc Report Data = OBData.PCA_Code_Compare nowd/*
-	style(report)=[width=100%]
-	style(report)=[rules=all cellspacing=0 bordercolor=gray] 
-	style(header)=[background=lightskyblue foreground=black] 
-	style(column)=[background=lightcyan foreground=black]*/;
+Proc Report Data = OBData.PCA_Code_Compare nowd;
 
 	Title1 "Open Banking - CodeList Comparison";
 	Title2 "Data Dictionary vs. CodeList Comparison Reports - %Sysfunc(UPCASE(&Fdate))";
@@ -642,7 +638,7 @@ Proc Report Data = OBData.PCA_Code_Compare nowd/*
 Run; 
 
 Proc Export Data = OBData.PCA_Code_Compare
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\PCA_CodeList_DD_Comparison_Final.csv"
+ 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\PCA_CodeList_DD_Comparison_Final_%Sysfunc(UPCASE(&Fdate)).csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
@@ -674,7 +670,7 @@ Proc Report Data = OBData.PCA_Code_Compare(Where=(Infile='Both')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - CodeList Comparison - Both";
 	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -868,13 +864,13 @@ Proc Report Data = OBData.PCA_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	Endcomp;
 
 Run; 
-
+/*
 Proc Export Data = OBData.PCA_Code_Compare(Where=(Infile='CodeList'))
- 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\PCA_CodeList_DD_Comparison.csv"
+ 	Outfile = "C:\inetpub\wwwroot\sasweb\Data\Results\PCA_CodeList_DD_Comparison_%Sysfunc(UPCASE(&Fdate)).csv"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
-
+*/
 ods tagsets.tableeditor close; 
 ods listing; 
 
@@ -900,7 +896,7 @@ Proc Report Data = OBData.PCA_Code_Compare(Where=(Infile='DD')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - CodeList Comparison - DD";
 	Title2 "Records only in the Data Dictionary (DD) Excel Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 

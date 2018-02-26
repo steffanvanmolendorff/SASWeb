@@ -15,19 +15,21 @@
 *	Author: Steffan van Molendorff																*
 *	Date: 27 March 2017																			*
 *																								*
-*	Updates - 7 April 2017:																		*
+*	Updates - 8 April 2017:																		*
 *	Version 1.1 created on 7 April 2017.														*
 *	Includes an update of the ODS CSV export code. This was implemented because Proc Export		*
 *	include new line characters from Excel and splits the data over multiple lines whereby the	*
 *	structure of the CSV file is broken. ODS CSV functionality does a direct export of the		*
 *	data in SAS to Excel/CSV.																	*
 *																								*
-*																								*
+*	9 February 2018:																			*
+*	Updated the P1-P7 functionality to automate the number of P1 columns.						*
+*	Update the URLs for AIB and First Trust Bank												*
 *	Nex Update:																					*
 *																								*
 *===============================================================================================;*/
 *--- Set Program Options ---;
-Option Source Source2 MLogic MPrint Symbolgen;
+/*Option Source Source2 MLogic MPrint Symbolgen;*/
 Options NOERRORABEND;
 
 
@@ -35,6 +37,7 @@ Options NOERRORABEND;
 %Global ErrorCode;
 %Global ErrorDesc;
 %Global Datasets;
+%Global _P_Val;
 
 %Let _SRVNAME = localhost;
 %Let _Host = &_SRVNAME;
@@ -54,7 +57,7 @@ Options NOERRORABEND;
 
 *--- Set Default Data Library as macro variable ---;
 *--- Alternatively set the Data library in Proc Appsrv ---;
-/*
+
 %Let Path = C:\inetpub\wwwroot\sasweb\Data\Perm;
 
 *--- Set X path variable to the default directory ---;
@@ -62,7 +65,7 @@ X "cd &Path";
 
 *--- Set the Library path where the permanent datasets will be saved ---;
 Libname OBData "&Path";
-*/
+
 
 *=====================================================================================================================================================
 --- Set the ERROR Code macro variables ---
@@ -101,6 +104,19 @@ Libname LibAPIs JSON Fileref=API;
 *--- Proc datasets will create the datasets to examine resulting tables and structures ---;
 Proc Datasets Lib = LibAPIs; 
 %ErrorCheck;
+
+Data Work.&Bank._&API._Sort(Keep = P);
+	Set LibAPIs.Alldata(Where=(V NE 0));
+Run;
+
+Proc Sort Data = Work.&Bank._&API._Sort;
+	By Decending P;
+Run;
+
+Data _Null_;
+	Set Work.&Bank._&API._Sort(Obs = 1);
+	Call Symput('_P_Val',Trim(Left(Put(P,3.))));
+Run;
 
 Data Work.&Bank._&API
 	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P&_P_Val Value 
@@ -213,7 +229,7 @@ Proc Sort Data = Work.&Bank._&API;
 	Run;
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OBData.NoDUP_CMA9_&API NoDupKey;
+		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -229,7 +245,7 @@ Proc Sort Data = Work.&Bank._&API;
 *--- Append ATMS Datasets ---;
 Data OBData.CMA9_ATM(Drop = P1-P7);
 
-	Merge OBData.NoDUP_CMA9_ATM
+	Merge Work.NoDUP_CMA9_ATM
 	&Datasets;
 	By Hierarchy;
 
@@ -294,7 +310,7 @@ Run;
 	Run;
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OBData.NoDUP_CMA9_&API NoDupKey;
+		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -310,7 +326,7 @@ Run;
 
 *--- Append BRANCHES Datasets ---;
 Data OBData.CMA9_BCH(Drop = P1-P7);
-	Merge OBData.NoDUP_CMA9_BCH
+	Merge Work.NoDUP_CMA9_BCH
 	&Datasets;
 	By Hierarchy;
 
@@ -375,7 +391,7 @@ Run;
 	Run;
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OBData.NoDUP_CMA9_&API NoDupKey;
+		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -389,7 +405,7 @@ Run;
 %Do;
 *--- Append PCA Datasets ---;
 Data OBData.CMA9_PCA(Drop = P1-P7);
-	Merge OBData.NoDUP_CMA9_PCA
+	Merge Work.NoDUP_CMA9_PCA
 	&Datasets;
 	By Hierarchy;
 Run;
@@ -453,7 +469,7 @@ Run;
 	Run;
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OBData.NoDUP_CMA9_&API NoDupKey;
+		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -467,7 +483,7 @@ Run;
 %Do;
 *--- Append BCA Datasets ---;
 Data OBData.CMA9_BCA(Drop = P1-P7);
-	Merge OBData.NoDUP_CMA9_BCA
+	Merge Work.NoDUP_CMA9_BCA
 	&Datasets;
 	By Hierarchy;
 Run;
@@ -528,7 +544,7 @@ Run;
 	Run;
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OBData.NoDUP_CMA9_&API NoDupKey;
+		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -542,7 +558,7 @@ Run;
 %Do;
 *--- Append SME Datasets ---;
 Data OBData.CMA9_SME(Drop = P1-P7);
-	Merge OBData.NoDUP_CMA9_SME
+	Merge Work.NoDUP_CMA9_SME
 	&Datasets;
 	By Hierarchy;
 Run;
@@ -593,7 +609,7 @@ Run;
 	Run;
 
 	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = OBData.NoDUP_CMA9_&API NoDupKey;
+		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
 
@@ -607,7 +623,7 @@ Run;
 %Do;
 *--- Append CCC Datasets ---;
 Data OBData.CMA9_CCC(Drop = P1-P7);
-	Merge OBData.NoDUP_CMA9_CCC
+	Merge Work.NoDUP_CMA9_CCC
 	&Datasets;
 	By Hierarchy;
 Run;
@@ -1011,7 +1027,7 @@ RUN;
 /*ODS HTML Close;*/
 
 
-ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\CMA9_&API..csv";
+/*ODS CSV File="C:\inetpub\wwwroot\sasweb\data\results\CMA9_&API..csv";*/
 /*
 Proc Print Data=OBData.CMA9_&API(Drop=Bank_API P Count RowCnt);
 	Title1 "Open Banking - &API";
