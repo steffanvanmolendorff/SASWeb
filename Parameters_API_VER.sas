@@ -1,4 +1,4 @@
-﻿Options MPrint MLogic Source Source2 Symbolgen;
+Options MPrint MLogic Source Source2 Symbolgen;
 
 *--- Set a Gloabl macro variable to determine if DD vs JSON or SWAGGER file will be executed ---;
 %Global _Swagger;
@@ -156,7 +156,7 @@ File _Webout;
 	%If "&_action" EQ "API CODELIST COMPARISON" %then
 	%Do;
 				*--- Read Dataset UniqueNames ---;
-				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('ATM','BCH','PCA','BCA','SME','CCC')))));
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('ATM','BCH','PCA','BCA','SME','CCC','FCA')))));
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 	%End;
@@ -227,10 +227,11 @@ File _Webout;
 	Put '<b>SELECT VERSION</b>';
 	Put '<p></p>';
 	Put '<SELECT NAME="_APIVersion" size="7" onchange="this.form.submit()"</option>';
-	Put '<OPTION VALUE="V1_3"> Version 1.3 </option>';
-	Put '<OPTION VALUE="V2_0"> Version 2.0 </option>';
+/*	Put '<OPTION VALUE="V1_3"> Version 1.3 </option>';*/
+/*	Put '<OPTION VALUE="V2_0"> Version 2.0 </option>';*/
+	Put '<OPTION VALUE="V1_1"> Version 1.0 </option>';
 	Put '<OPTION VALUE="V2_1"> Version 2.1 </option>';
-	Put '<OPTION VALUE="V2_1_1"> Version 2.1.1 </option>';
+/*	Put '<OPTION VALUE="V2_1_1"> Version 2.1.1 </option>';*/
 	Put '<OPTION VALUE="V2_2"> Version 2.2 </option>';
 	Put '</SELECT>';
 	Put '</div>';

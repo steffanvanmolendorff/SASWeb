@@ -23,7 +23,7 @@
 *	data in SAS to Excel/CSV.																	*
 *																								*
 *	9 February 2018:																			*
-*	Updated the P1-P7 functionality to automate the number of P1 columns.						*
+*	Updated the P1-P7 with (P1-P&_P_Val) functionality to automate the number of P1 columns.						*
 *	Update the URLs for AIB and First Trust Bank												*
 *	Nex Update:																					*
 *																								*
@@ -38,13 +38,16 @@ Options NOERRORABEND;
 %Global ErrorDesc;
 %Global Datasets;
 %Global _P_Val;
+%Global _P_Max;
 
 %Let _SRVNAME = localhost;
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
+%Let _P_Max = 0;
 
 %Let _Path = http://&_Host/sasweb;
 %Put _Path = &_Path;
+
 
 *--- Un-comment this section to run program locally from Desktop ---;
 *%Let _action = CMA9 COMPARISON ATMS;
@@ -57,7 +60,7 @@ Options NOERRORABEND;
 
 *--- Set Default Data Library as macro variable ---;
 *--- Alternatively set the Data library in Proc Appsrv ---;
-
+/*
 %Let Path = C:\inetpub\wwwroot\sasweb\Data\Perm;
 
 *--- Set X path variable to the default directory ---;
@@ -65,7 +68,7 @@ X "cd &Path";
 
 *--- Set the Library path where the permanent datasets will be saved ---;
 Libname OBData "&Path";
-
+*/
 
 *=====================================================================================================================================================
 --- Set the ERROR Code macro variables ---
@@ -113,10 +116,21 @@ Proc Sort Data = Work.&Bank._&API._Sort;
 	By Decending P;
 Run;
 
+*--- Set the P value in the _P_Val macro to loop through the number of P* columns to build Hierarchies ---;
 Data _Null_;
 	Set Work.&Bank._&API._Sort(Obs = 1);
 	Call Symput('_P_Val',Trim(Left(Put(P,3.))));
 Run;
+
+*--- Keep the highest _P_Val in _P_Max to delete all P1 - P* columns from final dataset ---;
+Data _Null_;
+	Set Work.&Bank._&API._Sort(Obs = 1);
+	If P > &_P_Max then
+	Do;
+		Call Symput('_P_Max',Trim(Left(Put(P,3.))));
+	End;
+Run;
+
 
 Data Work.&Bank._&API
 	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P&_P_Val Value 
@@ -243,7 +257,7 @@ Proc Sort Data = Work.&Bank._&API;
 %Do;
 
 *--- Append ATMS Datasets ---;
-Data OBData.CMA9_ATM(Drop = P1-P7);
+Data OBData.CMA9_ATM(Drop = P1-P&_P_Max);
 
 	Merge Work.NoDUP_CMA9_ATM
 	&Datasets;
@@ -325,7 +339,7 @@ Run;
 %Do;
 
 *--- Append BRANCHES Datasets ---;
-Data OBData.CMA9_BCH(Drop = P1-P7);
+Data OBData.CMA9_BCH(Drop = P1-P&_P_Max);
 	Merge Work.NoDUP_CMA9_BCH
 	&Datasets;
 	By Hierarchy;
@@ -404,7 +418,7 @@ Run;
 %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
 %Do;
 *--- Append PCA Datasets ---;
-Data OBData.CMA9_PCA(Drop = P1-P7);
+Data OBData.CMA9_PCA(Drop = P1-P&_P_Max);
 	Merge Work.NoDUP_CMA9_PCA
 	&Datasets;
 	By Hierarchy;
@@ -482,7 +496,7 @@ Run;
 %If "&_action" EQ "CMA9 COMPARISON BCA" %Then
 %Do;
 *--- Append BCA Datasets ---;
-Data OBData.CMA9_BCA(Drop = P1-P7);
+Data OBData.CMA9_BCA(Drop = P1-P&_P_Max);
 	Merge Work.NoDUP_CMA9_BCA
 	&Datasets;
 	By Hierarchy;
@@ -498,6 +512,7 @@ Run;
 /*	%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v2.1/unsecured-sme-loans,Bank_of_Ireland,SME);
 /*	%End;*/
+
 	%Main(https://openapi.aibgb.co.uk/open-banking/v2.1/unsecured-sme-loans,AIB_Group, SME);
 	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/unsecured-sme-loans,Bank_of_Scotland,SME);
 	%Main(https://atlas.api.barclays/open-banking/v2.1/unsecured-sme-loans,Barclays,SME);
@@ -510,6 +525,7 @@ Run;
 	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/unsecured-sme-loans,RBS,SME);
 	%Main(https://openbanking.santander.co.uk/sanuk/external/open-banking/v2.1/unsecured-sme-loans,Santander,SME);
 	%Main(https://openapi.ulsterbank.co.uk/open-banking/v2.1/unsecured-sme-loans,Ulster_Bank,SME);
+
 %End;
 *--- Get unique Hierarchy values for SME ---;
 %Macro UniqueSME(API);
@@ -556,8 +572,12 @@ Run;
 
 %If "&_action" EQ "CMA9 COMPARISON SME" %Then
 %Do;
+
+%Put _P_Val = P&_P_Val;
+
+
 *--- Append SME Datasets ---;
-Data OBData.CMA9_SME(Drop = P1-P7);
+Data OBData.CMA9_SME(Drop = P1-P&_P_Max);
 	Merge Work.NoDUP_CMA9_SME
 	&Datasets;
 	By Hierarchy;
@@ -622,7 +642,7 @@ Run;
 %If "&_action" EQ "CMA9 COMPARISON CCC" %Then
 %Do;
 *--- Append CCC Datasets ---;
-Data OBData.CMA9_CCC(Drop = P1-P7);
+Data OBData.CMA9_CCC(Drop = P1-P&_P_Max);
 	Merge Work.NoDUP_CMA9_CCC
 	&Datasets;
 	By Hierarchy;

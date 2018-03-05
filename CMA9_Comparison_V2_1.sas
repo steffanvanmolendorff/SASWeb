@@ -22,7 +22,9 @@
 *	structure of the CSV file is broken. ODS CSV functionality does a direct export of the		*
 *	data in SAS to Excel/CSV.																	*
 *																								*
-*																								*
+*	9 February 2018:																			*
+*	Updated the P1-P7 with (P1-P&_P_Val) functionality to automate the number of P1 columns.	*
+*	Update the URLs for AIB and First Trust Bank												*
 *	Nex Update:																					*
 *																								*
 *===============================================================================================;*/
@@ -35,10 +37,12 @@ Options NOERRORABEND;
 %Global ErrorDesc;
 %Global Datasets;
 %Global _P_Val;
+%Global _P_Max;
 
 /*%Let _SRVNAME = localhost;*/
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
+%Let _P_Max = 0;
 
 %Let _Path = http://&_Host/sasweb;
 %Put _Path = &_Path;
@@ -107,6 +111,15 @@ Run;
 Data _Null_;
 	Set Work.&Bank._&API._Sort(Obs = 1);
 	Call Symput('_P_Val',Trim(Left(Put(P,3.))));
+Run;
+
+*--- Keep the highest _P_Val in _P_Max to delete all P1 - P* columns from final dataset ---;
+Data _Null_;
+	Set Work.&Bank._&API._Sort(Obs = 1);
+	If P > &_P_Max then
+	Do;
+		Call Symput('_P_Max',Trim(Left(Put(P,3.))));
+	End;
 Run;
 
 Data Work.&Bank._&API
@@ -235,7 +248,7 @@ Run;
 %Do;
 
 *--- Append ATMS Datasets ---;
-Data OBData.CMA9_ATM(Drop = P1-P7);
+Data OBData.CMA9_ATM(Drop = P1-P&_P_Max);
 
 	Merge OBData.NoDUP_CMA9_ATM
 	&Datasets;
@@ -318,7 +331,7 @@ Run;
 %Do;
 
 *--- Append BRANCHES Datasets ---;
-Data OBData.CMA9_BCH(Drop = P1-P7);
+Data OBData.CMA9_BCH(Drop = P1-P&_P_Max);
 	Merge OBData.NoDUP_CMA9_BCH
 	&Datasets;
 	By Hierarchy;
@@ -397,7 +410,7 @@ Run;
 %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
 %Do;
 *--- Append PCA Datasets ---;
-Data OBData.CMA9_PCA(Drop = P1-P7);
+Data OBData.CMA9_PCA(Drop = P1-P&_P_Max);
 	Merge OBData.NoDUP_CMA9_PCA
 	&Datasets;
 	By Hierarchy;
@@ -475,7 +488,7 @@ Run;
 %If "&_action" EQ "CMA9 COMPARISON BCA" %Then
 %Do;
 *--- Append BCA Datasets ---;
-Data OBData.CMA9_BCA(Drop = P1-P7);
+Data OBData.CMA9_BCA(Drop = P1-P&_P_Max);
 	Merge OBData.NoDUP_CMA9_BCA
 	&Datasets;
 
@@ -552,7 +565,7 @@ Run;
 %If "&_action" EQ "CMA9 COMPARISON SME" %Then
 %Do;
 *--- Append SME Datasets ---;
-Data OBData.CMA9_SME(Drop = P1-P7);
+Data OBData.CMA9_SME(Drop = P1-P&_P_Max);
 	Merge OBData.NoDUP_CMA9_SME
 	&Datasets;
 	By Hierarchy;
@@ -617,7 +630,7 @@ Run;
 %If "&_action" EQ "CMA9 COMPARISON CCC" %Then
 %Do;
 *--- Append CCC Datasets ---;
-Data OBData.CMA9_CCC(Drop = P1-P7);
+Data OBData.CMA9_CCC(Drop = P1-P&_P_Max);
 	Merge OBData.NoDUP_CMA9_CCC
 	&Datasets;
 	By Hierarchy;

@@ -1,4 +1,4 @@
-﻿%Macro Valid();
+%Macro Valid();
 		File _Webout;
 
 		Put '<HTML>';
@@ -174,7 +174,7 @@ Run;
 
 
 %Macro CodeList(APIName,Version);
-/*Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Temp";*/
+/*Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";*/
 
 Data WORK.&APIName._CODELIST_FEES;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
@@ -184,15 +184,15 @@ Data WORK.&APIName._CODELIST_FEES;
        informat CodeName $50. ;
        informat Code_Mnemonic $4. ;
        informat Description $1000. ;
-       informat Include_in_v2_0_ $1. ;
-       informat Added_in_v2_0 $1. ;
+       informat Include_in_&_APIVersion. $1. ;
+       informat Added_in_&_APIVersion. $1. ;
        informat Notes $89. ;
        format CodelistName $50. ;
        format CodeName $50. ;
        format Code_Mnemonic $4. ;
        format Description $1000. ;
-       format Include_in_v2_0_ $1. ;
-       format Added_in_v2_0 $1. ;
+       format Include_in_&_APIVersion. $1. ;
+       format Added_in_&_APIVersion. $1. ;
        format Notes $89. ;
 
 	   Input @;
@@ -207,8 +207,8 @@ Data WORK.&APIName._CODELIST_FEES;
                 CodeName $
                 Code_Mnemonic $
                 Description $
-                Include_in_v2_0_ $
-                Added_in_v2_0 $
+                Include_in_&_APIVersion. $
+                Added_in_&_APIVersion. $
                 Notes $
     ;
     if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
@@ -218,7 +218,7 @@ run;
 Data Work.&APIName._CodeList_Fees1(Drop = Description);
 	Set Work.&APIName._CodeList_Fees;
 	CodeDescription = Description;
-	If Include_in_v2_0_ EQ 'N' or CodeName EQ '' then Delete;
+	If Include_in_&_APIVersion. EQ 'N' or CodeName EQ '' then Delete;
 /*	Where CodeListName = 'OB_CardType1Code';*/
 Run;
 
@@ -245,7 +245,7 @@ Data OBData.&APIName._CodeList;
 Run;
 
 Proc Sort Data = OBData.&APIName._CodeList(Keep = CodeName CodeListName CodeDescription
-	CodeName_CL CodeListName_CL CodeDescription_CL Include_in_v2_0_) ;
+	CodeName_CL CodeListName_CL CodeDescription_CL Include_in_&_APIVersion.) ;
 	By CodeListName CodeName CodeDescription;
 Run;
 
@@ -329,7 +329,14 @@ Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy
 
 	If XPath NE '';
 
-	If "&Dsn" EQ "&APIName" Then 
+*--- This code will check which API is called to select the point at which
+	the XPATH value must be extracted from ---;
+
+	If "&Dsn" EQ "FCA" Then 
+	Do;
+		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),1),'/','-');
+	End;
+	Else If "&Dsn" EQ "&APIName" Then 
 	Do;
 		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),16),'/','-');
 	End;
@@ -400,7 +407,7 @@ Data OBData.&APIName._Code_Compare Work.&APIName._Code_Compare;
 	CodeListName_DD CodeName_DD CodeDescription_DD)
 
 	OBData.&APIName._CodeList(In=a Keep = CodeListName CodeName CodeDescription
-	CodeListName_CL CodeName_CL CodeDescription_CL Include_in_v2_0_);
+	CodeListName_CL CodeName_CL CodeDescription_CL Include_in_&_APIVersion.);
 
 	By CodeListName CodeName CodeDescription;
 	If a and not b Then Infile = 'CodeList';
@@ -433,7 +440,7 @@ Data OBData.&APIName._Code_Compare Work.&APIName._Code_Compare;
 		CodeListName_Flag = 'Match';
 	End;
 
-	If Trim(Left(Include_in_v2_0_)) NE 'Y' Then
+	If Trim(Left(Include_in_&_APIVersion.)) NE 'Y' Then
 	Do;
 		InVersion_Flag = 'Mismatch';
 	End;
@@ -492,7 +499,7 @@ Proc Report Data = OBData.&APIName._Code_Compare nowd;
 	CodeName_Flag
 	CodeListName_Flag 
 	CodeDesc_Flag
-	Include_in_v2_0_
+	Include_in_&_APIVersion.
 	InVersion_Flag;
 
 	Define Count / display 'Row Count' left style(column)=[width=5%];
@@ -511,7 +518,7 @@ Proc Report Data = OBData.&APIName._Code_Compare nowd;
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
+	Define Include_in_&_APIVersion. / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -604,7 +611,7 @@ Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='Both')) nowd;
 	CodeName_Flag
 	CodeListName_Flag
 	CodeDesc_Flag
-	Include_in_v2_0_
+	Include_in_&_APIVersion.
 	InVersion_Flag;
 
 	Define Count / display 'Row Count' left style(column)=[width=5%];
@@ -623,7 +630,7 @@ Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='Both')) nowd;
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
+	Define Include_in_&_APIVersion. / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -711,7 +718,7 @@ Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='CodeList')) nowd
 	CodeName_Flag
 	CodeListName_Flag
 	CodeDesc_Flag
-	Include_in_v2_0_
+	Include_in_&_APIVersion.
 	InVersion_Flag;
 
 	Define Count / display 'Row Count' left style(column)=[width=5%];
@@ -730,7 +737,7 @@ Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='CodeList')) nowd
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
+	Define Include_in_&_APIVersion. / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
@@ -823,7 +830,7 @@ Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='DD')) nowd;
 	CodeName_Flag
 	CodeListName_Flag
 	CodeDesc_Flag
-	Include_in_v2_0_
+	Include_in_&_APIVersion.
 	InVersion_Flag;
 
 	Define Count / display 'Row Count' left style(column)=[width=5%];
@@ -842,7 +849,7 @@ Proc Report Data = OBData.&APIName._Code_Compare(Where=(Infile='DD')) nowd;
 	Define CodeListName_CL  / display 'CodeListName CL' left style(column)=[width=5%];
 	Define CodeName_CL  / display 'CodeName CL' left style(column)=[width=5%];
 	Define CodeDescription_CL / display 'CodeDescription CL' left style(column)=[width=5%];
-	Define Include_in_v2_0_ / display "Inversion &Version" left style(column)=[width=5%];
+	Define Include_in_&_APIVersion. / display "Inversion &Version" left style(column)=[width=5%];
 	Define Inversion_Flag / display 'Inversion Flag' left style(column)=[width=5%];
 
 	Compute Infile;
