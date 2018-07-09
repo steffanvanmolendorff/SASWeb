@@ -27,7 +27,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 *--- Uncomment this line to run program locally ---;
 
 %Global _APIVisual;
-%Let _APIVisual = BCH;
+%Let _APIVisual = PCA;
 %Put _APIVisual = &_APIVisual;
 
 *--- Assign Global Macro variables for storing data values and process in other data/proc steps ---;
@@ -56,7 +56,7 @@ Libname OBData "C:\inetpub\wwwroot\sasweb\data\perm";
 
 *--- Get a unique list of data elements per Open Data product type ---;
 Proc Summary Data = &API_Dsn Nway Missing;
-	Class Data_Element;
+	Class Hierrachy Data_Element _UniqueID;
 	Var Count;
 	Output Out = Work.Data_Elements(Drop=_type_ _Freq_) Sum=;
 Run;
@@ -854,7 +854,7 @@ Data WORK.SME_TEST1;
 		TsandCs1 $150. 
 		WillTheLoanBePaidInTrancheDra100 $10. 
 		Record_Count best12.;
-
+		Datalines;
 		;
  Run;
 *--- Write permanent dataset variable values to blank dataset with preset variable lengths ---;
@@ -985,7 +985,7 @@ Run;
 *****************************************************************************************************
 		CREATE THE CMA9_LAST UPDATED DATASET
 *****************************************************************************************************;
-
+/*
 *--- Extract Last Updated Date from each API and create Perm Datasets ---;
 %Macro LastUpDate(Dsn);
 Data Work.&Dsn._LastUpdated;

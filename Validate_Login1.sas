@@ -93,10 +93,11 @@ Data _Null_;
 		Put '<OPTION VALUE="SME CODELIST COMPARISON"> 6. SME CODELIST COMPARISON </option>';
 */
 		Put '<OPTION VALUE="API CODELIST COMPARISON"> 1. API CODELIST COMPARISON </option>';
-
 		Put '<OPTION VALUE="API_ALL DD JSON COMPARE"> 2. API ALL DD JSON COMPARE </option>';
 		Put '<OPTION VALUE="API_PAI_BAI DD JSON COMPARE"> 3. API PAI BAI DD JSON COMPARE </option>';
 		Put '<OPTION VALUE="API_ALL DD SWAGGER COMPARE"> 4. API ALL DD SWAGGER COMPARE </option>';
+		Put '<OPTION VALUE="API_FCA DD SWAGGER COMPARE"> 5. API FCA METRICS SWAGGER COMPARE </option>';
+		Put '<OPTION VALUE="API_SQM DD SWAGGER COMPARE"> 6. API SQM METRICS SWAGGER COMPARE </option>';
 		Put '</SELECT>';
 		Put '</div>';
 
@@ -152,9 +153,10 @@ Data _Null_;
 
 		Put '<H2>TEST</H2>';
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
-		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
+		Put '<SELECT NAME="_action" size="3" onchange="this.form.submit()"</option>';
 		Put '<OPTION VALUE="Null"> Select option below </option>';
 		Put '<OPTION VALUE="Test Other Script"> 1. TEST OTHER SCRIPT </option>';
+		Put '<OPTION VALUE="Run API Access"> 2. RUN API ACCESS </option>';
 		Put '</SELECT>';
 		Put '</div>';
 		Put '<p><br></p>';
@@ -378,10 +380,24 @@ Run;
 */
 Option Spool Symbolgen MLogic Mprint Source Source2;
 
+Proc Sort Data = OBData.Client_Login Nodupkey;
+	By Username;
+Run;
+
+Proc Sort Data = OBData.Clients_approved Nodupkey;
+	By Username;
+Run;
+*--- Only keep the clients who are in the approved clients table ---;
+Data OBData.Client_Login_Approved;
+	Merge OBData.Client_Login(In=a)
+	OBData.Clients_approved(In=b);
+	By Username;
+	If a and b;
+Run;
 
 Data OBData.Validate;
 	Length Username WebUser $ 100 Password WebPass $ 25 ValidUser InvalidUser ValidPass InvalidPass $ 1;
-	Set OBData.Client_Login;
+	Set OBData.Client_Login_Approved;
 
 	If Trim(Left(Username)) EQ "&_WebUser" and Trim(Left(Password)) EQ "&_WebPass" then
 	Do;

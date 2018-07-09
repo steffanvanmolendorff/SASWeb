@@ -1,4 +1,4 @@
-Options MPrint MLogic Source Source2 Symbolgen;
+﻿Options MPrint MLogic Source Source2 Symbolgen;
 
 *--- Set a Gloabl macro variable to determine if DD vs JSON or SWAGGER file will be executed ---;
 %Global _Swagger;
@@ -20,11 +20,11 @@ Options MPrint MLogic Source Source2 Symbolgen;
        informat Bank_Name $10. ;
        informat Bank_Description $27. ;
        informat API_Name $3. ;
-       informat API_Desc $25. ;
+       informat API_Desc $30. ;
        format Bank_Name $10. ;
        format Bank_Description $27. ;
        format API_Name $3. ;
-       format API_Desc $25. ;
+       format API_Desc $30. ;
     input
                 Bank_Name $
                 Bank_Description $
@@ -182,6 +182,15 @@ File _Webout;
 *--- Set Macro Variable to pass SWAGGER value to API_ALL DD JSON Comparison V03.sas file to execute DD vs. SWAGGER comparison ---;
 					%Let _Swagger = SWAGGER;
 	%End;
+	%If "&_action" EQ "API_SQM DD SWAGGER COMPARE" %then
+	%Do;
+				*--- Read Dataset UniqueNames ---;
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('SQP','SQB')))));
+				*--- Count Observations ---;
+				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
+*--- Set Macro Variable to pass SWAGGER value to API_ALL DD JSON Comparison V03.sas file to execute DD vs. SWAGGER comparison ---;
+					%Let _Swagger = SQMSWAGGER;
+	%End;
 	%If "&_action" EQ "BCA DD JSON COMPARE" %then
 	%Do;
 				*--- Read Dataset UniqueNames ---;
@@ -229,7 +238,7 @@ File _Webout;
 	Put '<SELECT NAME="_APIVersion" size="7" onchange="this.form.submit()"</option>';
 /*	Put '<OPTION VALUE="V1_3"> Version 1.3 </option>';*/
 /*	Put '<OPTION VALUE="V2_0"> Version 2.0 </option>';*/
-	Put '<OPTION VALUE="V1_1"> Version 1.0 </option>';
+	Put '<OPTION VALUE="V1_0"> Version 1.0 </option>';
 	Put '<OPTION VALUE="V2_1"> Version 2.1 </option>';
 /*	Put '<OPTION VALUE="V2_1_1"> Version 2.1.1 </option>';*/
 	Put '<OPTION VALUE="V2_2"> Version 2.2 </option>';
@@ -304,6 +313,44 @@ File _Webout;
 	%Else %If "&_SWAGGER" EQ "SWAGGER" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_Swagger VALUE=' /
+			"&_Swagger"
+			'>';
+	%End;
+	%Else %If "&_SWAGGER" EQ "FCASWAGGER" %Then
+	%Do;
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_FCA DD SWAGGER Compare V01.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_Swagger VALUE=' /
+			"&_Swagger"
+			'>';
+	%End;
+	%Else %If "&_SWAGGER" EQ "SQMSWAGGER" %Then
+	%Do;
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_SQM DD SWAGGER Compare V01.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
 			'>';

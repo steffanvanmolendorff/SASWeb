@@ -395,10 +395,24 @@ Run;
 */
 Option Spool Symbolgen MLogic Mprint Source Source2;
 
+Proc Sort Data = OBData.Client_Login Nodupkey;
+	By Username;
+Run;
+
+Proc Sort Data = OBData.Clients_approved Nodupkey;
+	By Username;
+Run;
+*--- Only keep the clients who are in the approved clients table ---;
+Data OBData.Client_Login_Approved;
+	Merge OBData.Client_Login(In=a)
+	OBData.Clients_approved(In=b);
+	By Username;
+	If a and b;
+Run;
 
 Data OBData.Validate;
 	Length Username WebUser $ 100 Password WebPass $ 25 ValidUser InvalidUser ValidPass InvalidPass $ 1;
-	Set OBData.Client_Login;
+	Set OBData.Client_Login_Approved;
 
 	If Trim(Left(Username)) EQ "&_WebUser" and Trim(Left(Password)) EQ "&_WebPass" then
 	Do;

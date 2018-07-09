@@ -1,4 +1,4 @@
-/*===============================================================================================*
+﻿/*===============================================================================================*
 *																								*
 *	Program Name: CMA9 Product Comparison V1.0													*																							*
 *	Version 1.0																					*
@@ -431,7 +431,7 @@ Run;
 	%Main(https://atlas.api.barclays/open-banking/v2.1/business-current-accounts,Barclays,BCA);
 	%Main(https://obp-data.danskebank.com/open-banking/v2.1/business-current-accounts,Danske_Bank,BCA);
 	%Main(https://openapi.firsttrustbank.co.uk/open-banking/v2.1/personal-current-accounts,First_Trust_Bank,BCA);
-	%Main(https://api.hsbc.com/open-banking/v2.1/personal-current-accounts,HSBC,BCA);
+	%Main(https://api.hsbc.com/open-banking/v2.1/business-current-accounts,HSBC,BCA);
 	%Main(https://api.lloydsbank.com/open-banking/v2.1/business-current-accounts,Lloyds_Bank,BCA);
 	%Main(https://openapi.natwest.com/open-banking/v2.1/business-current-accounts,Natwest,BCA);
 	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/business-current-accounts,RBS,BCA);

@@ -1,7 +1,7 @@
-*--- Run the SAS code manually ---;
+﻿*--- Run the SAS code manually on desktop ---;
 /*
 %Global _APIName;
-%Let _APIName = BCH;
+%Let _APIName = PCA;
 */
 
 %Macro Select_OD_RW(_API);
@@ -20,6 +20,16 @@ OPTIONS NOSYNTAXCHECK;
 
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 
+*--- Uncomment to run on local laptop/pc machine ---;
+/*
+%Global _BankName;
+%Global _APIName;
+%Global _VersionNo;
+
+%Let _BankName = BOI;
+%Let _APIName = PCA;
+%Let _VersionNo = v2.2;
+*/
 
 Data Work._Null_;
 _BankName = "&_BankName";
@@ -56,12 +66,7 @@ Run;
 %Put _Path = &_Path;
 
 
-*--- Uncomment to run on local laptop/pc machine ---;
-/*
-%Let _BankName = BOI;
-%Let _APIName = BCH;
-%Let _VersionNo = v2.1;
-*/
+
 
 
 *=====================================================================================================================================================
@@ -179,7 +184,7 @@ Libname OBData "&Path\Perm";
 	%Put SCH_Name = "&SCH_Name";
 	%Put Perm_Sch_Table = "&Perm_Sch_Table";
 	%Put Version = "&Version_C";
-	%Put Sch_Version = "Sch_Version";
+	%Put Sch_Version = "&Sch_Version";
 *=====================================================================================================================================================
 --- Set the ERROR Code macro variables ---
 ======================================================================================================================================================;
@@ -681,7 +686,8 @@ Run;
 				%Else %Do;
 					Length &&Variable_Name_&i._&j  $ 300;
 				%End;
-				%Let Varname = &&Variable_Name_&i._&j.;
+*--- Some variable names has a space i.e. Status Code - tranword (blanks,_) to Status_Code ---;
+				%Let Varname = %Sysfunc(Tranwrd(&&Variable_Name_&i._&j.,'','_'));
 				&Varname = %UNQUOTE(%STR(%')"&&Variable_Value_&i._&j."%STR(%'));
 			%End;
 	Run;
@@ -708,11 +714,69 @@ Run;
 
 		If Hierarchy EQ '' then Delete;
 	Run;
-
+/*
 	Proc Sort Data = Work.Schema_Columns
 		Out = OBData.&API_SCH._&Sch_Version;
 		By Hierarchy;
 	Run;
+*/
+	%IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
+		and "&_APIName" EQ "PCA" %Then
+	%Do;
+		Data Work.Schema_Columns;
+			Set Work.Schema_Columns;
+				If Find(Hierarchy,'Brand') NE 0 Then
+				Do;
+					Hierarchy = Substr(Hierarchy,Find(Hierarchy,'Brand'));
+				End;
+		Run;
+
+		Proc Sort Data = Work.Schema_Columns
+			Out = OBData.&API_SCH._&Sch_Version;
+			By Hierarchy;
+		Run;
+
+	%End;
+	%Else %IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
+		and "&_APIName" EQ "BCA" %Then
+	%Do;
+		Data Work.Schema_Columns;
+			Set Work.Schema_Columns;
+				If Find(Hierarchy,'Brand') NE 0 Then
+				Do;
+					Hierarchy = Substr(Hierarchy,Find(Hierarchy,'Brand'));
+				End;
+		Run;
+
+		Proc Sort Data = Work.Schema_Columns
+			Out = OBData.&API_SCH._&Sch_Version;
+			By Hierarchy;
+		Run;
+
+	%End;
+	%Else %IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
+		and "&_APIName" EQ "BCH" %Then
+	%Do;
+		Data Work.Schema_Columns;
+			Set Work.Schema_Columns;
+				If Find(Hierarchy,'Brand') NE 0 Then
+				Do;
+					Hierarchy = Substr(Hierarchy,Find(Hierarchy,'Brand'));
+				End;
+		Run;
+
+		Proc Sort Data = Work.Schema_Columns
+			Out = OBData.&API_SCH._&Sch_Version;
+			By Hierarchy;
+		Run;
+
+	%End;
+	%Else %Do;
+		Proc Sort Data = Work.Schema_Columns
+			Out = OBData.&API_SCH._&Sch_Version;
+			By Hierarchy;
+		Run;
+	%End;
 
 %End;
 
@@ -2124,8 +2188,8 @@ Run;
 	*/
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._Matches_%sysfunc(today(),date9.).csv"
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(today(),date9.).csv"
-	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv";
-	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail_%sysfunc(datetime(),datetime13.).csv";
+	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv"
+/*	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail_%sysfunc(datetime(),datetime13.).csv"*/
 %Mend;
 
 
@@ -2356,7 +2420,7 @@ options emailhost=
    /* your Gmail address */
    id="steffan.vanmolendorff@qlick2.com"
    /* optional: encode PW with PROC PWENCODE */
-   pw="@Octa7700" 
+   pw="@Qlick22018!" 
  )
 ;
 
@@ -2395,6 +2459,11 @@ Filename Myemail Clear;
 
 *--- BOI - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOI" %Then
+%Do;
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+*--- BOI - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "BOI" %Then
 %Do;
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
@@ -2508,7 +2577,27 @@ Filename Myemail Clear;
 	execution of the API data extract ---
 ==================================================================================================;
 %Mend Schema;
-%Schema(&GitHub_Path/%Sysfunc(Tranwrd(&Github_API..json,'-','_')),&Bank_Name,&API_SCH);
+*%Schema(&GitHub_Path/%Sysfunc(Tranwrd(&Github_API..json,'-','_')),&Bank_Name,&API_SCH);
+*--- Added the conditional logic because BOI is using Swagger v2.2.1 file in a v2.2 live endpoint 
+	- Note the _v221.json extention in macro Schema() calll below ---;
+%IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
+	and "&Main_API" EQ "personal-current-accounts" %Then
+%Do;
+	%Schema(&GitHub_Path/pca_swagger_v221.json,&Bank_Name,&API_SCH);
+%End;
+%Else %IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
+	and "&Main_API" EQ "business-current-accounts"%Then
+%Do;
+	%Schema(&GitHub_Path/bca_swagger_v221.json,&Bank_Name,&API_SCH);
+%End;
+%Else %IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
+	and "&_APIName" EQ "BCH"%Then
+%Do;
+	%Schema(&GitHub_Path/branch_swagger_v22.json,&Bank_Name,&API_SCH);
+%End;
+%Else %Do;
+	%Schema(&GitHub_Path/%Sysfunc(Tranwrd(&Github_API..json,'-','_')),&Bank_Name,&API_SCH);
+%End; 
 *=================================================================================================
 --- The values are passed from the UI to resolve in the macro below which allows 
 	execution of the API data extract ---

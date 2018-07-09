@@ -1,16 +1,20 @@
-*--- Uncomment to run locally on laptop ---;
+﻿*--- Uncomment to run locally on laptop ---;
 
 %Global _APINamme;
 %Global _APIVersion;
 %Global _SRVNAME;
 %GLOBAL _Host;
-/*
+%GLOBAL _Swagger;
+
 %Let _SRVNAME = localhost;
 %Let _Host = &_SRVNAME;
 %Put _Host = &_Host;
 
+*--- Uncomment when running this on local machine ---;
+/*
 %Let _APIName = PAI;
 %Let _APIVersion = V2_2;
+%Let _Swagger = PCA;
 */
 %Global _Host;
 %Global _Path;
@@ -38,7 +42,7 @@ Options MPrint MLogic Source Source2 Symbolgen;
      data OBData.&Dsn;
      %let _EFIERR_ = 0; 
      infile "&Filename" delimiter = ','
-  	MISSOVER DSD lrecl=32767 firstobs=2 Termstr=CRLF;
+  	MISSOVER DSD lrecl=32767 firstobs=2 Termstr=CRLF /*encoding="utf-8"*/;
         informat XPath $1000. ;
         informat FieldName $91. ;
         informat ConstraintID $25. ;
@@ -93,23 +97,19 @@ Options MPrint MLogic Source Source2 Symbolgen;
      run;
 
 
-Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/;
+Data OBData.&Dsn OBData.X/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy))*/;
 	Length Pattern Hierarchy $ 1000 &DSN._Lev1 $ 1000;
 	Set OBData.&Dsn;
 
 	If XPath NE '';
 
-	If "&Dsn" EQ "BCH" Then 
+	If "&Dsn" EQ "PCA" Then 
 	Do;
-		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),19),'/','-');
+		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),22),'/','-');
 	End;
-	Else If "&Dsn" EQ "SME" Then 
+	Else If "&Dsn" EQ "BCA" Then 
 	Do;
-		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),20),'/','-');
-	End;
-	Else If "&Dsn" EQ "&_APIName" Then 
-	Do;
-		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),21),'/','-');
+		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),29),'/','-');
 	End;
 
 	&DSN._Lev1 = Compress(/*'Brand-'||*/Hierarchy);
@@ -193,7 +193,7 @@ Quit;
 %End;
 
 *--- Create the Bank Schema dataset ---;
-Data Work.&JSON OBData.X;
+Data Work.&JSON;
 	Set LibAPIs.Alldata(Where=(V NE 0));
 Run;
 
@@ -258,7 +258,7 @@ Data Work.&JSON
 Run;
 
 
-Data Work.&JSON OBData.X2;
+Data Work.&JSON;
 	Set Work.&JSON;
 
 	Length New_Data_Element1 $ 1000;
@@ -284,7 +284,7 @@ Data Work.&JSON OBData.X2;
 Run;
 
 
-Data Work.&JSON OBData.X3(Drop = Word New_Word1 New_Word2 New_Data_Element3 New_Data_Element4 New_Data_Element6);
+Data Work.&JSON OBData.X3/*OBData.X3(Drop = Word New_Word1 New_Word2 New_Data_Element3 New_Data_Element4 New_Data_Element6)*/;
 	Set Work.&JSON;
 
 	Length New_Data_Element1 New_Data_Element2 New_Data_Element3 New_Data_Element4 New_Data_Element6 $ 1000;
@@ -333,7 +333,7 @@ Run;
 
 
 
-Data Work.&JSON/*(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy))*/ OBData.X4;
+Data Work.&JSON/*(Drop=Hierarchy Rename=(Data_Element_1 = Hierarchy))*/;
 	Set Work.&JSON;
 	By Hierarchy;
 
@@ -372,7 +372,7 @@ Proc Sort Data = Work.&JSON
 Run;
 
 
-Data Work.&JSON OBData.X5;
+Data Work.&JSON;
 	Set Work.&JSON;
 
 	By Hierarchy;
@@ -432,7 +432,7 @@ Proc Sort Data = Work.&JSON
 	By Hierarchy Attribute;
 Run;
 
-Data Work.&JSON OBData.X6;
+Data Work.&JSON;
 	Set Work.&JSON;
 	By Hierarchy Attribute;
 
@@ -452,7 +452,7 @@ Proc Sort Data = Work.&JSON
 	By Data_Element;
 Run;
 
-Data Work.&JSON._1 OBData.X7;
+Data Work.&JSON._1;
 	Set Work.&JSON;
 	By Data_Element;
 
@@ -477,7 +477,7 @@ Run;
 %Macro VarVal();
 
 *--- TBC ---;
-Data Work.&JSON._2 OBData.X8;
+Data Work.&JSON._2;
 	Set Work.&JSON._1(Where=(Columns NE ''));
 	By HierCnt Counter;
 
@@ -530,7 +530,7 @@ Run;
 	Run;
 
 
-	Data Work.Schema_Columns(Drop = Hierarchy Rename=(Hier = Hierarchy))OBData.X9;
+	Data Work.Schema_Columns(Drop = Hierarchy Rename=(Hier = Hierarchy));
 		Length Table $ 16 Swagger_&API_DSN._Lev1 $ 1000;
 		Set Work.Schema_Columns
 			Work.Unique_Columns&i;
@@ -1096,7 +1096,6 @@ ods listing;
 		%Let _APIName = BCA;
 		%Main(&_APIName,bca_swagger);
 	%End;
-
 %End;
 %Else %Do;
 	%If "&_APIName" EQ "BCA" %Then
@@ -1126,12 +1125,12 @@ ods listing;
 	%Else %If "&_APIName" EQ "PAI" %Then
 	%Do;
 		%Let _APIName = PCA;
-		%Main(&_APIName,personal_current_account);
+		%Main(&_APIName,pca_swagger);
 	%End;
 	%Else %If "&_APIName" EQ "BAI" %Then
 	%Do;
 		%Let _APIName = BCA;
-		%Main(&_APIName,business_current_account);
+		%Main(&_APIName,bca_swagger);
 	%End;
 %End;
 %Mend SelectAPI;

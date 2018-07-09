@@ -133,7 +133,7 @@ Run;
 
 
 Data Work.&Bank._&API
-	(Keep = RowCnt Count P Bank_API Var2 Var3 P1 - P&_P_Val Value 
+	(Keep = RowCnt Count P Bank_API Var2 Var3 V P1 - P&_P_Val Value 
 	Rename=(Var3 = Data_Element Var2 = Hierarchy Value = &Bank)) X1;
 
 	Length Bank_API $ 8 Var2 Value1 Value2 $ 250 Var3 $ 100 P1 - P&_P_Val Value $ 300;
@@ -175,7 +175,7 @@ Var3 = Reverse(Scan(Left(Trim(Reverse(Var2))),1,'-',' '));
 		Test = 1; 
 	End;
 %ErrorCheck;
-
+/*
 Data Work.X2;
 	Set Work.X1;
 	By RowCnt;
@@ -186,8 +186,22 @@ Data Work.X2;
 		_Hier_ID = 0;
 		_Element_ID = 0;
 	End;
+	If V = 0 Then 
+	Do;
+		_Hier_ID + 1;
+		_Element_ID = 0;
+	End;
+	Else If _Hier_ID = 0 and V = 1 Then
+	Do;
+		_Element_ID = 0;
+	End;
+	Else If _Hier_ID > 0 and V = 1 Then
+	Do;
+		_Element_ID + 1;
+	End;
 	Retain _Record_ID _Hier_ID _Element_ID;
 Run;
+*/
 
 Proc Sort Data = Work.&Bank._&API;
 	By P1-P&_P_Val;
@@ -255,10 +269,19 @@ Proc Sort Data = Work.&Bank._&API;
 		Set &Datasets;
 	Run;
 
-	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
+	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy Data_Element) 
 		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
+
+/*
+*--- Create a unique identifier for the data hierarchy ---;
+	Data Work.NoDUP_CMA9_&API(Drop = UniqueNum);
+		Set Work.NoDUP_CMA9_&API;
+		UniqueNum = Put(_N_,z4.);
+		UniqueID = Compress("&API"||UniqueNum);
+	Run;
+*/
 
 %Mend UniqueATM;
 %If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
@@ -341,6 +364,15 @@ Run;
 		By Hierarchy;
 	Run;
 
+/*
+	*--- Create a unique identifier for the data hierarchy ---;
+	Data Work.NoDUP_CMA9_&API(Drop = UniqueNum);
+		Set Work.NoDUP_CMA9_&API;
+		UniqueNum = Put(_N_,z4.);
+		UniqueID = Compress("&API"||UniqueNum);
+	Run;
+*/
+
 %Mend UniqueBRANCHES;
 
 %If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
@@ -371,18 +403,22 @@ Run;
 /*	%Do;*/
 	%Main(https://openapi.bankofireland.com/open-banking/v2.1/personal-current-accounts,Bank_of_Ireland,PCA);
 /*	%End;*/
+
+/*
 	%Main(https://api.bankofscotland.co.uk/open-banking/v2.1/personal-current-accounts,Bank_of_Scotland,PCA);
 	%Main(https://atlas.api.barclays/open-banking/v2.1/personal-current-accounts,Barclays,PCA);
 	%Main(https://obp-data.danskebank.com/open-banking/v2.1/personal-current-accounts,Danske_Bank,PCA);
 	%Main(https://openapi.firsttrustbank.co.uk/open-banking/v2.1/personal-current-accounts,First_Trust_Bank,PCA);
 	%Main(https://api.halifax.co.uk/open-banking/v2.1/personal-current-accounts,Halifax,PCA);
 	%Main(https://api.hsbc.com/open-banking/v2.1/personal-current-accounts,HSBC,PCA);
+*/
 	%Main(https://api.lloydsbank.com/open-banking/v2.1/personal-current-accounts,Lloyds_Bank,PCA);
-	%Main(https://openapi.nationwide.co.uk/open-banking/v2.1/personal-current-accounts,Nationwide,PCA);
+/*	%Main(https://openapi.nationwide.co.uk/open-banking/v2.1/personal-current-accounts,Nationwide,PCA);
 	%Main(https://openapi.natwest.com/open-banking/v2.1/personal-current-accounts,Natwest,PCA);
 	%Main(https://openapi.rbs.co.uk/open-banking/v2.1/personal-current-accounts,RBS,PCA);
 	%Main(https://openbanking.santander.co.uk/sanuk/external/open-banking/v2.1/personal-current-accounts,Santander,PCA);
 	%Main(https://openapi.ulsterbank.co.uk/open-banking/v2.1/personal-current-accounts,Ulster_Bank,PCA);
+*/
 %End;
 *--- Get unique Hierarchy values for PCA ---;
 %Macro UniquePCA(API);
@@ -417,10 +453,176 @@ Run;
 		Set &Datasets;
 	Run;
 
-	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy) 
-		Out = Work.NoDUP_CMA9_&API NoDupKey;
-		By Hierarchy;
+*--- Create Unique Data_Element Names ---;
+	Data Work.NoDUP_CMA9_&API;
+		Set Work.NoDUP_CMA9_&API;
+
+*--- Amount ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-CreditInterestEligibility-Amount' Then Data_Element = 'CreditIntEligAmount';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-OtherEligibility-Amount' Then Data_Element = 'OtherEligAmount';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-Amount' Then Data_Element = 'FeatureBenefitEligAmount';
+
+*--- ApplicationFrequency ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-ApplicationFrequency' Then Data_Element = 'FeeChargeAppFreq';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-OverdraftTierBand-OverdraftFeesCharges-OverdraftFeeChargeDetail-ApplicationFrequency' Then Data_Element = 'OverDraftFeeChargeAppFreq';
+
+*--- CalculationFrequency ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-CalculationFrequency' Then Data_Element = 'FeeChargeCalcFreq';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-OverdraftTierBand-OverdraftFeesCharges-OverdraftFeeChargeDetail-CalculationFrequency' Then Data_Element = 'OverDraftFeeChargeCalcFreq';
+
+*--- Description ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-CreditInterestEligibility-Description' Then Data_Element = 'CreditIntEligDesc';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-OtherEligibility-Description' Then Data_Element = 'OtherEligDesc';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-OtherType-Description' Then Data_Element = 'FeatBenefitGroupOtherDesc';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-Description' Then Data_Element = 'FeatBenefitItemDesc';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-OtherType-Description' Then Data_Element = 'FeatBenefitItemOtherDesc';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-MobileWallet-OtherType-Description' Then Data_Element = 'MobileWalletOtherDesc';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-OtherFeeType-Description' Then Data_Element = 'FeeChargeOtherTypeDesc';
+
+*--- FeeAmount ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-FeeAmount' Then Data_Element = 'FeeChargeAmount';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-OverdraftTierBand-OverdraftFeesCharges-OverdraftFeeChargeDetail-FeeAmount' Then Data_Element = 'OverdraftFeeChargeAmount';
+
+*--- FeeCategory ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-FeeCategory' Then Data_Element = 'FeeChargeFeeCategory';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-OtherFeeType-FeeCategory' Then Data_Element = 'FeeChargeOtherFeeCategory';
+
+*--- FeeType ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeCap-FeeType' Then Data_Element = 'FeeChargeCapFeeType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-FeeType' Then Data_Element = 'FeeChargeDetailFeeType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-OverdraftTierBand-OverdraftFeesCharges-OverdraftFeeChargeDetail-FeeType' Then Data_Element = 'OverdraftFeeChargeFeeType';
+
+*--- Indetification ---;
+	If Hierarchy = 'data-Brand-PCA-Identification' Then Data_Element = 'PCAIdentification';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-TierBand-Identification' Then Data_Element = 'TierBandIdentification';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-FeatureBenefitItem-Identification' Then Data_Element = 'FeatureBenGroupIdentification';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-Identification' Then Data_Element = 'FeatureBenItemIdentification';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Identification' Then Data_Element = 'MarkStateIdentification';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-Identification' Then Data_Element = 'OverdraftIdentification';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-OverdraftTierBand-Identification' Then Data_Element = 'OverdraftTierBandIdentification';
+
+*--- Indetification ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-OtherEligibility-Indicator' Then Data_Element = 'OtherEligIndicator';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-Indicator' Then Data_Element = 'FeatureBenefitEligIndicator';
+
+*--- Name ---;
+	If Hierarchy = 'data-Brand-PCA-Name' Then Data_Element = 'ProductName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-CreditInterestEligibility-Name' Then Data_Element = 'CreditIntEligName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-OtherEligibility-Name' Then Data_Element = 'OtherEligName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-FeatureBenefitItem-Name' Then Data_Element = 'FeatureBenefitItemName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-Name' Then Data_Element = 'FeatureBenefitGrpName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-OtherType-Name' Then Data_Element = 'FeatureBenefitGrpOtherName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-Name' Then Data_Element = 'FeatureBenefitEligName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-OtherType-Name' Then Data_Element = 'FeatureBenefitEligOtherName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-Name' Then Data_Element = 'FeatureBenefitItemName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-MobileWallet-OtherType-Name' Then Data_Element = 'MobileWalletOtherTypeName';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-OtherFeeType-Name' Then Data_Element = 'FeeChargeOtherFeeTypeName';
+
+
+*--- Notes ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-Notes' Then Data_Element = 'CreditIntTierBandSetNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-AgeEligibility-Notes' Then Data_Element = 'AgeEligibilityNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-OtherEligibility-Notes' Then Data_Element = 'OtherEligibilityNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-ResidencyEligibility-Notes' Then Data_Element = 'ResidencyEligibilityNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-Card-Notes' Then Data_Element = 'FeatureBenefitsCardNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-FeatureBenefitItem-Notes' Then Data_Element = 'FeatureBenefitGrpItemNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-Notes' Then Data_Element = 'FeatureBenefitGrpNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-Notes' Then Data_Element = 'FeatureBenefitItemNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-MobileWallet-Notes' Then Data_Element = 'MobileWalletNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Notes' Then Data_Element = 'PCAMarketingStateNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeCap-Notes' Then Data_Element = 'FeeChargeCapNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-Notes' Then Data_Element = 'FeeChargeDetailNotes';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-OverdraftTierBand-OverdraftFeesCharges-OverdraftFeeChargeDetail-Notes' Then Data_Element = 'OverdraftFeeChargeNotes';
+
+*--- Notes1 ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-Notes-Notes1' Then Data_Element = 'TierBandSetNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-AgeEligibility-Notes-Notes1' Then Data_Element = 'AgeEligibilityNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-OtherEligibility-Notes-Notes1' Then Data_Element = 'OtherEligibilityNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-ResidencyEligibility-Notes-Notes1' Then Data_Element = 'ResidencyEligNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-Card-Notes-Notes1' Then Data_Element = 'FeatureBenefitsCardNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-FeatureBenefitItem-Notes-Notes1' Then Data_Element = 'FeatureBenefitItemNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-Notes-Notes1' Then Data_Element = 'FeatureBenefitGrpNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-Notes-Notes1' Then Data_Element = 'FeatureBenefitItemNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-MobileWallet-Notes-Notes1' Then Data_Element = 'MobileWalletNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Notes-Notes1' Then Data_Element = 'PCAMarketingStateNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeCap-Notes-Notes1' Then Data_Element = 'FeeChargeCapNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-Notes-Notes1' Then Data_Element = 'FeeChargeDetailNotes1';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-OverdraftTierBand-OverdraftFeesCharges-OverdraftFeeChargeDetail-Notes-Notes1' Then Data_Element = 'OverdraftFeeChargeNotes1';
+
+*--- Notes2 ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-FeatureBenefitItem-Notes-Notes2' Then Data_Element = 'FeatureBenefitItemNotes2';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-Notes-Notes2' Then Data_Element = 'FeatureBenefitItemNotes2';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-Notes-Notes2' Then Data_Element = 'FeeChargeDetailNotes2';
+
+
+*--- Notes2 ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-Notes-Notes3' Then Data_Element = 'FeatureBenefitItemNotes3';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-OtherFeesCharges-FeeChargeDetail-Notes-Notes3' Then Data_Element = 'FeeChargeDetailNotes3';
+
+*--- OtherType ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-OtherType' Then Data_Element = 'FeatureBenefitGrpOtherType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-OtherType' Then Data_Element = 'FeatureBenefitEligOtherType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-MobileWallet-OtherType' Then Data_Element = 'MobileWalletOtherType';
+
+*--- Period ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-CreditInterestEligibility-Period' Then Data_Element = 'CreditIntEligPeriod';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-Period' Then Data_Element = 'FeatureBenefitEligPeriod';
+
+*--- Textual ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-FeatureBenefitItem-Textual' Then Data_Element = 'FeatureBenefitItemTextual';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-Textual' Then Data_Element = 'FeatureBenefitEligTextual';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-Textual' Then Data_Element = 'FeatureBenefitItemTextual';
+
+*--- Method ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-TierBandMethod' Then Data_Element = 'TierBandMethod';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Overdraft-OverdraftTierBandSet-TierBandMethod' Then Data_Element = 'OverdraftTierBandSetMethod';
+
+*--- Type ---;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-CreditInterest-TierBandSet-CreditInterestEligibility-Type' Then Data_Element = 'CreditInterestEligType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-Eligibility-OtherEligibility-Type' Then Data_Element = 'OtherEligType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-Card-Type' Then Data_Element = 'FeaturesBenefitsCardType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-FeatureBenefitItem-Type' Then Data_Element = 'FeatureBenefitGrpItemType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitGroup-Type' Then Data_Element = 'FeatureBenefitGrpType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-FeatureBenefitEligibility-Type' Then Data_Element = 'FeatureBenefitEligType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-FeatureBenefitItem-Type' Then Data_Element = 'FeatureBenefitItemType';
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState-FeaturesAndBenefits-MobileWallet-Type' Then Data_Element = 'MobileWalletType';
+Run;
+
+	Proc Sort Data = Work.NoDUP_CMA9_&API(Keep=Hierarchy Data_Element) 
+	Out = Work.NoDUP_CMA9_&API Nodupkey;
+	By Hierarchy;
 	Run;
+
+/*
+	*--- Create a unique identifier for the data hierarchy ---;
+	Data Work.NoDUP_CMA9_&API(Drop = UniqueNum);
+		Set Work.NoDUP_CMA9_&API;
+		UniqueNum = Put(_N_,z4.);
+		UniqueID = Compress("&API"||UniqueNum);
+	Run;
+*/
+
+/*
+	Data Work.FMT;
+		Set Work.FMT;
+		Start = UniqueID;
+		End = Start;
+		Label = Data_Element;
+		Type = 'C';
+		FMTName = 'PCAFMT';
+	Run;
+
+	Proc Format Library = Work Cntlin=FMT;
+	Quit;
+
+	Options FMTSearch=(FMT);
+
+	*--- Create a unique identifier for the data hierarchy ---;
+	Data Work.NoDUP_CMA9_&API(Drop = UniqueNum);
+		Set Work.FMT;
+		UniqueID = Put(UniqueID,$PCAFMT.);
+	Run;
+*/
 
 %Mend UniquePCA;
 %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
@@ -430,12 +632,75 @@ Run;
 
 %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
 %Do;
+
+
 *--- Append PCA Datasets ---;
-Data OBData.CMA9_PCA(Drop = P1-P&_P_Max);
-	Merge Work.NoDUP_CMA9_PCA
-	&Datasets;
+Data Work.Lloyds_Bank_PCA(Drop = P1-P&_P_Max) Work.X21;
+	Merge Work.NoDUP_CMA9_PCA(In=a)
+/*	&Datasets(Drop = Data_Element);*/
+	Work.Lloyds_Bank_PCA(In=b Drop = Data_Element);
 	By Hierarchy;
+	If a and b;
+	Length Bank_Name $ 25;
+	Bank_Name = 'Lloyds_Bank';
 Run;
+*--- Sort by Row count to get the order of the rows correct ---;
+Proc Sort Data = Work.Lloyds_Bank_PCA;
+	By RowCnt;
+Run;
+Data Work.Lloyds_Bank_PCA;
+	Set Work.Lloyds_Bank_PCA;
+	If Hierarchy = 'data-Brand-BrandName' Then
+	Do;
+		_Record_ID = 0;
+	End;
+	If Hierarchy = 'data-Brand-PCA-Name' Then
+	Do;
+		_Record_ID + 1;
+		_MarkStateID = 0;
+	End;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState' Then
+	Do;
+		_MarkStateID + 1;
+ 	End;
+	Retain _Record_ID _MarkStateID;
+Run;
+*--- Append PCA Datasets ---;
+Data Work.Bank_of_Ireland_PCA(Drop = P1-P&_P_Max) Work.X22;
+	Merge Work.NoDUP_CMA9_PCA(In=a)
+/*	&Datasets(Drop = Data_Element);*/
+	Work.Bank_of_Ireland_PCA(In=b Drop = Data_Element);
+	By Hierarchy;
+	If a and b;
+	Length Bank_Name $ 25;
+	Bank_Name = 'Bank_of_Ireland';
+Run;
+*--- Sort by Row count to get the order of the rows correct ---;
+Proc Sort Data = Work.Bank_of_Ireland_PCA;
+	By RowCnt;
+Run;
+Data Work.Bank_of_Ireland_PCA;
+	Set Work.Bank_of_Ireland_PCA;
+	If Hierarchy = 'data-Brand-BrandName' Then
+	Do;
+		_Record_ID = 0;
+	End;
+	If Hierarchy = 'data-Brand-PCA-Name' Then
+	Do;
+		_Record_ID + 1;
+		_MarkStateID = 0;
+	End;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState' Then
+	Do;
+		_MarkStateID + 1;
+ 	End;
+	Retain _Record_ID _MarkStateID;
+Run;
+Data OBData.CMA9_PCA;
+	Set Work.Lloyds_Bank_PCA
+	Work.Bank_of_Ireland_PCA;
+Run;
+
 
 %End;
 *------------------------------------------------------------------------------------------------------
@@ -499,6 +764,15 @@ Run;
 		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
+
+/*
+	*--- Create a unique identifier for the data hierarchy ---;
+	Data Work.NoDUP_CMA9_&API(Drop = UniqueNum);
+		Set Work.NoDUP_CMA9_&API;
+		UniqueNum = Put(_N_,z4.);
+		UniqueID = Compress("PCA"||UniqueNum);
+	Run;
+*/
 
 %Mend UniqueBCA;
 %If "&_action" EQ "CMA9 COMPARISON BCA" %Then
@@ -577,6 +851,15 @@ Run;
 		By Hierarchy;
 	Run;
 
+/*
+	*--- Create a unique identifier for the data hierarchy ---;
+	Data Work.NoDUP_CMA9_&API(Drop = UniqueNum);
+		Set Work.NoDUP_CMA9_&API;
+		UniqueNum = Put(_N_,z4.);
+		UniqueID = Compress("PCA"||UniqueNum);
+	Run;
+*/
+
 %Mend UniqueSME;
 %If "&_action" EQ "CMA9 COMPARISON SME" %Then
 %Do;
@@ -645,6 +928,15 @@ Run;
 		Out = Work.NoDUP_CMA9_&API NoDupKey;
 		By Hierarchy;
 	Run;
+
+/*
+	*--- Create a unique identifier for the data hierarchy ---;
+	Data Work.NoDUP_CMA9_&API(Drop = UniqueNum);
+		Set Work.NoDUP_CMA9_&API;
+		UniqueNum = Put(_N_,z4.);
+		UniqueID = Compress("PCA"||UniqueNum);
+	Run;
+*/
 
 %Mend UniqueCCC;
 %If "&_action" EQ "CMA9 COMPARISON CCC" %Then
@@ -885,21 +1177,93 @@ ods tagsets.tableeditor file=_Webout
             ); 
 */
 *--- Sort dataset by the RowCnt value to set the table in the original JSON script order ---; 
+/*
 Proc Sort Data = OBData.CMA9_&API;
 	By RowCnt;
 Run;
-
+*/
 *--- Create a Record-ID field for all records in the API JSON file ---;
 *--- Each record in the API file starts with the Data_Element LEI ---;
 *--- Every time the Data_Element value LEI is encountered a new records start in the JSON file ---;
-Data OBData.CMA9_&API;
+Data OBData.CMA9_&API(Where=(V NE 0)) Work.X3 ;
 	Set OBData.CMA9_&API;
-/*	If Data_Element = 'LEI' Then */
+/*
+	If Hierarchy = 'data-Brand-BrandName' Then
+	Do;
+		_Record_ID = 0;
+	End;
 	If Hierarchy = 'data-Brand-PCA-Name' Then
 	Do;
 		_Record_ID + 1;
+		_MarkStateID = 0;
 	End;
-	Retain _Record_ID;
+	If Hierarchy = 'data-Brand-PCA-PCAMarketingState' Then
+	Do;
+		_MarkStateID + 1;
+ 	End;
+	Retain _Record_ID _MarkStateID;
+*/
+Run;
+
+*--- Correct the _MarkStateID value to show 1 from the first data-Brand-PCA-Name record ---;
+Data OBData.CMA9_&API Work.X4;
+	Set OBData.CMA9_&API;
+
+	If _Record_ID = 0 Then 
+	Do; 
+		_MarkStateID = 1;
+		_SegmentID = 1; 
+	End;
+	If _Record_ID >= 1 and _MarkStateID = 0 Then 
+	Do; 
+		_MarkStateID = 1;
+	End;
+
+	If Hierarchy EQ 'data-Brand-PCA-PCAMarketingState-MarketingState' 
+	and _Record_ID > 1 and _MarkStateID >= 1 Then 
+	Do; 
+		_SegmentID + 1;
+	End;
+
+/*
+	If Hierarchy EQ 'data-Brand-PCA-Name' and _Record_ID > 0 and _MarkStateID = 0 
+	Then Do; 
+		_MarkStateID + 1; 
+	End;
+
+	If Hierarchy EQ 'data-Brand-BrandName' Then 
+	Do; 
+		_SegmentID = 1; 
+	End;
+	If _Record_ID = 0 and _MarkStateID = 0 Then 
+	Do; 
+		_SegmentID = 1; 
+	End;
+
+	If Hierarchy EQ 'data-Brand-PCA-Identification' and _Record_ID > 0 and _MarkStateID = 0 
+	Then Do; 
+		_MarkStateID + 1; 
+	End;
+
+	If Hierarchy EQ 'data-Brand-PCA-Segment-Segment1' and _Record_ID > 0 and _MarkStateID = 0 
+	Then 
+	Do; 
+		_MarkStateID + 1; 
+	End;
+
+	If Hierarchy EQ 'data-Brand-PCA-PCAMarketingState-MarketingState' 
+	and _Record_ID = 1 and _MarkStateID = 1 Then
+	Do;
+		_SegmentID = 1;
+	End;
+	If Hierarchy EQ 'data-Brand-PCA-PCAMarketingState-MarketingState' 
+	and _Record_ID > 1 and _MarkStateID = 1 Then
+	Do;
+		_SegmentID + 1;
+	End;
+*/
+
+	Retain _SegmentID;
 Run;
 
 *--- Print ATMS Report ---;

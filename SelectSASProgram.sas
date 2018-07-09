@@ -1,4 +1,4 @@
-Options Source Source2 Symbolgen MLogic MPrint;
+﻿Options Source Source2 Symbolgen MLogic MPrint;
 %Global _action;
 
 %Let _action = &_action;
@@ -198,6 +198,18 @@ Options Source Source2 Symbolgen MLogic MPrint;
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API.sas";
 %End;
+
+%Else %If "&_action" EQ "API_SQM DD SWAGGER COMPARE" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
+%End;
+
+%Else %If "&_action" EQ "API_FCA DD SWAGGER COMPARE" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
+%End;
+
+
 /*
 *====================================================================================================
 		SWAGGER V2 VS. JSON COMPARISON - EARLY VERSIONS
@@ -206,6 +218,10 @@ Options Source Source2 Symbolgen MLogic MPrint;
 %Else %If "&_action" EQ "Test Other Script" %Then
 %Do;
 	%Include "C:\inetpub\wwwroot\sasweb\Source\NHSData.sas";
+%End;
+%Else %If "&_action" EQ "Run API Access" %Then
+%Do;
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Qlick2\Proc HTTP - Test API Access V0.1.sas";
 %End;
 /*
 *====================================================================================================
