@@ -1,4 +1,4 @@
-﻿*--- Run the SAS code manually on desktop ---;
+*--- Run the SAS code manually on desktop ---;
 /*
 %Global _APIName;
 %Let _APIName = PCA;
@@ -123,10 +123,12 @@ Data OBDATA.API_Config;
 	Call Symput('BankName_C',Bank_Name);
 	Call Symput('API_Link',API_Link);
 	Call Symput('API_Name',API_Name);
-	Call Symput('SCH_Link',SCH_Link);
+*--- Add the Tranwrd function to test from local directories ---;
+	Call Symput('SCH_Link',Tranwrd(SCH_Link,'.','_'));
 	Call Symput('SCH_Name',SCH_Name);
 	Call Symput('Perm_Sch_Table',Perm_Sch_Table);
-	Call Symput('Version_C',Version);
+*--- Add the Tranwrd function to test from local directories ---;
+	Call Symput('Version_C',Tranwrd(Version,'.','_'));
 	Call Symput('Sch_Version',Tranwrd(Version,'.','_'));
 	Call Symput('API_JSON',Trim(Left(API_JSON)));
 Run;
@@ -678,12 +680,23 @@ Run;
 		If Last.HierCnt and Last.Counter;
 
 			%Do j = 1 %To &&Test_&i;
+	*--- Create a list of characters to search. All variable names that only have numbers, then 
+				append an underscore to avoid program errors. Variable names must start with 
+				an underscore if only numbers are present in the macro variable ---;
+				charlist = 'abcdefghijklmnopqrstuvwxyz';
+				%If %Index(&&Variable_Name_&i._&j,charlist) EQ 0 %Then
+				%Do;
+					%Let Variable_Name_&i._&j = _&&Variable_Name_&i._&j;
+				%End;
+			
 				%Put j = &j;
-				%If "&&Variable_Name_&i._&j" = "description" %Then
+				%If "&&Variable_Name_&i._&j" EQ "description" %Then
 				%Do;
 					Length &&Variable_Name_&i._&j  $ 1000;
 				%End;
-				%Else %Do;
+		*--- Test if the Variable Name only contains numbers - if yes - add underscore ---;
+				%If "&&Variable_Name_&i._&j" NE "description" %Then
+				%Do;
 					Length &&Variable_Name_&i._&j  $ 300;
 				%End;
 *--- Some variable names has a space i.e. Status Code - tranword (blanks,_) to Status_Code ---;
@@ -731,10 +744,12 @@ Run;
 				End;
 		Run;
 
-		Proc Sort Data = Work.Schema_Columns
-			Out = OBData.&API_SCH._&Sch_Version;
-			By Hierarchy;
-		Run;
+/*
+	Proc Sort Data = Work.Schema_Columns
+		Out = OBData.&API_SCH._&Sch_Version;
+		By Hierarchy;
+	Run;
+*/
 
 	%End;
 	%Else %IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
@@ -748,10 +763,12 @@ Run;
 				End;
 		Run;
 
-		Proc Sort Data = Work.Schema_Columns
-			Out = OBData.&API_SCH._&Sch_Version;
-			By Hierarchy;
-		Run;
+/*
+	Proc Sort Data = Work.Schema_Columns
+		Out = OBData.&API_SCH._&Sch_Version;
+		By Hierarchy;
+	Run;
+*/
 
 	%End;
 	%Else %IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
@@ -765,18 +782,20 @@ Run;
 				End;
 		Run;
 
-		Proc Sort Data = Work.Schema_Columns
-			Out = OBData.&API_SCH._&Sch_Version;
-			By Hierarchy;
-		Run;
+/*
+	Proc Sort Data = Work.Schema_Columns
+		Out = OBData.&API_SCH._&Sch_Version;
+		By Hierarchy;
+	Run;
+*/
 
 	%End;
-	%Else %Do;
+/*	%Else %Do;*/
 		Proc Sort Data = Work.Schema_Columns
 			Out = OBData.&API_SCH._&Sch_Version;
 			By Hierarchy;
 		Run;
-	%End;
+/*	%End;*/
 
 %End;
 
@@ -1150,12 +1169,24 @@ run;
 Data Work.Varlist(Keep = Name RowCount);
 	Length RowCount 8.;
 	Set Work.Varlist;
-	Where Name contains 'enum';
+	%If "&Bankname_C" EQ "OB" %Then
+	%Do;
+/*		Where Name contains 'enum';*/
+	%End;
+	%Else %Do;
+		Where Name contains 'enum';
+	%End;
 	RowCount + 1;
 Run;
 
 Data _Null_;
-	Set Varlist(where=(Name contains ('enum')));
+	%If "&Bankname_C" EQ "OB" %Then
+	%Do;
+		Set Varlist;
+	%End;
+	%Else %Do;
+		Set Varlist(where=(Name contains ('enum')));
+	%End;
 	Call Symput(Compress('Varlist'||'_'||Put(_N_,2.)),Name);
 	Call Symput('VarObs',Compress(RowCount));
 Run;
@@ -2177,7 +2208,16 @@ Proc Export Data = Work._API_&Bank._API(Keep = Hierarchy &Bank._Value Table)
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
+%If "&Bankname_C" EQ "OB" %Then
+%Do;
+	*--- Note the difference between the 2 lines i.e. &_API_Name vs &API_Name macro variable ---;
+	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&API_Name._%sysfunc(today(),date9.).csv);
+%End;
+%Else %Do;
+	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
+%End;
+
+%End;
 
 
 %Macro SendMail();
@@ -2304,13 +2344,20 @@ ods listing;
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
 %Macro ExportXL(Path);
-Proc Export Data = Work._SCH_&Bank._API(Keep = Hierarchy Table Flag &Bank._Value OB_Comment Description)
+Proc Export Data = Work._SCH_&Bank._API(Keep = Hierarchy Table Flag &Bank._Value OB_Comment /*Description*/)
  	Outfile = "&Path"
 	DBMS = CSV REPLACE;
 	PUTNAMES=YES;
 Run;
 %Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
+%If "&Bankname_C" EQ "OB" %Then
+%Do;
+	*--- Note the difference between the 2 lines i.e. &_API_Name vs &API_Name macro variable ---;
+	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&API_Name._%sysfunc(today(),date9.).csv);
+%End;
+%Else %Do;
+	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
+%End;
 
 %End;
 
@@ -2420,7 +2467,7 @@ options emailhost=
    /* your Gmail address */
    id="steffan.vanmolendorff@qlick2.com"
    /* optional: encode PW with PROC PWENCODE */
-   pw="@Qlick22018!" 
+   pw="@FDi2014" 
  )
 ;
 
@@ -2450,6 +2497,12 @@ Filename Myemail Clear;
 --- The values are passed from the Main macro to resolve in the macro below which allows execution of the API data extract ---
 ======================================================================================================================================================;
 %Mend API;
+*--- For json files end point - remove *.json* in %API(&API_Path/&Main_API) ---;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "OB" %Then
+%Do;
+	%API(&API_Path/&Version/%Sysfunc(Tranwrd(&API_Name,'.','_')).json,&Bank_Name,%Sysfunc(Tranwrd(&API_Name,'.','_')));
+%End;
+
 *--- For json files end point - remove *.json* in %API(&API_Path/&Main_API) ---;
 %If "&_VersionNo" EQ "v1.2" or "&_VersionNo" = "v1.3" %Then
 %Do;
@@ -2594,6 +2647,11 @@ Filename Myemail Clear;
 	and "&_APIName" EQ "BCH"%Then
 %Do;
 	%Schema(&GitHub_Path/branch_swagger_v22.json,&Bank_Name,&API_SCH);
+%End;
+%Else %IF "&_VersionNo" EQ "v1.0" and "&Bank_Name" EQ "OB" 
+	and "&_APIName" EQ "SQ1"%Then
+%Do;
+	%Schema(&GitHub_Path/sqm_swagger.json,&Bank_Name,&API_SCH);
 %End;
 %Else %Do;
 	%Schema(&GitHub_Path/%Sysfunc(Tranwrd(&Github_API..json,'-','_')),&Bank_Name,&API_SCH);

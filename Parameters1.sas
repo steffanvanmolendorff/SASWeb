@@ -72,6 +72,13 @@ Run;
 		Out = Work.Unique_No NoDupKey;
 		By Version_No;
 	Run;
+	*--- Get Unique Version Number from Dataset for SQM ---;
+	Proc Sort Data = Work.Bank_API_List(Where=(Bank_Name = "&_BankName"))
+		Out = Work.Unique_No_SQM NoDupKey;
+		By Version_No Version_No_Desc;
+	Run;
+
+	
 
 
 /*
@@ -279,13 +286,13 @@ Put '</table>';
 				%End;
 
 				%Else %Do;
-				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No in ("v2.1","v1.1")))));
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No in ("v2.1","v1.1","v1.0")))));
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 				%End;
 
 				*--- Populate Drop Down Box on HTML Page ---;
-				Put	'<select name="_APIName" size="7">' /;
+				Put	'<select name="_APIName" size="7" style="width: 80%; height: 30%">' /;
 				    %Do I = 1 %To &Count;
 				        %Let Rc = %Sysfunc(fetch(&Dsn,&i));
 				        %Let Start=%Sysfunc(GETVARC(&Dsn,%Sysfunc(VARNUM(&Dsn,API_Name))));
@@ -334,7 +341,7 @@ Put '</table>';
 	Put '<p></p>';
 
 					*--- Read Dataset UniqueNames ---;
-				 	%Let Dsn = %Sysfunc(Open(Work.Unique_No(Where=(Bank_Name = "&_BankName"))));
+				 	%Let Dsn = %Sysfunc(Open(Work.Unique_No_SQM(Where=(Bank_Name = "&_BankName"))));
 					%Put Dsn = "&Dsn";
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
@@ -379,7 +386,8 @@ Put '</table>';
 
 	Put '<Table align="center" style="width: 100%; height: 5%" border="0">';
 	Put '<tr>';
-	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_LIVE_APP_V09.sas">';
+	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SQM_METRICS_SWAGGER_V01.sas">';
+/*	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_LIVE_APP_V09.sas">';*/
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"
 		'>';
