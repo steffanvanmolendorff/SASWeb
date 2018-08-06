@@ -21,15 +21,14 @@ OPTIONS NOSYNTAXCHECK;
 Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
 
 *--- Uncomment to run on local laptop/pc machine ---;
-/*
+
 %Global _BankName;
 %Global _APIName;
 %Global _VersionNo;
 
-%Let _BankName = BOI;
+%Let _BankName = Danske;
 %Let _APIName = PCA;
-%Let _VersionNo = v2.2;
-*/
+%Let _VersionNo = v2.2.1;
 
 Data Work._Null_;
 _BankName = "&_BankName";
@@ -752,7 +751,7 @@ Run;
 */
 
 	%End;
-	%Else %IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
+	%IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
 		and "&_APIName" EQ "BCA" %Then
 	%Do;
 		Data Work.Schema_Columns;
@@ -771,7 +770,7 @@ Run;
 */
 
 	%End;
-	%Else %IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
+	%IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
 		and "&_APIName" EQ "BCH" %Then
 	%Do;
 		Data Work.Schema_Columns;
@@ -790,12 +789,33 @@ Run;
 */
 
 	%End;
-/*	%Else %Do;*/
+	*--- Add this section to extract the path from Brand in the Swagger Path to 
+		match the FCA API file structure ---;
+	%IF "&_VersionNo" EQ "v1.0" and "&_APIName" EQ "FCP" or "&_APIName" EQ "FCB" %Then
+	%Do;
+		Data Work.Schema_Columns;
+			Set Work.Schema_Columns;
+				If Find(Hierarchy,'Brand') NE 0 Then
+				Do;
+					Hierarchy = Substr(Hierarchy,Find(Hierarchy,'Brand'));
+				End;
+		Run;
+
+/*
+	Proc Sort Data = Work.Schema_Columns
+		Out = OBData.&API_SCH._&Sch_Version;
+		By Hierarchy;
+	Run;
+*/
+
+	%End;
+
+	%Else %Do;
 		Proc Sort Data = Work.Schema_Columns
 			Out = OBData.&API_SCH._&Sch_Version;
 			By Hierarchy;
 		Run;
-/*	%End;*/
+	%End;
 
 %End;
 
@@ -2526,6 +2546,11 @@ Filename Myemail Clear;
 *	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "NBS" and "&_APIName" EQ "FCP" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
 /*
 %Put _VersionNo = &_VersionNo;
 %Put BankName_C = &BankName_C;
@@ -2570,10 +2595,10 @@ Filename Myemail Clear;
 %End;
 
 *--- Danske - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Danske" %Then
+%If "&_VersionNo" EQ "v2.2.1" and "&BankName_C" EQ "Danske" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
 %End;
 
 *--- RBS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
@@ -2690,3 +2715,4 @@ commercial-credit-cards,
 CCC_Schema,
 v1.3,
 Barclays);
+

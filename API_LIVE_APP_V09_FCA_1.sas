@@ -647,7 +647,7 @@ Data Work.&JSON._2;
 	Set Work.&JSON._1(Where=(Columns NE ''));
 	By HierCnt Counter;
 
-		Call Symput(Compress('Variable_Name'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Trim(Left(Columns)));
+		Call Symput(Compress('Variable_Name'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Tranwrd(Trim(Left(Columns)),' ','_'));
 		Call Symput(Compress('Variable_Value'||'_'||Put(HierCnt,8.)||'_'||Put(Counter,8.)),Trim(Left(Value)));
 
 	If Last.HierCnt and Last.Counter then
@@ -686,21 +686,22 @@ Run;
 				charlist = 'abcdefghijklmnopqrstuvwxyz';
 				%If %Index(&&Variable_Name_&i._&j,charlist) EQ 0 %Then
 				%Do;
-					%Let Variable_Name_&i._&j = _&&Variable_Name_&i._&j;
+/*					%Let Variable_Name_&i._&j = _&&Variable_Name_&i._&j;*/
+					%Let Variable_Name_&i._&j = %Sysfunc(Tranwrd(&&Variable_Name_&i._&j.,' ','_'));
 				%End;
 			
 				%Put j = &j;
 				%If "&&Variable_Name_&i._&j" EQ "description" %Then
 				%Do;
-					Length &&Variable_Name_&i._&j  $ 1000;
+					Length %Sysfunc(Tranwrd(&&Variable_Name_&i._&j.,'','_'))  $ 1000;
 				%End;
 		*--- Test if the Variable Name only contains numbers - if yes - add underscore ---;
 				%If "&&Variable_Name_&i._&j" NE "description" %Then
 				%Do;
-					Length &&Variable_Name_&i._&j  $ 300;
+					Length %Sysfunc(Tranwrd(&&Variable_Name_&i._&j.,' ','_'))  $ 300;
 				%End;
 *--- Some variable names has a space i.e. Status Code - tranword (blanks,_) to Status_Code ---;
-				%Let Varname = %Sysfunc(Tranwrd(&&Variable_Name_&i._&j.,'','_'));
+				%Let Varname = %Sysfunc(Tranwrd(&&Variable_Name_&i._&j.,' ','_'));
 				&Varname = %UNQUOTE(%STR(%')"&&Variable_Value_&i._&j."%STR(%'));
 			%End;
 	Run;
@@ -733,6 +734,18 @@ Run;
 		By Hierarchy;
 	Run;
 */
+
+	%IF "&_VersionNo" EQ "v1.0" and "&_APIName" EQ "FCP" or "&_APIName" EQ "FCB"%Then
+	%Do;
+		Data Work.Schema_Columns;
+			Set Work.Schema_Columns;
+				If Find(Hierarchy,'Brand') NE 0 Then
+				Do;
+					Hierarchy = Substr(Hierarchy,Find(Hierarchy,'Brand'));
+				End;
+		Run;
+	%End;
+
 	%IF "&_VersionNo" EQ "v2.2" and "&Bank_Name" EQ "BOI" 
 		and "&_APIName" EQ "PCA" %Then
 	%Do;
@@ -790,6 +803,18 @@ Run;
 */
 
 	%End;
+
+		%Else %IF "&_VersionNo" EQ "v2.2" and "&_APIName" NE "OB" %Then
+	%Do;
+		Data Work.Schema_Columns;
+			Set Work.Schema_Columns;
+				If Find(Hierarchy,'Brand') NE 0 Then
+				Do;
+					Hierarchy = Substr(Hierarchy,Find(Hierarchy,'Brand'));
+				End;
+		Run;
+	%End;
+
 /*	%Else %Do;*/
 		Proc Sort Data = Work.Schema_Columns
 			Out = OBData.&API_SCH._&Sch_Version;
@@ -2460,14 +2485,17 @@ Run;
 =================================================================================;
 options emailhost=
  (
-   "smtp.office365.com" 
+/*   "smtp.office365.com" */
+   "smtp.stackmail.com"
    /* alternate: port=487 SSL */
    port=587 STARTTLS 
    auth=login
    /* your Gmail address */
-   id="steffan.vanmolendorff@qlick2.com"
+/*   id="steffan.vanmolendorff@qlick2.com"*/
+   id="steffan@vanmolendorff.com"
    /* optional: encode PW with PROC PWENCODE */
-   pw="@FDi2014" 
+/*   pw="@FDi2014" */
+   pw="@Octa7700" 
  )
 ;
 
@@ -2526,6 +2554,21 @@ Filename Myemail Clear;
 *	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "NBS" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "NBS" and "&_APIName" EQ "FCP" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "NBS" and "&_APIName" EQ "FCB" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
 /*
 %Put _VersionNo = &_VersionNo;
 %Put BankName_C = &BankName_C;
@@ -2570,10 +2613,20 @@ Filename Myemail Clear;
 %End;
 
 *--- Danske - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Danske" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Danske" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Danske" and "&_APIName" EQ "FCP" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Danske" and "&_APIName" EQ "FCB" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- RBS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
@@ -2582,17 +2635,62 @@ Filename Myemail Clear;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "RBS" %Then
+%Do;
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "RBS" and "&_APIName" EQ "FCP" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "RBS" and "&_APIName" EQ "FCB" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
 *--- NATWEST - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Natwest" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Natwest" %Then
+%Do;
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Natwest" and "&_APIName" EQ "FCP" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Natwest" and "&_APIName" EQ "FCB" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
 *--- Ulster - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Ulster" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Ulster" %Then
+%Do;
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Ulster" and "&_APIName" EQ "FCP" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Ulster" and "&_APIName" EQ "FCB" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 *--- Adam & Co - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "AdamCo" %Then

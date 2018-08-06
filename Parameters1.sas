@@ -244,13 +244,13 @@ Put '</table>';
 	Put '<p></p>';
 
 				*--- Read Dataset UniqueNames ---;
-				%If %Sysfunc(Compress("&_BankName")) = "Barclays" %Then
+				%If %Sysfunc(Compress("&_BankName")) = "Test_Bank" %Then
 				%Do;
 				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No = "v1.3"))));
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 				%End;
-
+/*
 
 				%Else %If %Sysfunc(Compress("&_BankName")) = "RBS" %Then
 				%Do;
@@ -268,7 +268,7 @@ Put '</table>';
 
 				%Else %If %Sysfunc(Compress("&_BankName")) = "Natwest" %Then
 				%Do;
-				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No = "v1.3"))));
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No in ("v1.3","v1.0")))));
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 				%End;
@@ -284,9 +284,9 @@ Put '</table>';
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 				%End;
-
+*/
 				%Else %Do;
-				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No in ("v2.1","v1.1","v1.0")))));
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(Bank_Name = "&_BankName" and Version_No in ("v1.0","v1.1","v2.1","v2.2")))));
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 				%End;
@@ -386,8 +386,14 @@ Put '</table>';
 
 	Put '<Table align="center" style="width: 100%; height: 5%" border="0">';
 	Put '<tr>';
-	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SQM_METRICS_SWAGGER_V01.sas">';
-/*	Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_LIVE_APP_V09.sas">';*/
+	%If "&_Bankname" EQ "OB" %Then
+	%Do;
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SQM_METRICS_SWAGGER_V01.sas">';
+	%End;
+	%If "&_Bankname" NE "OB" %Then
+	%Do;
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_LIVE_APP_V09_FCA_1.sas">';
+	%End;
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"
 		'>';

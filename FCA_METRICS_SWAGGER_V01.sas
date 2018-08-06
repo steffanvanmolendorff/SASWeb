@@ -1,11 +1,15 @@
-Proc Options option=encoding;
-Run;
-Libname OBData "C:\inetpub\wwwroot\sasweb\Data\Perm";
-*--- The Main macro will execute the code to extract data from the API end points ---;
-%Macro API(Url,Bank,API,Encoding);
+*--- Uncomment to run on local machine ---;
+/*
+%Global _APIName;
+%Let _APIName = SQ1;
+*/
+Options MPrint MLogic Source Source2 Symbolgen;
 
-/*Filename API Temp encoding="wlatin21";*/
-&Encoding;
+*--- The Main macro will execute the code to extract data from the API end points ---;
+%Macro Main();
+%Macro API(Url,Bank,API);
+
+Filename API Temp;
 
 *--- Proc HTTP assigns the GET method in the URL to access the data ---;
 Proc HTTP
@@ -22,9 +26,12 @@ Proc Datasets Lib = LibAPIs;
 Quit;
 
 Data Work.&Bank._API;
-	Set LibAPIs.Alldata;
+	Set LibAPIs.Alldata(Where=(V=1));
 Run;
 
 %Mend API;
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.Full.json,PCA,SQM,Filename API Temp;);
-/*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/atms1.json,PCA,SQM,Filename API Temp/* encoding="wlatin1";);*/
+%API(http://localhost/sasweb/data/temp/ob/fca/v1_0/fca_pca_swagger.json,FCA_PCA_SWAGGER,SWA);
+%API(http://localhost/sasweb/data/temp/ob/fca/v1_0/fca_nbs_pca.json,FCA_NBS_PCA,FCA);
+
+%Mend Main;
+%Main();

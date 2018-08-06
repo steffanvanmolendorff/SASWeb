@@ -1,7 +1,7 @@
 *--- Uncomment to run on local machine ---;
 /*
 %Global _APIName;
-%Let _APIName = SQ6;
+%Let _APIName = SQ1;
 */
 Options MPrint MLogic Source Source2 Symbolgen;
 
@@ -39,9 +39,11 @@ Run;
 *%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.Full.json,PCAFULL,SQM,Filename API Temp);
 %API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SwaggerFile..json,SWAGGER,SWA,Filename API Temp);
 %API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SQMFile..json,SQM,SQM,Filename API Temp);
+/*%API(&SQMFile,SQM,SQM,Filename API Temp);*/
+
 
 Data Work.Swagger_API1(Keep = P4 P5 Value Where=(P5 in ('description')));
-	Set Work.Swagger_API/*(Where=(P5 = 'description'))*/;
+	Set Work.Swagger_API(Where=(P1 EQ 'definitions'));
 	If P2 EQ 'Weight' and P3 EQ 'description' then
 	Do;
 		P4 = P2;
@@ -57,6 +59,7 @@ Data Work.Swagger_API1(Keep = P4 P5 Value Where=(P5 in ('description')));
 	Do;
 		P5 = 'description';
 	End;
+
 Run;
 
 *--- Add a Required field as Area does not contain have this in the Spec ---;
@@ -88,6 +91,7 @@ Run;
 Data Work.Swagger_API2;
 	Set Work.Swagger_API1
 	Work.Required1;
+	P4 = Trim(Left(P4));
 Run;
 
 Proc Sort Data = Work.Swagger_API2;
@@ -107,6 +111,21 @@ Data Work.SQM_API1(Keep = P1 P4 Value Count RowCnt);
 	Do;
 		P4 = P2;
 	End;
+
+	If P4 EQ '' and P3 NE '' Then
+	Do;
+		P4 = P2;
+	End;
+	If P4 EQ '' and P3 EQ '' and P2 NE '' Then
+	Do;
+		P4 = P2;
+	End;
+*--- Changes Footnotes1,2,3,4 to Footnotes as SAS adds 1234 to an array of values. 
+	The spec states Footnotes ---;
+	If P4 in ('Footnotes1','Footnotes2','Footnotes3','Footnotes4') Then P4 = 'Footnotes';
+
+	P4 = Trim(Left(P4));
+	Value = Trim(Left(Value));
 Run;
 Proc Sort Data = Work.SQM_API1;
 	By P4 Value;
@@ -312,9 +331,9 @@ ods tagsets.tableeditor file=_Webout
 			DiffDate;
 
 			Define P5 / display 'SQM Metric Type' style(column)=[width=15%] left;
-			Define P4 / display 'SQM Metric Name' style(column)=[width=15%] left;
-			Define Value / display 'SQM Metric Value' style(column)=[width=15%] left;
-			Define Swagger_Desc / display 'SQM Metric Description' style(column)=[width=20%] left;
+			Define P4 / display 'SQM Agency Metric Name' style(column)=[width=15%] left;
+			Define Value / display 'SQM Agency Metric Value' style(column)=[width=15%] left;
+			Define Swagger_Desc / display 'OB Metric Description' style(column)=[width=20%] left;
 			Define RowCnt / display 'Row Number' style(column)=[width=5%] left;
 			Define Infile / display 'Source File' style(column)=[width=5%] left;
 			Define DiffDate / display 'Date Difference' style(column)=[width=5%] left /*Noprint*/;
@@ -443,27 +462,36 @@ Data _Null_;
 Run;
  
 Filename Myemail Clear;
-
-
+/*
+%API(https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/aggregated/wave/latest,SQM_PCA_GB_FULL,X2);
+%API(https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/full/wave/latest,SQM_PCA_GB_AGG,X1);
+%API(https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/aggregated/wave/latest,SQM_PCA_NI_FULL,X4);
+%API(https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/full/wave/latest,SQM_PCA_NI_AGG,X3);
+*/
 %Mend Run_SQM;
 %If "&_APIName" EQ "SQ1" %Then
 %Do;
-	%Run_SQM(PCA_GB_AGG,PCA.GB.Agg,SQM_Swagger);
+/*	%Run_SQM(PCA_GB_AGG,pca.gb.agg,SQM_Swagger);*/
+	%Run_SQM(PCA_GB_AGG,https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/aggregated/wave/latest,SQM_Swagger);
 %End;
 
 %If "&_APIName" EQ "SQ2" %Then
 %Do;
-	%Run_SQM(PCA_GB_FULL,PCA.GB.Full,SQM_Swagger);
+/*	%Run_SQM(PCA_GB_FULL,pca.gb.full,SQM_Swagger);*/
+%Run_SQM(PCA_GB_FULL,https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/full/wave/latest,SQM_Swagger);
+	
 %End;
 
 %If "&_APIName" EQ "SQ3" %Then
 %Do;
-	%Run_SQM(PCA_NI_AGG,PCA.NI.Agg,SQM_Swagger);
+/*	%Run_SQM(PCA_NI_AGG,pca.ni.agg,SQM_Swagger);*/
+	%Run_SQM(PCA_NI_AGG,https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/aggregated/wave/latest,SQM_Swagger);
 %End;
 
 %If "&_APIName" EQ "SQ4" %Then
 %Do;
-	%Run_SQM(PCA_NI_FULL,PCA.NI.Full,SQM_Swagger);
+/*	%Run_SQM(PCA_NI_FULL,pca.ni.full,SQM_Swagger);*/
+	%Run_SQM(PCA_NI_FULL,https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/full/wave/latest,SQM_Swagger);
 %End;
 
 %If "&_APIName" EQ "SQ5" %Then
@@ -488,3 +516,94 @@ Filename Myemail Clear;
 
 %Mend Main;
 %Main;
+
+
+/*
+%Macro MacroVars();
+Proc Summary Data = Work.Swagger_API Nway Missing;
+	Where P5 EQ 'enum';
+	Class P4 P6 Value;
+	Var V;
+	Output Out = SWA_Summary(Drop=_Type_ _Freq_) Sum=;
+Run;
+
+Data Work.SWA_Summary1;
+	Set Work.SWA_Summary End=Last;
+	By P4 P6;
+	If First.P4 Then
+	Do;
+		P4_Cnt + 1;
+		P6_Cnt = 1;
+	End;
+	If Not First.P4 Then 
+	Do;
+		P6_Cnt + 1; 
+	End;
+	If Last.P4 and Last.P6 Then
+	Do;
+		P4_Total = P4_Cnt;
+		P6_Total = P6_Cnt;
+	End;
+	Row_Cnt + 1;
+	Retain P4_Cnt;
+Run;
+
+Data Work.SWA_Summary2;
+	Set Work.SWA_Summary1; 
+	Call Symput(Compress('P4_Var'||Put(P4_Cnt,2.)),P4);
+	Call Symput(Compress('P6_VarVal'||Put(P4_Cnt,2.)||'_'||Put(P6_Cnt,2.)),Trim(Left(Value)));
+Run;
+Data Work.SWA_Summary_Total;
+	Set Work.SWA_Summary1(Where=(P4_Total NE .)); 
+	Call Symput(Compress('P4_Total'),Put(P4_Total,2.));
+	Call Symput(Compress('P6_Total'||Put(P4_Total,2.)),Put(P6_Total,2.));
+Run;
+%Put _All_;
+
+%Put _All_;
+
+%Macro Test();
+%Do i=1 %To &P4_Total;
+	%Put i = &i;
+	Data Work.X;
+		Set Work._Match_BCA_GB_Full;
+		%Do j = 1 %To &&P6_Total&i;
+			%Put j = &&P6_Total&i;
+			%Put P6_VarVal = "&&P6_VarVal&i._&j";
+			If Trim(Left(Value)) EQ %Sysfunc(Trim(%Sysfunc(Left("&&P6_VarVal&i._&j")))) Then
+			Do;
+				Test = 'Yes';
+				Output;
+			End;
+			Else Do;
+				Test = 'No';
+				Output;
+			End;
+		%End;
+	Run;
+%End;
+%Mend Test;
+%Test();
+
+%Mend MacroVars;
+%MacroVars();
+
+Proc Sort Data = Work.SQM_API1;
+	By P4 Value;
+Run;
+Proc Sort Data = Work.Swagger_API2;
+	By P4 Value;
+Run;
+
+Data Work.Match Work.NoMatch;
+	Merge Work.SWA_Summary2(In=a)
+	Work.SQM_API1(In=b Rename=(Value=SQM_Value));
+	By P4;
+	If a and b then
+	Do;
+		Output Work.Match;
+	End;
+	Else Do;
+		Output Work.NoMatch;
+	End;
+Run;
