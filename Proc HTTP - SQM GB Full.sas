@@ -26,5 +26,19 @@ Data Work.&Bank._API;
 Run;
 
 %Mend API;
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.Full.json,PCA,SQM,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/BCA_GB_Full_1.json,BCA_GB,SQM,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/BCA_NI_Full_1.json,BCA_NI,SQM,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA_GB_Full.json,PCA_GB,SQM,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA_NI_Full.json,BCA_NI,SQM,Filename API Temp;);
 /*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/atms1.json,PCA,SQM,Filename API Temp/* encoding="wlatin1";);*/
+
+
+
+*--- Test rows vs Meta TotalRecords ---;
+Data Work.BCA_GB;
+	Set Work.BCA_GB_API(Where=(P3='Data' and V=0));
+Run;
+*--- Test rows vs Meta TotalRecords ---;
+Data Work.BCA_NI;
+	Set Work.BCA_NI_API(Where=(P3='Data' and V=0));
+Run;

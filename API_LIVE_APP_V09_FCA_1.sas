@@ -2124,28 +2124,28 @@ ods tagsets.tableeditor file=_Webout
 		Endcomp;
 
 Run;
-*=====================================================================================================================================================
---- Add bottom of report Menu ReturnButton code here ---
-======================================================================================================================================================;
-	%ReturnButton();
+	*=====================================================================================================================================================
+	--- Add bottom of report Menu ReturnButton code here ---
+	======================================================================================================================================================;
+		%ReturnButton();
 
-%Mend API_Errors;
-%API_Errors(&Bank, &API);
+	%Mend API_Errors;
+	%API_Errors(&Bank, &API);
 
-ods tagsets.tableeditor close; 
-ods listing; 
+	ods tagsets.tableeditor close; 
+	ods listing; 
 
-*=====================================================================================================================================================
-						EXPORT REPORT RESULTS TO RESULTS FOLDER
-=====================================================================================================================================================;
-%Macro ExportXL(Path);
-Proc Export Data = Work.Fail
- 	Outfile = "&Path"
-	DBMS = CSV REPLACE;
-	PUTNAMES=YES;
-Run;
-%Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail_%sysfunc(today(),date9.).csv);
+	*=====================================================================================================================================================
+							EXPORT REPORT RESULTS TO RESULTS FOLDER
+	=====================================================================================================================================================;
+	%Macro ExportXL(Path);
+	Proc Export Data = Work.Fail
+	 	Outfile = "&Path"
+		DBMS = CSV REPLACE;
+		PUTNAMES=YES;
+	Run;
+	%Mend ExportXL;
+	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail_%sysfunc(today(),date9.).csv);
 
 %End;
 
@@ -2223,24 +2223,24 @@ ods tagsets.tableeditor close;
 ods listing; 
 
 
-*=====================================================================================================================================================
-						EXPORT REPORT RESULTS TO RESULTS FOLDER
-=====================================================================================================================================================;
-%Macro ExportXL(Path);
-Proc Export Data = Work._API_&Bank._API(Keep = Hierarchy &Bank._Value Table)
- 	Outfile = "&Path"
-	DBMS = CSV REPLACE;
-	PUTNAMES=YES;
-Run;
-%Mend ExportXL;
-%If "&Bankname_C" EQ "OB" %Then
-%Do;
-	*--- Note the difference between the 2 lines i.e. &_API_Name vs &API_Name macro variable ---;
-	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&API_Name._%sysfunc(today(),date9.).csv);
-%End;
-%Else %Do;
-	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
-%End;
+	*=====================================================================================================================================================
+							EXPORT REPORT RESULTS TO RESULTS FOLDER
+	=====================================================================================================================================================;
+	%Macro ExportXL(Path);
+	Proc Export Data = Work._API_&Bank._API(Keep = Hierarchy &Bank._Value Table)
+	 	Outfile = "&Path"
+		DBMS = CSV REPLACE;
+		PUTNAMES=YES;
+	Run;
+	%Mend ExportXL;
+	%If "&Bankname_C" EQ "OB" %Then
+	%Do;
+		*--- Note the difference between the 2 lines i.e. &_API_Name vs &API_Name macro variable ---;
+		%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&API_Name._%sysfunc(today(),date9.).csv);
+	%End;
+	%Else %Do;
+		%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
+	%End;
 
 %End;
 
@@ -2255,10 +2255,7 @@ Run;
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_API_&Bank._&_APIName._%sysfunc(today(),date9.).csv"
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv"
 /*	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&_APIName._Fail_%sysfunc(datetime(),datetime13.).csv"*/
-%Mend;
-
-
-%End;
+%Mend SendMail;
 
 %If &ErrorCode = 0 and &NOBS_SCH > 0 %Then 
 %Do;
@@ -2365,24 +2362,24 @@ ods tagsets.tableeditor file=_Webout
 ods tagsets.tableeditor close; 
 ods listing; 
 
-*=====================================================================================================================================================
-						EXPORT REPORT RESULTS TO RESULTS FOLDER
-=====================================================================================================================================================;
-%Macro ExportXL(Path);
-Proc Export Data = Work._SCH_&Bank._API(Keep = Hierarchy Table Flag &Bank._Value OB_Comment /*Description*/)
- 	Outfile = "&Path"
-	DBMS = CSV REPLACE;
-	PUTNAMES=YES;
-Run;
-%Mend ExportXL;
-%If "&Bankname_C" EQ "OB" %Then
-%Do;
-	*--- Note the difference between the 2 lines i.e. &_API_Name vs &API_Name macro variable ---;
-	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&API_Name._%sysfunc(today(),date9.).csv);
-%End;
-%Else %Do;
-	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
-%End;
+	*=====================================================================================================================================================
+							EXPORT REPORT RESULTS TO RESULTS FOLDER
+	=====================================================================================================================================================;
+	%Macro ExportXL(Path);
+	Proc Export Data = Work._SCH_&Bank._API(Keep = Hierarchy Table Flag &Bank._Value OB_Comment /*Description*/)
+	 	Outfile = "&Path"
+		DBMS = CSV REPLACE;
+		PUTNAMES=YES;
+	Run;
+	%Mend ExportXL;
+	%If "&Bankname_C" EQ "OB" %Then
+	%Do;
+		*--- Note the difference between the 2 lines i.e. &_API_Name vs &API_Name macro variable ---;
+		%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&API_Name._%sysfunc(today(),date9.).csv);
+	%End;
+	%Else %Do;
+		%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\_SCH_&Bank._&_APIName._%sysfunc(today(),date9.).csv);
+	%End;
 
 %End;
 
@@ -2461,20 +2458,20 @@ ods tagsets.tableeditor file=_Webout
 	%Mend No_Errors;
 	%No_Errors(&Bank, &API);
 
-ods tagsets.tableeditor close; 
-ods listing; 
+	ods tagsets.tableeditor close; 
+	ods listing; 
 
-*=====================================================================================================================================================
-						EXPORT REPORT RESULTS TO RESULTS FOLDER
-=====================================================================================================================================================;
-%Macro ExportXL(Path);
-Proc Export Data = Work.No_Obs
- 	Outfile = "&Path"
-	DBMS = CSV REPLACE;
-	PUTNAMES=YES;
-Run;
-%Mend ExportXL;
-%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&APIName._No_Obs.csv);
+	*=====================================================================================================================================================
+							EXPORT REPORT RESULTS TO RESULTS FOLDER
+	=====================================================================================================================================================;
+	%Macro ExportXL(Path);
+	Proc Export Data = Work.No_Obs
+	 	Outfile = "&Path"
+		DBMS = CSV REPLACE;
+		PUTNAMES=YES;
+	Run;
+	%Mend ExportXL;
+	%ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\&BankName_C\&Bank._&APIName._No_Obs.csv);
 
 
 %End;
@@ -2485,22 +2482,24 @@ Run;
 =================================================================================;
 options emailhost=
  (
-/*   "smtp.office365.com" */
-   "smtp.stackmail.com"
-   /* alternate: port=487 SSL */
-   port=587 STARTTLS 
-   auth=login
-   /* your Gmail address */
-/*   id="steffan.vanmolendorff@qlick2.com"*/
-   id="steffan@vanmolendorff.com"
-   /* optional: encode PW with PROC PWENCODE */
-/*   pw="@FDi2014" */
-   pw="@Octa7700" 
+   "smtp.office365.com"
+	port=587 STARTTLS
+	auth=login
+	id="steffan.vanmolendorff@qlick2.com"
+   	pw="@V4nM0lend0rff"
  )
 ;
 
+/*
+"smtp.office365.com"
+alternate: port=487 SSL
+port=587 STARTTLS 
+id="steffan.vanmolendorff@qlick2.com"
+pw="@FDi2014"
+*/
+
 Filename myemail EMAIL
-  To=("steffan.vanmolendorff@openbanking.org.uk" "&_WebUser") 
+  To=("steffan.vanmolendorff@openbanking.org.uk") 
   Subject="JSON VALIDATION - &_BankName &_APIName &_VersionNo"
 		%SendMail;
 
@@ -2548,6 +2547,17 @@ Filename Myemail Clear;
 %Do;
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOI" and "&_APIName" EQ "FCP" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOI" and "&_APIName" EQ "FCB" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+
 *--- NBS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "NBS" %Then
 %Do;
@@ -2556,8 +2566,8 @@ Filename Myemail Clear;
 %End;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "NBS" %Then
 %Do;
-*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "NBS" and "&_APIName" EQ "FCP" %Then
 %Do;
