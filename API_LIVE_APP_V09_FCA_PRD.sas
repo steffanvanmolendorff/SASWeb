@@ -2532,18 +2532,7 @@ Filename Myemail Clear;
 	%API(&API_Path/&Version/%Sysfunc(Tranwrd(&API_Name,'.','_')).json,&Bank_Name,%Sysfunc(Tranwrd(&API_Name,'.','_')));
 %End;
 
-*--- For json files end point - remove *.json* in %API(&API_Path/&Main_API) ---;
-%If "&_VersionNo" EQ "v1.2" or "&_VersionNo" = "v1.3" %Then
-%Do;
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
 
-
-*--- BOI - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOI" %Then
-%Do;
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
 *--- BOI - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "BOI" %Then
 %Do;
@@ -2553,237 +2542,288 @@ Filename Myemail Clear;
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOI" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOI" and "&_APIName" EQ "FCB" %Then
-%Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
-
-*--- NBS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "NBS" %Then
 %Do;
 *	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+
+
+*--- NBS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "NBS" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "NBS" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "NBS" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 /*
 %Put _VersionNo = &_VersionNo;
 %Put BankName_C = &BankName_C;
 */
+
+
 *--- HSBC - For json files end point - remove *.json* in %API(&API_Path/&Main_API) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "HSBC" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "HSBC" %Then
 %Do;
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "HSBC" %Then
-%Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "HSBC" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "HSBC" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+
+
 *--- Santander - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Santander" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Santander" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Santander" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Santander" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+
+
 *--- BARCLAYS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Barclays" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Barclays" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Barclays" and "&_APIName" EQ "FCP" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Barclays" and "&_APIName" EQ "FCB" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- LLOYDS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Lloyds" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Lloyds" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Lloyds" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Lloyds" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- BOS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOS" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "BOS" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOS" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOS" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- HALIFAX - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Halifax" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Halifax" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Halifax" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- Danske - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Danske" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Danske" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Danske" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *--- RBS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "RBS" %Then
-%Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "RBS" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "RBS" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "RBS" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
-*--- NATWEST - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Natwest" %Then
-%Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+*--- NATWEST - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Natwest" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Natwest" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Natwest" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
-*--- Ulster - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Ulster" %Then
-%Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+*--- Ulster - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Ulster" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-/*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Ulster" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Ulster" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 *--- Adam & Co - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "AdamCo" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "AdamCo" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "AdamCo" and "&_APIName" EQ "FCP" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "AdamCo" and "&_APIName" EQ "FCB" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+
+
 *--- ESME - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "ESME" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "ESME" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "ESME" and "&_APIName" EQ "FCP" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "ESME" and "&_APIName" EQ "FCB" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+
+
 *--- Coutts - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Coutts" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Coutts" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Coutts" and "&_APIName" EQ "FCP" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Coutts" and "&_APIName" EQ "FCB" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+
+
 *--- AIB - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "AIB" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "AIB" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "AIB" and "&_APIName" EQ "FCP" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "AIB" and "&_APIName" EQ "FCB" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+
+
 *--- First Trust Bank - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Firsttrust" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Firsttrust" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Firsttrust" and "&_APIName" EQ "FCP" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Firsttrust" and "&_APIName" EQ "FCB" %Then
+%Do;
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 

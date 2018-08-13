@@ -388,11 +388,13 @@ Put '</table>';
 	Put '<tr>';
 	%If "&_Bankname" EQ "OB" %Then
 	%Do;
-		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SQM_METRICS_SWAGGER_V01.sas">';
+*		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SQM_METRICS_SWAGGER_V01.sas">';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.SQM_METRICS_SWAGGER_V01_PRD.sas">';
 	%End;
 	%If "&_Bankname" NE "OB" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_LIVE_APP_V09_FCA_1.sas">';
+*		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_LIVE_APP_V09_FCA_PRD.sas">';
 	%End;
 	Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 		"&_service"

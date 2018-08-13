@@ -21,24 +21,32 @@ Libname LibAPIs JSON Fileref=API Ordinalcount = All;
 Proc Datasets Lib = LibAPIs; 
 Quit;
 
-Data Work.&Bank._API;
+Data Work.&Bank;
 	Set LibAPIs.Alldata;
 Run;
 
 %Mend API;
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/BCA_GB_Full_1.json,BCA_GB,SQM,Filename API Temp;);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/BCA_NI_Full_1.json,BCA_NI,SQM,Filename API Temp;);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA_GB_Full.json,PCA_GB,SQM,Filename API Temp;);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA_NI_Full.json,BCA_NI,SQM,Filename API Temp;);
-/*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/atms1.json,PCA,SQM,Filename API Temp/* encoding="wlatin1";);*/
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/Test-File.json,Test_File,Test,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.AGG.json,PCA_GB_AGG,SQM,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.Full.json,PCA_GB_FULL,SQM,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.NI.AGG.json,PCA_NI_AGG,SQM,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.NI.Full.json,PCA_NI_FULL,SQM,Filename API Temp;);
 
 
 
 *--- Test rows vs Meta TotalRecords ---;
-Data Work.BCA_GB;
-	Set Work.BCA_GB_API(Where=(P3='Data' and V=0));
+Data Work.PCA_GB_AGG1;
+	Set Work.PCA_GB_AGG(Where=(P2='Question' and P3='Results' and P4='Brand' and V=1));
 Run;
 *--- Test rows vs Meta TotalRecords ---;
-Data Work.BCA_NI;
-	Set Work.BCA_NI_API(Where=(P3='Data' and V=0));
+Data Work.PCA_GB_FULL1;
+	Set Work.PCA_GB_FULL(Where=(P3='Data' and V=0));
+Run;
+*--- Test rows vs Meta TotalRecords ---;
+Data Work.PCA_NI_AGG1;
+	Set Work.PCA_NI_AGG(Where=(P2='Question' and P3='Results' and V=1));
+Run;
+*--- Test rows vs Meta TotalRecords ---;
+Data Work.PCA_NI_FULL1;
+	Set Work.PCA_NI_FULL(Where=(P3='Data' and V=0));
 Run;
