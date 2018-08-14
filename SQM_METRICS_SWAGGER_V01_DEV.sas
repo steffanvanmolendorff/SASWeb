@@ -38,8 +38,8 @@ Run;
 *%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/sqm_swagger.json,SWAGGER,SWA,Filename API Temp);
 *%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.Full.json,PCAFULL,SQM,Filename API Temp);
 %API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SwaggerFile..json,SWAGGER,SWA,Filename API Temp);
-*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SQMFile..json,SQM,SQM,Filename API Temp);
-%API(&SQMFile,SQM,SQM,Filename API Temp);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SQMFile..json,SQM,SQM,Filename API Temp);
+/*%API(&SQMFile,SQM,SQM,Filename API Temp);*/
 
 
 Data Work.Swagger_API1(Keep = P4 P5 Value Where=(P5 in ('description')));
@@ -311,10 +311,10 @@ ods tagsets.tableeditor file=_Webout
             ); 
 
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
-		Title2 "SERVICE QUALITY INDICATORS - &Dsn";
-		Title3 color=red "%Sysfunc(UPCASE(&Fdate))";
-		Footnote1 "API LOCATION: &SQMFile";
-		Footnote2 "SPEC LOCATION: http://localhost/../_SWA_&Dsn";
+		Title2 "%Sysfunc(UPCASE(&SQMFile)) vs. %Sysfunc(UPCASE(&SwaggerFile))";
+		Title3 color=red "&SQMFile - %Sysfunc(UPCASE(&Fdate))";
+		Footnote1 "API LOCATION: TBC1";
+		Footnote2 "SCHEMA LOCATION: TBC2";
 
 		Proc Sort Data = Work.&SQM_Dsn;
 			By RowCnt P5 P4;
@@ -446,7 +446,7 @@ options emailhost=
 ;
 
 Filename myemail EMAIL
-  To=("steffan.vanmolendorff@openbanking.org.uk" "&_WebUser" "ServiceDesk@openbanking.org.uk") 
+  To=("steffan.vanmolendorff@openbanking.org.uk" /*"&_WebUser" "daniel.johnson@openbanking.org.uk"*/) 
   Subject="JSON VALIDATION - SQM &SQMFile -RESULTS"
 		%SendMail;
 
@@ -471,51 +471,47 @@ Filename Myemail Clear;
 %Mend Run_SQM;
 %If "&_APIName" EQ "SQ1" %Then
 %Do;
-*	%Run_SQM(PCA_GB_AGG,pca.gb.agg,SQM_Swagger);
-	%Run_SQM(PCA_GB_AGG,https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/aggregated/wave/latest,SQM_Swagger);
+	%Run_SQM(PCA_GB_AGG,pca.gb.agg,SQM_Swagger);
+/*	%Run_SQM(PCA_GB_AGG,https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/aggregated/wave/latest,SQM_Swagger);*/
 %End;
 
 %If "&_APIName" EQ "SQ2" %Then
 %Do;
-*	%Run_SQM(PCA_GB_FULL,pca.gb.full,SQM_Swagger);
-	%Run_SQM(PCA_GB_FULL,https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/full/wave/latest,SQM_Swagger);
+	%Run_SQM(PCA_GB_FULL,pca.gb.full,SQM_Swagger);
+/*%Run_SQM(PCA_GB_FULL,https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/full/wave/latest,SQM_Swagger);*/
 	
 %End;
 
 %If "&_APIName" EQ "SQ3" %Then
 %Do;
-*	%Run_SQM(PCA_NI_AGG,pca.ni.agg,SQM_Swagger);
-	%Run_SQM(PCA_NI_AGG,https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/aggregated/wave/latest,SQM_Swagger);
+	%Run_SQM(PCA_NI_AGG,pca.ni.agg,SQM_Swagger);
+/*	%Run_SQM(PCA_NI_AGG,https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/aggregated/wave/latest,SQM_Swagger);*/
 %End;
 
 %If "&_APIName" EQ "SQ4" %Then
 %Do;
-*	%Run_SQM(PCA_NI_FULL,pca.ni.full,SQM_Swagger);
-	%Run_SQM(PCA_NI_FULL,https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/full/wave/latest,SQM_Swagger);
+	%Run_SQM(PCA_NI_FULL,pca.ni.full,SQM_Swagger);
+/*	%Run_SQM(PCA_NI_FULL,https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/full/wave/latest,SQM_Swagger);*/
 %End;
 
 %If "&_APIName" EQ "SQ5" %Then
 %Do;
-*	%Run_SQM(BCA_GB_AGG,BCA.GB.Agg,SQM_Swagger);
-	%Run_SQM(PCA_NI_FULL,https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/bca/area/GB/export-type/aggregated/wave/latest,SQM_Swagger);
+	%Run_SQM(BCA_GB_AGG,BCA.GB.Agg,SQM_Swagger);
 %End;
 
 %If "&_APIName" EQ "SQ6" %Then
 %Do;
-*	%Run_SQM(BCA_GB_FULL,BCA.GB.Full,SQM_Swagger);
-	%Run_SQM(PCA_NI_FULL,https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/bca/area/GB/export-type/full/wave/latest,SQM_Swagger);
+	%Run_SQM(BCA_GB_FULL,BCA.GB.Full,SQM_Swagger);
 %End;
 
 %If "&_APIName" EQ "SQ7" %Then
 %Do;
-*	%Run_SQM(BCA_NI_AGG,BCA.NI.Agg,SQM_Swagger);
-	%Run_SQM(PCA_NI_FULL,https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/bca/area/NI/export-type/aggregated/wave/latest,SQM_Swagger);
+	%Run_SQM(BCA_NI_AGG,BCA.NI.Agg,SQM_Swagger);
 %End;
 
 %If "&_APIName" EQ "SQ8" %Then
 %Do;
-*	%Run_SQM(BCA_NI_FULL,BCA.NI.Full,SQM_Swagger);
-	%Run_SQM(PCA_NI_FULL,https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/bca/area/NI/export-type/full/wave/latest,SQM_Swagger);
+	%Run_SQM(BCA_NI_FULL,BCA.NI.Full,SQM_Swagger);
 %End;
 
 %Mend Main;
