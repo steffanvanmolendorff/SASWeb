@@ -2563,11 +2563,6 @@ Filename Myemail Clear;
 *	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
-%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "NBS" and "&_APIName" EQ "FCB" %Then
-%Do;
-*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
-%End;
 /*
 %Put _VersionNo = &_VersionNo;
 %Put BankName_C = &BankName_C;
@@ -2618,13 +2613,13 @@ Filename Myemail Clear;
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Barclays" and "&_APIName" EQ "FCP" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Barclays" and "&_APIName" EQ "FCB" %Then
 %Do;
-	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 

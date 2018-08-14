@@ -1,4 +1,4 @@
-﻿%Global _WebUser;
+%Global _WebUser;
 %Global _WebPass;
 %Global _RegUser;
 %Global _RegPass;
@@ -105,7 +105,7 @@ Data _Null_;
 		Put '<div class="dropdown" align="center" style="float:center; width: 70%">';
 		Put '<SELECT NAME="_action" size="2" onchange="this.form.submit()"</option>';
 		Put '<OPTION VALUE="SELECT OD API PARAMETERS"> 1. RUN OD JSON VALIDATION APP </option>';
-		Put '<OPTION VALUE="SELECT RW API PARAMETERS"> 1. RUN RW JSON VALIDATION APP </option>';
+		Put '<OPTION VALUE="SELECT RW API PARAMETERS"> 2. RUN RW JSON VALIDATION APP </option>';
 		Put '<OPTION VALUE="STATISTICS REPORT"> 2. STATISTICS REPORT </option>';
 		Put '</SELECT>';
 		Put '</div>';
