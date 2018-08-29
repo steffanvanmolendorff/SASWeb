@@ -25,7 +25,10 @@ Data Work.&Bank._API;
 Run;
 
 %Mend API;
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/account_v1_1_swagger.json,ACC1,AC1,Filename API Temp;);
+%API(http://localhost/sasweb/Data/Temp/OD/Santander/v2_2/atms.json,ATMS,ATM,Filename API Temp;);
+%API(http://localhost/sasweb/Data/Temp/OD/Lloyds/v2_2/atms.json,ATMS,ATM,Filename API Temp;);
+
+/*
 %API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/account_v2_0_swagger.json,ACC2,AC2,Filename API Temp encoding="wlatin2";);
 %API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA_GB_Full.json,PCA,SQM,);
 Proc Summary Data = Work.Acc1_api Nway Missing;

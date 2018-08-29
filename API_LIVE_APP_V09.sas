@@ -2511,7 +2511,7 @@ Filename Myemail Clear;
 
 
 *--- BOI - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOI" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "BOI" %Then
 %Do;
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;

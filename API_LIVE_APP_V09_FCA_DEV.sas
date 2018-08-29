@@ -2482,6 +2482,7 @@ ods tagsets.tableeditor file=_Webout
 *================================================================================
 					EMAIL REPORTS TO WEBUSER
 =================================================================================;
+/*
 options emailhost=
  (
    "smtp.stackmail.com" 
@@ -2491,7 +2492,7 @@ options emailhost=
    pw="@Octa7700" 
  )
 ;
-
+*/
 /*
 "smtp.office365.com"
 alternate: port=487 SSL
@@ -2499,7 +2500,7 @@ port=587 STARTTLS
 id="steffan.vanmolendorff@qlick2.com"
 pw="@FDi2014"
 */
-
+/*
 Filename myemail EMAIL
   To=("steffan.vanmolendorff@openbanking.org.uk" "adam.pretlove@openbanking.org.uk") 
   Subject="JSON VALIDATION - &_BankName &_APIName &_VersionNo"
@@ -2518,7 +2519,7 @@ Run;
  
 Filename Myemail Clear;
 
-
+*/
 
 %Mend Print_Results;
 %Print_Results(&Bank, &API);
@@ -2621,10 +2622,10 @@ Filename Myemail Clear;
 
 
 *--- BARCLAYS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Barclays" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Barclays" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Barclays" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2639,10 +2640,10 @@ Filename Myemail Clear;
 
 
 *--- LLOYDS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Lloyds" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Lloyds" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Lloyds" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2655,11 +2656,12 @@ Filename Myemail Clear;
 	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 
+
 *--- BOS - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "BOS" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "BOS" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOS" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2674,16 +2676,17 @@ Filename Myemail Clear;
 
 
 *--- HALIFAX - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Halifax" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Halifax" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Halifax" and "&_APIName" EQ "FCP" %Then
 %Do;
 *	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
+
 
 *--- Danske - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Danske" %Then
@@ -2722,11 +2725,6 @@ Filename Myemail Clear;
 
 
 *--- NATWEST - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Natwest" %Then
-%Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Natwest" %Then
 %Do;
 	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
@@ -2742,12 +2740,9 @@ Filename Myemail Clear;
 	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 *	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+
+
 *--- Ulster - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Ulster" %Then
-%Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-%End;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Ulster" %Then
 %Do;
 	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
@@ -2763,35 +2758,66 @@ Filename Myemail Clear;
 	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 *	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+
+
 *--- Adam & Co - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "AdamCo" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+
+
 *--- ESME - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "ESME" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+
+
 *--- Coutts - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Coutts" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
 	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
+
+
 *--- AIB - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "AIB" %Then
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "AIB" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
-*--- First Trust Bank - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
-%If "&_VersionNo" EQ "v2.1" and "&BankName_C" EQ "Firsttrust" %Then
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "AIB" and "&_APIName" EQ "FCP" %Then
 %Do;
-/*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "AIB" and "&_APIName" EQ "FCB" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+
+
+
+*--- First Trust Bank - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
+%If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Firsttrust" %Then
+%Do;
+	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Firsttrust" and "&_APIName" EQ "FCP" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+%End;
+%If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Firsttrust" and "&_APIName" EQ "FCB" %Then
+%Do;
+	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
+*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 *=================================================================================================

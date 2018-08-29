@@ -2482,6 +2482,7 @@ ods tagsets.tableeditor file=_Webout
 *================================================================================
 					EMAIL REPORTS TO WEBUSER
 =================================================================================;
+/*
 options emailhost=
  (
    "smtp.stackmail.com" 
@@ -2492,13 +2493,13 @@ options emailhost=
  )
 ;
 
-/*
+
 "smtp.office365.com"
 alternate: port=487 SSL
 port=587 STARTTLS 
 id="steffan.vanmolendorff@qlick2.com"
 pw="@FDi2014"
-*/
+
 
 Filename myemail EMAIL
   To=("steffan.vanmolendorff@openbanking.org.uk" "servicedesk@openbanking.org.uk" "adam.pretlove@openbanking.org.uk") 
@@ -2518,7 +2519,7 @@ Run;
  
 Filename Myemail Clear;
 
-
+*/
 
 %Mend Print_Results;
 %Print_Results(&Bank, &API);
@@ -2538,7 +2539,7 @@ Filename Myemail Clear;
 %Do;
 *	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
 *	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
-	%API(&API_Path/&_Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOI" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2556,7 +2557,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "NBS" %Then
 %Do;
 *	%API(&API_Path/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "NBS" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2573,7 +2574,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "HSBC" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "HSBC" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2676,7 +2677,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Danske" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Danske" and "&_APIName" EQ "FCP" %Then
 %Do;

@@ -26,14 +26,15 @@ Data Work.&Bank;
 Run;
 
 %Mend API;
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/Test-File.json,Test_File,Test,Filename API Temp;);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.AGG.json,PCA_GB_AGG,SQM,Filename API Temp;);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.Full.json,PCA_GB_FULL,SQM,Filename API Temp;);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.NI.AGG.json,PCA_NI_AGG,SQM,Filename API Temp;);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.NI.Full.json,PCA_NI_FULL,SQM,Filename API Temp;);
+*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/Test-File.json,Test_File,Test,Filename API Temp);
+*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.AGG.json,PCA_GB_AGG,SQM,Filename API Temp);
+*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.Full.json,PCA_GB_FULL,SQM,Filename API Temp);
+*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.NI.AGG.json,PCA_NI_AGG,SQM,Filename API Temp);
+*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.NI.Full.json,PCA_NI_FULL,SQM,Filename API Temp);
+%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/BCA.GB.Full.json,BCA_GB_FULL,SQM,Filename API Temp);
 
 
-
+/*
 *--- Test rows vs Meta TotalRecords ---;
 Data Work.PCA_GB_AGG1;
 	Set Work.PCA_GB_AGG(Where=(P2='Question' and P3='Results' and P4='Brand' and V=1));
