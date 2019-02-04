@@ -23,9 +23,17 @@ Data Work.&Bank._API;
 Run;
 
 %Mend API;
+%API(http://localhost/Data/Temp/OB/SQM/h1_2019/pca.gb.agg.json,pca_gb_agg);
+%API(http://localhost/Data/Temp/OB/SQM/h1_2019/pca.gb.full.json,pca_gb_full);
 /*
-%API(https://atlas.api.barclays/open-banking/v1.3/atms,Barclays,ATM);
 %API(https://atlas.api.barclays/open-banking/v1.3/personal-current-accounts,Barclays,PCA);
 %API(https://obp-api.danskebank.com/open-banking/v1.2/atms,Danske,ATM);
-*/
 %API(https://obp-api.danskebank.com/open-banking/v1.2/personal-current-accounts,Danske,PCA);
+
+%Macro Loop(URL);
+%Do i = 1 %To 1;
+%API(https://atlas.api.barclays/open-banking/v2.2/atms,Barclays,ATM);
+%End;
+%Mend Loop;
+%Loop();
+*/

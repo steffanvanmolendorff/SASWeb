@@ -4,6 +4,7 @@
 %Let _APIName = SQ1;
 */
 Options MPrint MLogic Source Source2 Symbolgen;
+%Global _URL_Link;
 
 %Macro Main();
 Proc Options option=encoding;
@@ -32,15 +33,19 @@ Quit;
 
 Data Work.&Agency._API;
 	Set LibAPIs.Alldata(Where=(V=1));
+	Call Symput("_URL_Link",%Str(Trim(Left("&Url"))));
 Run;
 
 %Mend API;
 *%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/sqm_swagger.json,SWAGGER,SWA,Filename API Temp);
 *%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/PCA.GB.Full.json,PCAFULL,SQM,Filename API Temp);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SwaggerFile..json,SWAGGER,SWA,Filename API Temp);
-%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SQMFile..json,SQM,SQM,Filename API Temp);
+*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SwaggerFile..json,SWAGGER,SWA,Filename API Temp);
+*%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SQMFile..json,SQM,SQM,Filename API Temp);
+%API(http://localhost/sasweb/data/temp/ob/sqm/h1_2019/&SwaggerFile..json,SWAGGER,SWA,Filename API Temp);
+%API(http://localhost/sasweb/data/temp/ob/sqm/h1_2019/&SQMFile..json,SQM,SQM,Filename API Temp);
 /*%API(&SQMFile,SQM,SQM,Filename API Temp);*/
 
+%Put _URL_Link = &_URL_Link;
 
 Data Work.Swagger_API1(Keep = P4 P5 Value Where=(P5 in ('description')));
 	Set Work.Swagger_API(Where=(P1 EQ 'definitions'));
@@ -313,8 +318,8 @@ ods tagsets.tableeditor file=_Webout
 		Title1 "OPEN BANKING - QUALITY ASSURANCE TESTING";
 		Title2 "%Sysfunc(UPCASE(&SQMFile)) vs. %Sysfunc(UPCASE(&SwaggerFile))";
 		Title3 color=red "&SQMFile - %Sysfunc(UPCASE(&Fdate))";
-		Footnote1 "API LOCATION: TBC1";
-		Footnote2 "SCHEMA LOCATION: TBC2";
+		Footnote1 "API LOCATION: &_URL_Link";
+		Footnote2 "SCHEMA LOCATION: &_URL_Link";
 
 		Proc Sort Data = Work.&SQM_Dsn;
 			By RowCnt P5 P4;
@@ -408,7 +413,18 @@ ods tagsets.tableeditor file=_Webout
 ======================================================================================================================================================;
 ODS HTML Close;	
 ODS Listing;	
-
+/*
+	%Macro PrintPDF(Path,Dsn);
+	ODS PDF style=HTMLBlue file="&Path";
+	Proc Print Data = Work.&Dsn;
+	Run;
+	%Mend PrintPDF;
+	%PrintPDF(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_Meta_&Dsn._%sysfunc(today(),date9.).pdf,_Meta_&Dsn);
+	%PrintPDF(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SQM_&Dsn._%sysfunc(today(),date9.).pdf,_SQM_&Dsn);
+	%PrintPDF(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SWA_&Dsn._%sysfunc(today(),date9.).pdf,_SWA_&Dsn);
+	%PrintPDF(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_MATCH_&Dsn._%sysfunc(today(),date9.).pdf,_MATCH_&Dsn);
+	ODS PDF Close;
+*/
 *=====================================================================================================================================================
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
@@ -423,7 +439,7 @@ Run;
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SQM_&Dsn._%sysfunc(today(),date9.).csv,_SQM_&Dsn);
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SWA_&Dsn._%sysfunc(today(),date9.).csv,_SWA_&Dsn);
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_MATCH_&Dsn._%sysfunc(today(),date9.).csv,_MATCH_&Dsn);
-
+/*
 *================================================================================
 					EMAIL REPORTS TO WEBUSER
 =================================================================================;
@@ -446,7 +462,7 @@ options emailhost=
 ;
 
 Filename myemail EMAIL
-  To=("steffan.vanmolendorff@openbanking.org.uk" /*"&_WebUser" "daniel.johnson@openbanking.org.uk"*/) 
+  To=("steffan.vanmolendorff@openbanking.org.uk" "&_WebUser" "daniel.johnson@openbanking.org.uk") 
   Subject="JSON VALIDATION - SQM &SQMFile -RESULTS"
 		%SendMail;
 
@@ -460,8 +476,8 @@ Data _Null_;
   Put " ";
   Put "Open Banking - Test Team";
 Run;
- 
-Filename Myemail Clear;
+*/
+*Filename Myemail Clear;
 /*
 %API(https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/aggregated/wave/latest,SQM_PCA_GB_FULL,X2);
 %API(https://sqm.openbanking.me.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/full/wave/latest,SQM_PCA_GB_AGG,X1);

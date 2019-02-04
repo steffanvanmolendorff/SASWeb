@@ -1,4 +1,4 @@
-﻿Options Source Source2 Symbolgen MLogic MPrint;
+Options Source Source2 Symbolgen MLogic MPrint;
 %Global _action;
 
 %Let _action = &_action;
@@ -10,43 +10,44 @@
 %If "&_action" EQ "CMA9 COMPARISON ATMS" %Then
 %Do;
 /*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_2.sas";
 
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON BRANCHES" %Then
 %Do;
 /*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_2.sas";
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON PCA" %Then
 %Do;
 /*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_2.sas";
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON BCA" %Then
 %Do;
 /*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_2.sas";
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON CCC" %Then
 %Do;
 /*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_2.sas";
 %End;
 
 %Else %If "&_action" EQ "CMA9 COMPARISON SME" %Then
 %Do;
 /*	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V1_2.sas";*/
-	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_1.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\CMA9_Comparison_V2_2.sas";
 %End;
 
 %Else %If "&_action" EQ "UPDATE OPEN DATA CMA9 TABLES" %Then
 %Do;
-	%Include "C:\inetpub\wwwroot\sasweb\Source\Update Open Data Tables V0.1.sas";
+/*	%Include "C:\inetpub\wwwroot\sasweb\Source\Qlick2\Extract All CMA9 API Data Elements V0.1.sas";*/
+	%Include "C:\inetpub\wwwroot\sasweb\Source\Qlick2\CMA9 API Data Extracts V1.3.sas";
 %End;
 
 
@@ -209,6 +210,11 @@
 	%Include "C:\inetpub\wwwroot\sasweb\Source\Parameters_API_VER.sas";
 %End;
 
+%Else %If "&_action" EQ "API_SQM DATA VALIDATION" %Then
+%Do;
+*	%Include "C:\inetpub\wwwroot\sasweb\Source\API_SQM Data Value Validation v0.1.sas";
+	%Include "C:\inetpub\wwwroot\sasweb\Source\API_SQM Data Value Validation v0.2.sas";
+%End;
 
 /*
 *====================================================================================================
