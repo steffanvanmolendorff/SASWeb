@@ -4,6 +4,7 @@
 %Let _APIName = SQ1;
 */
 Options MPrint MLogic Source Source2 Symbolgen;
+%Global _URL_Link;
 
 %Macro Main();
 Proc Options option=encoding;
@@ -32,6 +33,7 @@ Quit;
 
 Data Work.&Agency._API;
 	Set LibAPIs.Alldata(Where=(V=1));
+	Call Symput("_URL_Link",%Str(Trim(Left("&Url"))));
 Run;
 
 %Mend API;
@@ -41,6 +43,9 @@ Run;
 *%API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/&SQMFile..json,SQM,SQM,Filename API Temp);
 %API(&SQMFile,SQM,SQM,Filename API Temp);
 
+
+
+%Put _URL_Link = &_URL_Link;
 
 Data Work.Swagger_API1(Keep = P4 P5 Value Where=(P5 in ('description')));
 	Set Work.Swagger_API(Where=(P1 EQ 'definitions'));
@@ -394,12 +399,11 @@ ods tagsets.tableeditor file=_Webout
 		Run;
 
 %Mend SQM_Reports;
-/*
 %SQM_Reports(_META_&Dsn);
 %SQM_Reports(_MATCH_&Dsn);
 %SQM_Reports(_SQM_&Dsn);
 %SQM_Reports(_SWA_&Dsn);
-*/
+
 *=====================================================================================================================================================
 --- Add bottom of report Menu ReturnButton code here ---
 ======================================================================================================================================================;
@@ -409,7 +413,18 @@ ods tagsets.tableeditor file=_Webout
 ======================================================================================================================================================;
 ODS HTML Close;	
 ODS Listing;	
-
+/*
+	%Macro PrintPDF(Path,Dsn);
+	ODS PDF style=HTMLBlue file="&Path";
+	Proc Print Data = Work.&Dsn;
+	Run;
+	%Mend PrintPDF;
+	%PrintPDF(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_Meta_&Dsn._%sysfunc(today(),date9.).pdf,_Meta_&Dsn);
+	%PrintPDF(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SQM_&Dsn._%sysfunc(today(),date9.).pdf,_SQM_&Dsn);
+	%PrintPDF(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SWA_&Dsn._%sysfunc(today(),date9.).pdf,_SWA_&Dsn);
+	%PrintPDF(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_MATCH_&Dsn._%sysfunc(today(),date9.).pdf,_MATCH_&Dsn);
+	ODS PDF Close;
+*/
 *=====================================================================================================================================================
 						EXPORT REPORT RESULTS TO RESULTS FOLDER
 =====================================================================================================================================================;
@@ -424,11 +439,11 @@ Run;
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SQM_&Dsn._%sysfunc(today(),date9.).csv,_SQM_&Dsn);
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SWA_&Dsn._%sysfunc(today(),date9.).csv,_SWA_&Dsn);
 %ExportXL(C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_MATCH_&Dsn._%sysfunc(today(),date9.).csv,_MATCH_&Dsn);
-
+/*
 *================================================================================
 					EMAIL REPORTS TO WEBUSER
 =================================================================================;
-/*
+
 %Macro SendMail();
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_META_&Dsn._%sysfunc(today(),date9.).csv"
 	Attach="C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\_SQM_&Dsn._%sysfunc(today(),date9.).csv"

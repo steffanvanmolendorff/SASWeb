@@ -85,6 +85,7 @@ Run;
 ======================================================================================================================================================;
 Data Work.API_CONFIG    ;
     %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+/*    infile 'C:\inetpub\wwwroot\sasweb\Data\Perm\API_Config_PRD_V2_2.csv' delimiter = ',' MISSOVER*/
     infile 'C:\inetpub\wwwroot\sasweb\Data\Perm\API_Config.csv' delimiter = ',' MISSOVER
 	DSD lrecl=32767 firstobs=2 ;
        informat Bank_Name $20. ;
@@ -2592,7 +2593,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Santander" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Santander" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2610,7 +2611,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Barclays" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&VersionNo/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Barclays" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2628,7 +2629,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Lloyds" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Lloyds" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2646,7 +2647,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "BOS" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "BOS" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2663,8 +2664,8 @@ Filename Myemail Clear;
 *--- HALIFAX - For json files on local directory - not end point - add *.json* in %API(&API_Path/&Main_API..json) ---;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Halifax" %Then
 %Do;
-	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-*	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Halifax" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2695,7 +2696,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "RBS" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "RBS" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2713,7 +2714,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Natwest" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Natwest" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2731,7 +2732,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Ulster" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Ulster" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2749,7 +2750,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "AdamCo" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 
@@ -2757,7 +2758,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "ESME" %Then
 %Do;
 *	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 
@@ -2765,7 +2766,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Coutts" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 
 
@@ -2773,7 +2774,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "AIB" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "AIB" and "&_APIName" EQ "FCP" %Then
 %Do;
@@ -2791,7 +2792,7 @@ Filename Myemail Clear;
 %If "&_VersionNo" EQ "v2.2" and "&BankName_C" EQ "Firsttrust" %Then
 %Do;
 /*	%API(&API_Link/&API_JSON..json,&Bank_Name,&Main_API);*/
-	%API(&API_Path/&Version/&Main_API,&Bank_Name,&Main_API);
+	%API(&API_Path/&_VersionNo/&Main_API,&Bank_Name,&Main_API);
 %End;
 %If "&_VersionNo" EQ "v1.0" and "&BankName_C" EQ "Firsttrust" and "&_APIName" EQ "FCP" %Then
 %Do;
