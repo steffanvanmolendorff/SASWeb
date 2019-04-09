@@ -25,8 +25,11 @@ Data Work.&Bank._API;
 Run;
 
 %Mend API;
-%API(http://localhost/sasweb/Data/Temp/OD/Santander/v2_2/atms.json,ATMS,ATM,Filename API Temp;);
-%API(http://localhost/sasweb/Data/Temp/OD/Lloyds/v2_2/atms.json,ATMS,ATM,Filename API Temp;);
+%API(http://localhost/sasweb/data/temp/ob/fca/v1.0/fca_pca_swagger.json,PCA,PCA,Filename API Temp);
+%API(http://localhost/sasweb/data/temp/ob/fca/v1.0/fca-boi-pca.json,PCA,PCA,Filename API Temp);
+%API(http://localhost/sasweb/data/temp/ob/fca/v1.0/fca-boi-bca.json,BCA,BCA,Filename API Temp);
+*%API(http://localhost/sasweb/Data/Temp/OD/Santander/v2_2/atms.json,ATMS,ATM,Filename API Temp);
+*%API(http://localhost/sasweb/Data/Temp/OD/Lloyds/v2_2/atms.json,ATMS,ATM,Filename API Temp);
 
 /*
 %API(http://localhost/sasweb/data/temp/ob/sqm/v1_0/account_v2_0_swagger.json,ACC2,AC2,Filename API Temp encoding="wlatin2";);

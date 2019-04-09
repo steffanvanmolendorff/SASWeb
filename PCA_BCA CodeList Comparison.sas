@@ -1,4 +1,9 @@
-﻿%Global _APIName;
+%Global _APIName;
+%Global _APIVersion;
+
+%Let _APIName = &_APIName;
+%Let _APIVerion = &_APIVersion;
+
 %Macro Valid();
 		File _Webout;
 
@@ -560,7 +565,7 @@ Proc Report Data = OBData.&_APIName._Code_Compare nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Data Dictionary vs. CodeList Comparison Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -677,7 +682,7 @@ Proc Report Data = OBData.&_APIName._Code_Compare(Where=(Infile='Both')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -788,7 +793,7 @@ Proc Report Data = OBData.&_APIName._Code_Compare(Where=(Infile='CodeList')) now
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records only in the CodeList Excel Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -903,7 +908,7 @@ Proc Report Data = OBData.&_APIName._Code_Compare(Where=(Infile='DD')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records only in the Data Dictionary (DD) Excel Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 

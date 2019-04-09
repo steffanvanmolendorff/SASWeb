@@ -7,6 +7,7 @@
 
 %Let _Path = http://&_Host/sasweb;
 %Put _Path = &_Path;
+%Put _Debug = &_Debug;
 
 %Macro Login();
 Data _NULL_;

@@ -3,13 +3,10 @@
 %Global _Path;
 %Global _PCA_GB_FULL_Records;
 %Global _BCA_GB_FULL_Records;
-%Global _PCA_NI_FULL_Records;
-%Global _BCA_NI_FULL_Records;
-%Global _Record_Cnt;
 
 %Let _Host = &_SRVNAME;
-%Let _Host = Localhost;
-*%Put _Host = &_Host;
+*%Let _Host = Localhost;
+%Put _Host = &_Host;
 
 %Let _Path = http://&_Host/sasweb;
 %Put _Path = &_Path;
@@ -352,8 +349,6 @@ Data Work.&Dsn(Where=(V NE 0) /*Keep = V P4 PCA_Value Value Row_Count*/ Rename =
 /*	If _N_ EQ 50456 then PCA_Value = Strip(Value)||'_TEST';*/
 
 	Row_Count + 1;
-	Record_Cnt = _N_;
-	Call Symput('_Record_Cnt',Record_Cnt);
 Run;
 
 Proc Sort Data = Work.&Dsn;
@@ -371,8 +366,6 @@ Data Work.&Dsn._STD_Combined;
 	If a and not b then Flag = "ONLY_&Dsn.";
 
 	If Question in ('Brand' 'Age' 'Weight') and SQM_Value EQ '' Then Flag = 'IGNORE';
-
-	Test_Flag = "&_Record_Cnt";
 Run;
 *--- Sort data by Row_Count ---;
 Proc Sort Data = Work.&Dsn._STD_Combined(Keep= Question
@@ -382,18 +375,17 @@ Proc Sort Data = Work.&Dsn._STD_Combined(Keep= Question
 	P3
 	Value
 	Row_Count
-	Test_Flag
 	Where=(Flag EQ "ONLY_&Dsn."));
 	By Row_Count;
 Run;
 
 *--- Sort the dataset and keep only the unique variables ---;
-Proc Sort Data = Work.&Dsn._STD_Combined/*(Where=(Question NE ''))*/
+Proc Sort Data = Work.&Dsn._STD_Combined(Where=(Question NE '')) 
 	Out = Work.&Dsn._Final NoDupKey;
 	By Question Value;
 Run;
 *--- Sort the dataset and keep only the unique variables ---;
-Proc Sort Data = Work.SQM_Subset3/*(Where=(Question NE ''))*/
+Proc Sort Data = Work.SQM_Subset3(Where=(Question NE ''))
 	Out = Work.SQM_Subset4 NoDupKey;
 	By Question Value;
 Run;
@@ -403,7 +395,7 @@ Data Work.&Dsn._Final_Options(Drop=Row_Count Value P3);
 	Work.SQM_Subset4(In=b);
 	By Question;
 *--- Only keep records if there are matches of the 'By Question variable' between the 2 datasets ---;
-	If a and b/* or P1 EQ 'Meta'*/;
+	If a and b;
 
 *--- Create variables with the value 0 and 1. If _N_<1 then there are no records ---;
 	No_Records = '0';
@@ -435,8 +427,6 @@ Run;
 %Mend SQM_Agency;
 %SQM_Agency(https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/GB/export-type/full/wave/latest,PCA_GB_FULL);
 %SQM_Agency(https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/bca/area/GB/export-type/full/wave/latest,BCA_GB_FULL);
-%SQM_Agency(https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/pca/area/NI/export-type/full/wave/latest,PCA_NI_FULL);
-%SQM_Agency(https://sqm.openbanking.org.uk/cma-service-quality-metrics/v1.0/product-type/bca/area/NI/export-type/full/wave/latest,BCA_NI_FULL);
 
 *=====================================================================================================================================================
 --- Set Output Delivery Parameters  ---
@@ -476,44 +466,14 @@ ods tagsets.tableeditor file=_Webout
 			SQM_VALUE = "SQM N/A";
 		Run;
 
-		%Put &&_&Dsn._FULL_Records = "&&_&Dsn._FULL_Records";
+		%Put &&_&Dsn._GB_FULL_Records = "&&_&Dsn._GB_FULL_Records";
 
-		%If "&&_&Dsn._FULL_Records" EQ "" %Then
+		%If "&&_&Dsn._GB_FULL_Records" EQ "" %Then
 		%Do;
 
 *--- Write the dataset to a pdf file ---;
-*		ODS PDF File = "C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\&Dsn._FULL_Final_Options.pdf"
+		ODS PDF File = "C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\&Dsn._GB_FULL_Final_Options.pdf"
 		style=styles.SASWeb; 
-
-
-		Proc Report Data =  Work.&Dsn._FULL_Final(Where=(P1 EQ 'Meta')) nowd;
-
-*--- Set the column order in the report output ---;
-		Columns Compare=Compare_n
-		Flag
-		P1
-		P2
-		Value
-		Test_Flag;
-
-*--- Define the data elements in the headings ---;
-		Define Compare_n / Noprint;
-		Define Flag / display 'ERROR FILE' left;
-		Define P1 / display 'META DATA' left;
-		Define P2 / display 'DATA TYPE' left;
-		Define Value / display 'HEADER VALUE' left;
-		Define Test_Flag / display 'TEST FLAG' left;
-
-/*		Compute Before;
-			_C5_ = Value;
-		EndComp;
-
-		Compute Test_Flag;
-			Test_Flag = _C5_;
-		EndComp;
-*/
-		Run;
-
 
 *--- Create the Web report for the zero mismatches in the PCA-BCA file ---;
 		Proc Report Data =  Work.No_Records nowd;
@@ -536,48 +496,16 @@ ods tagsets.tableeditor file=_Webout
 
 		Run;
 *--- Close the PDF output ---;
-*		ODS PDF CLOSE;
+		ODS PDF CLOSE;
 		%End;
-		%If "&&_&Dsn._FULL_Records" EQ "1" %Then
+		%If "&&_&Dsn._GB_FULL_Records" EQ "1" %Then
 		%Do;
 
-*		ODS PDF File = "C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\&Dsn._FULL_Final_Options.pdf"
+		ODS PDF File = "C:\inetpub\wwwroot\sasweb\Data\Results\OB\SQM\&Dsn._GB_FULL_Final_Options.pdf"
 		style=styles.SASWeb; 
 
-
-		Proc Report Data =  Work.&Dsn._FULL_Final(Where=(P1 EQ 'Meta')) nowd;
-
-*--- Set the column order in the report output ---;
-		Columns Compare=Compare_n
-		Flag
-		P1
-		P2
-		Value
-		Test_Flag;
-
-*--- Define the data elements in the headings ---;
-		Define Compare_n / Noprint;
-		Define Flag / display 'ERROR FILE' left;
-		Define P1 / display 'META DATA' left;
-		Define P2 / display 'DATA TYPE' left;
-		Define Value / display 'HEADER VALUE' left;
-		Define Test_Flag / display 'TEST FLAG' left;
-
-/*		Compute Before;
-			_C5_ = Value;
-		EndComp;
-
-		Compute Test_Flag;
-			If Test_Flag = _C5_ Then Test_Flag = 'Match';
-		EndComp;
-*/
-		Run;
-
-
-
-
 *--- Create the Web report for the zero mismatches in the PCA-BCA file ---;
-		Proc Report Data =  Work.&Dsn._FULL_Final_Options nowd;
+		Proc Report Data =  Work.&Dsn._GB_FULL_Final_Options nowd;
 
 *--- Set the column order in the report output ---;
 		Columns Compare=Compare_n
@@ -585,7 +513,7 @@ ods tagsets.tableeditor file=_Webout
 		Flag
 		P1
 		P2
-		&Dsn._FULL_Value
+		&Dsn._GB_FULL_Value
 		SQM_Value;
 
 *--- Define the data elements in the headings ---;
@@ -594,11 +522,11 @@ ods tagsets.tableeditor file=_Webout
 		Define Flag / display 'ERROR FILE' left;
 		Define P1 / display 'META DATA' left;
 		Define P2 / display 'DATA TYPE' left;
-		Define &Dsn._FULL_Value / display "&Dsn VALUE" left;
+		Define &Dsn._GB_FULL_Value / display "&Dsn VALUE" left;
 		Define SQM_Value / display 'SQM VALUE' left;
 
 *--- Compute the ourput colours in the report to show error records (blue) ---;
-		Compute &Dsn._FULL_Value;
+		Compute &Dsn._GB_FULL_Value;
 			If Compare_n = 1 Then
 			Do;
 				call define(_col_,'style',"style=[foreground=blue background=#D4E6F1 font_weight=bold]");
@@ -617,26 +545,12 @@ ods tagsets.tableeditor file=_Webout
 		Proc Print Data = Work.&Dsn._GB_FULL_STD_COMBINED;
 		Run;
 */
-
-*		ODS PDF CLOSE;
-
+		ODS PDF CLOSE;
 		%End;
 
-		*--- Run summary reports on the various banks names between PCA and BCA filenames ---;
-		Proc Summary Data = Work.&Dsn._Full(Where=(P3 EQ 'BrandName')) Nway Missing;
-			Class Value;
-			Var V;
-			Output Out = Sum_&Dsn(Drop=_Type_ _Freq_)Sum=;
-		Run;
-		Proc Print;
-		Run;
-
-
 %Mend SQM_Errors;
-%SQM_Errors(PCA_GB);
-%SQM_Errors(BCA_GB);
-%SQM_Errors(PCA_NI);
-%SQM_Errors(BCA_NI);
+%SQM_Errors(PCA);
+%SQM_Errors(BCA);
 
 
 *=====================================================================================================================================================

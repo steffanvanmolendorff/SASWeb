@@ -121,6 +121,75 @@ Data _Null_;
 Run;
 %Mend ReturnButton;
 
+%Macro ExportButton();
+Data _Null_;
+		File _Webout;
+
+		Put '<html xmlns="http://www.w3.org/1999/xhtml">';
+		Put '<head>';
+		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+		Put '<meta http-equiv="X-UA-Compatible" content="IE=10"/>';
+		Put '<title>OB TESTING</title>';
+
+		Put '<meta charset="utf-8" />';
+		Put '<title>Open Data Test Harness</title>';
+		Put '<meta name="description" content="">';
+		Put '<meta name="author" content="">';
+
+		Put '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />'; 
+
+		Put '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+		Put '<title>LRM</title>';
+
+		Put '<script type="text/javascript" src="'"&_Path/js/jquery.js"'">';
+		Put '</script>';
+
+		Put '<link rel="stylesheet" type="text/css" href="'"&_Path/css/style.css"'">';
+
+		Put '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>';
+
+
+		Put '<p></p>';
+		Put '<HR>';
+		Put '<p></p>';
+		Put '<p><br></p>';
+
+		Put '<Table align="center" style="width: 100%; height: 8%" border="0">';
+		Put '<td valign="center" align="center" style="background-color: lightblue; color: White">';
+		Put '<FORM NAME=check METHOD=get ACTION="'"http://&_Host/scripts/broker.exe"'">';
+		Put '<p><br></p>';
+		Put '<INPUT TYPE=submit VALUE="CSV Export" align="center">';
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.NHSReport2.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+		Put '</Form>';
+		Put '</td>';
+		Put '</tr>';
+		Put '</Table>';
+/*
+		Put '<Table align="center" style="width: 100%; height: 8%" border="0">';
+		Put '<td valign="top" style="background-color: White; color: black">';
+		Put '<H3>All Rights Reserved</H3>';
+		Put '<A HREF="http://www.openbanking.org.uk">Open Banking Limited</A>';
+		Put '</td>';
+		Put '</Table>';
+*/
+		Put '</BODY>';
+		Put '<HTML>';
+		
+Run;
+%Mend ExportButton;
+
 *--- Set Title Date in Proc Print ---;
 %Macro Fdate(Fmt,Fmt2);
    %Global Fdate FdateTime;
@@ -644,17 +713,47 @@ Run;
 
 *--- Test Proc Univariate ---;
 		proc univariate data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA /*&Perc_FactCols*/) PCTLDEF=1;  
+			title "Histogram by Region";
 			var Other_Refer_Made_GA;  
 			histogram Other_Refer_Made_GA / kernel;
 			Output Out=Work.Stats pctlpre=P_ pctlpts=90, 95, 97 97.5, 98 to 99 by 0.1;
 		run;
 
-		proc stdize data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA /*&Perc_FactCols*/)
+		*--- Test QQ-PLOT---;
+		proc univariate data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA /*&Perc_FactCols*/) PCTLDEF=1;  
+			title "QQ-Plot by Region";
+			var Other_Refer_Made_GA;  
+   			qqplot;
+
+		proc univariate data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA /*&Perc_FactCols*/) PCTLDEF=1;  
+			var Other_Refer_Made_GA;  
+		run;
+		*--- TEST END ---;
+		*--- Test PROBPLOT---;
+		proc univariate data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA /*&Perc_FactCols*/) PCTLDEF=1;  
+			title "Probability Plot by Region";
+			var Other_Refer_Made_GA;  
+   			probplot;
+
+		proc univariate data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA /*&Perc_FactCols*/) PCTLDEF=1;  
+			var Other_Refer_Made_GA;  
+		run;
+		*--- TEST END ---;
+
+		ods csv file="C:\OB\NHS_Percentage_2_Sum.csv";
+	    	proc print data=Work.NHS_Percentage_2_Sum;
+	     	title "&sysver";
+		 	footnote "&sysdate";
+ 	    	run;
+		ods csv close;
+  /*
+		proc stdize data=NHSDATA.NHS(Keep = Region_Name Other_Refer_Made_GA &Perc_FactCols);
+			title "Percentiles Plot by Region";
 			PctlMtd=ORD_STAT outstat=StdLongPctls
            	pctlpts=90, 95, 97 97.5, 98 to 99 by 0.1;
 			var Other_Refer_Made_GA;  
 		run;
-
+*/
 
 		Proc Print Data = Work.Stats;
 		Run;
@@ -670,6 +769,8 @@ Run;
 */
 *---- Close the _webout location ---;
 	ODS HTML Close;
+
+	%ExportButton;
 
 	%ReturnButton;
 

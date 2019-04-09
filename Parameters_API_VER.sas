@@ -1,4 +1,4 @@
-﻿Options MPrint MLogic Source Source2 Symbolgen;
+Options MPrint MLogic Source Source2 Symbolgen;
 
 *--- Set a Gloabl macro variable to determine if DD vs JSON or SWAGGER file will be executed ---;
 %Global _Swagger;
@@ -151,12 +151,23 @@ File _Webout;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 	%End;
 *=============================================================================================================================
-			Read Dataset for the CodeList Comparison
+			Read Dataset for the PCA and BCA CodeList Comparison
+=============================================================================================================================;
+/*	%If "&_action" EQ "API CODELIST COMPARISON" %then*/
+	%If "&_action" EQ "PCA BCA CODELIST COMPARISON" %then
+	%Do;
+				*--- Read Dataset UniqueNames ---;
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('PCA','BCA')))));
+				*--- Count Observations ---;
+				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
+	%End;
+*=============================================================================================================================
+			Read Dataset for the PCA and BCA CodeList Comparison
 =============================================================================================================================;
 	%If "&_action" EQ "API CODELIST COMPARISON" %then
 	%Do;
 				*--- Read Dataset UniqueNames ---;
-				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('ATM','BCH','PCA','BCA','SME','CCC','FCA')))));
+				 	%Let Dsn = %Sysfunc(Open(Work.Bank_API_List(Where=(API_Name in ('ATM','BCH','SME','CCC','FCA')))));
 				*--- Count Observations ---;
 				    %Let Count = %Sysfunc(Attrn(&Dsn,Nobs));
 	%End;
@@ -242,6 +253,7 @@ File _Webout;
 	Put '<OPTION VALUE="V2_1"> Version 2.1 </option>';
 /*	Put '<OPTION VALUE="V2_1_1"> Version 2.1.1 </option>';*/
 	Put '<OPTION VALUE="V2_2"> Version 2.2 </option>';
+	Put '<OPTION VALUE="V2_3"> Version 2.3 </option>';
 	Put '</SELECT>';
 	Put '</div>';
 	Put '</td>';
@@ -261,10 +273,10 @@ File _Webout;
 *=============================================================================================================================
 			Call SAS program for the ATM BCH PCA BCA SME CCC CodeList Comparison
 =============================================================================================================================;
-	%If "&_action" EQ "API CODELIST COMPARISON" or
-	"&_action" EQ "ATM CODELIST COMPARISON" %Then
+	%If "&_action" EQ "PCA BCA CODELIST COMPARISON" %Then
 	%Do;
-		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API CodeList Comparison.sas">';
+/*		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL CodeList Comparison.sas">';*/
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.PCA_BCA CodeList Comparison.sas">';
 		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
 			"&_service"
 			'>';
@@ -278,6 +290,29 @@ File _Webout;
 			"&_WebPass"
 			'>';
 	%End;
+
+
+*=============================================================================================================================
+			Call SAS program for the PCA BCA CodeList Comparison
+=============================================================================================================================;
+	%If "&_action" EQ "API CODELIST COMPARISON" %Then
+	%Do;
+		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL CodeList Comparison.sas">';
+		Put '<INPUT TYPE=hidden NAME=_service VALUE=' /
+			"&_service"
+			'>';
+	    Put '<INPUT TYPE=hidden NAME=_debug VALUE=' /
+			"&_debug"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebUser VALUE=' /
+			"&_WebUser"
+			'>';
+		Put '<INPUT TYPE=hidden NAME=_WebPass VALUE=' /
+			"&_WebPass"
+			'>';
+	%End;
+
+
 	%If "&_action" EQ "API_ALL DD JSON COMPARE" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';
@@ -294,6 +329,7 @@ File _Webout;
 			"&_WebPass"
 			'>';
 	%End;
+
 	%Else %If "&_action" EQ "API_PAI_BAI DD JSON COMPARE" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03 PAI-BAI.sas">';
@@ -310,6 +346,7 @@ File _Webout;
 			"&_WebPass"
 			'>';
 	%End;
+
 	%Else %If "&_SWAGGER" EQ "SWAGGER" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_ALL DD JSON Compare V03.sas">';
@@ -329,6 +366,7 @@ File _Webout;
 			"&_Swagger"
 			'>';
 	%End;
+
 	%Else %If "&_SWAGGER" EQ "FCASWAGGER" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_FCA DD SWAGGER Compare V01.sas">';
@@ -348,6 +386,7 @@ File _Webout;
 			"&_Swagger"
 			'>';
 	%End;
+
 	%Else %If "&_SWAGGER" EQ "SQMSWAGGER" %Then
 	%Do;
 		Put '<INPUT TYPE=hidden NAME=_program VALUE="Source.API_SQM DD SWAGGER Compare V01.sas">';

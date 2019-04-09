@@ -1,3 +1,9 @@
+%Global _APIName;
+%Global _APIVersion;
+
+%Let _APIName = &_APIName;
+%Let _APIVersion = &_APIVersion;
+
 %Macro Valid();
 		File _Webout;
 
@@ -334,7 +340,8 @@ Data OBData.&Dsn/*(Drop = Hierarchy Position Want Rename=(Hierarchy1 = Hierarchy
 
 	If "&Dsn" EQ 'SME' Then 
 	Do;
-		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),16),'/','-');
+/*		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),16),'/','-');*/
+		Hierarchy = Tranwrd(Substr(Trim(Left(XPath)),20),'/','-');
 	End;
 
 	&DSN._Lev1 = Hierarchy;
@@ -482,7 +489,7 @@ Proc Report Data = OBData.SME_Code_Compare nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - &_action";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Data Dictionary vs. CodeList Comparison Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -598,7 +605,7 @@ Proc Report Data = OBData.SME_Code_Compare(Where=(Infile='Both')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - &_action";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -709,7 +716,7 @@ Proc Report Data = OBData.SME_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - &_action";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records only in the CodeList Excel Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -824,7 +831,7 @@ Proc Report Data = OBData.SME_Code_Compare(Where=(Infile='DD')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - &_action";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records only in the Data Dictionary (DD) Excel Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 

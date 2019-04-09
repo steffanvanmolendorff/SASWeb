@@ -1,3 +1,9 @@
+%Global _APIName;
+%Global _APIVersion;
+
+%Let _APIName = &_APIName;
+%Let _APIVersion = &_APIVersion;
+
 %Macro Valid();
 		File _Webout;
 
@@ -480,7 +486,7 @@ ods tagsets.tableeditor file=_Webout
 
 Proc Report Data = OBData.CCC_Code_Compare nowd;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Data Dictionary vs. CodeList Comparison Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -593,7 +599,7 @@ ods tagsets.tableeditor file=_Webout
 
 Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='Both')) nowd;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records Both In Data Dictionary (DD) and CodeList Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -704,7 +710,7 @@ Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='CodeList')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records only in the CodeList Excel Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
@@ -819,7 +825,7 @@ Proc Report Data = OBData.CCC_Code_Compare(Where=(Infile='DD')) nowd/*
 	style(header)=[background=lightskyblue foreground=black] 
 	style(column)=[background=lightcyan foreground=black]*/;
 
-	Title1 "Open Banking - CodeList Comparison";
+	Title1 "Open Banking - &_APIName &_APIVersion CodeList Comparison";
 	Title2 "Records only in the Data Dictionary (DD) Excel Reports - %Sysfunc(UPCASE(&Fdate))";
 
 	Columns Count Infile 
